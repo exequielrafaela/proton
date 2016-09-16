@@ -664,6 +664,7 @@ Initialize knife zero on RedHat/Centos OS
 
         try:
             with cd ('/home/' + usernamek +'/my_chef_repo'):
+                sudo('pwd')
                 with open("./conf/servers/out_users_test.txt", "r") as f:
                     ServerList = [line.split()[0] for line in f]
                     for serverIp in ServerList:
