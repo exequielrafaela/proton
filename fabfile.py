@@ -35,7 +35,7 @@ logging.info('LOG STARTS')
 # logging.warning('And this, too')
 
 # Open the server list file and split the IP o each server.
-with open("./out_users_test.txt", "r") as f:
+with open("./conf/servers/out_users_test.txt", "r") as f:
     ServerList = [line.split()[0] for line in f]
 
 # In env.roledefs we define the remote servers. It can be IP Addrs or domain names.
