@@ -637,6 +637,23 @@ def kifezero_conf_centos(usernamek):
             print colored('#############################################', 'red')
             file_send_mod('./conf/chef/knife-zero/knife.rb', '/home/' + usernamek + '/my_chef_repo/', '600')
 
+        with open("./servers/out_users_test.txt", "r") as f:
+            ServerList = [line.split()[0] for line in f]
+            client_index = 1
+            for serverIp in ServerList:
+                sudo('knife zero bootstrap '+usernamek+'@'+serverIp+' -N'+ str(client_index =+ 1))
+
+            sudo('knife node list')
+            sudo('knife search node "name:cli*"')
+            sudo('knife search node "platform:centos"')
+
+            # knife ssh "platform:centos*" --ssh-user ebarrirero hostname
+            # knife ssh "name:cli*" --ssh-user ebarrirero yum search vim
+
+            sudo('knife zero converge "name:*" --ssh-user ebarrirero')
+
+
+
         try:
             knifezero_inst = run('chef gem list | grep knife-zero')
             if (knifezero_inst == ""):
