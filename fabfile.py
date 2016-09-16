@@ -663,7 +663,7 @@ Initialize knife zero on RedHat/Centos OS
             file_send_mod('./conf/chef/knife-zero/knife.rb', '/home/' + usernamek + '/my_chef_repo/', '600')
 
         try:
-            with cd ('/home/' + usernamek):
+            with cd ('/home/' + usernamek +'/my_chef_repo'):
                 with open("./conf/servers/out_users_test.txt", "r") as f:
                     ServerList = [line.split()[0] for line in f]
                     for serverIp in ServerList:
