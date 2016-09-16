@@ -670,6 +670,7 @@ Initialize knife zero on RedHat/Centos OS
                         client_index = 0
                         client_index += 1
                         run('knife zero bootstrap '+usernamek+'@'+serverIp+' -N client'+str(client_index))
+                        # knife bootstrap node_domain_or_IP -x username -P password -N name_for_node --sudo
 
                 sudo('knife node list')
                 sudo('knife search node "name:cli*"')
