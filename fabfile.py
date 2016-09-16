@@ -193,6 +193,7 @@ Install/Upgrade an Debian apt based linux package
     :param action: "install" or "upgrade"
     :param package: name of the package to install
     """
+    import apt
     with settings(warn_only=False):
         hostvm = sudo('hostname')
         if action == "install":
@@ -400,6 +401,11 @@ Change RedHat/Centos based OS user password
 
 
 def key_gen(usernameg):
+    """
+Generate an SSH key for a certain
+    :param usernameu: "username" to change password
+    :param upass: "password" to be used
+    """
     with settings(warn_only=False):
         # usernameg = prompt("Which USERNAME you like to GEN KEYS?")
         # user_exists = sudo('cut -d: -f1 /etc/passwd | grep '+usernameg)
@@ -598,7 +604,7 @@ Install knife zero on RedHat/Centos OS
             print colored('###### Chef Development Kit will be installed  #######', 'red')
             print colored('######################################################', 'red')
             run('wget -P /tmp/ https://packages.chef.io/stable/el/7/chefdk-0.17.17-1.el7.x86_64.rpm')
-            run('rpm -Uvh /tmp/chefdk-0.17.17-1.el7.x86_64.rpm')
+            sudo('rpm -Uvh /tmp/chefdk-0.17.17-1.el7.x86_64.rpm')
 
         try:
             knifezero_inst = run('chef gem list | grep knife-zero')
