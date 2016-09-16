@@ -615,7 +615,7 @@ def kifezero_install_centos():
                 print colored('###########################################', 'red')
 
 
-def kifezero_conf_centos(usernamek):
+def kifezero_conf_centos(usernamek, envs_list = []):
     with settings(warn_only=False):
         if exists('/home/' + usernamek + '/my_chef_repo', use_sudo=True):
             print colored('#########################################', 'blue')
@@ -637,51 +637,37 @@ def kifezero_conf_centos(usernamek):
             print colored('#############################################', 'red')
             file_send_mod('./conf/chef/knife-zero/knife.rb', '/home/' + usernamek + '/my_chef_repo/', '600')
 
-        with open("./servers/out_users_test.txt", "r") as f:
-            ServerList = [line.split()[0] for line in f]
-            client_index = 1
-            for serverIp in ServerList:
-                sudo('knife zero bootstrap '+usernamek+'@'+serverIp+' -N'+ str(client_index =+ 1))
-
-            sudo('knife node list')
-            sudo('knife search node "name:cli*"')
-            sudo('knife search node "platform:centos"')
-
-            # knife ssh "platform:centos*" --ssh-user ebarrirero hostname
-            # knife ssh "name:cli*" --ssh-user ebarrirero yum search vim
-
-            sudo('knife zero converge "name:*" --ssh-user ebarrirero')
-
-
-
         try:
-            knifezero_inst = run('chef gem list | grep knife-zero')
-            if (knifezero_inst == ""):
-                run('chef gem install knife-zero')
-            else:
-                print colored('##############################################', 'blue')
-                print colored('##### knife-zero already installed ###########', 'blue')
-                print colored('##############################################', 'blue')
+            with cd ('/home/' + usernamek + '/'):
+                with open("./servers/out_users_test.txt", "r") as f:
+                    ServerList = [line.split()[0] for line in f]
+                    client_index = 1
+                    for serverIp in ServerList:
+                        sudo('knife zero bootstrap '+usernamek+'@'+serverIp+' -N'+ str(client_index =+ 1))
 
-            if exists('/opt/chefdk/embedded/bin/knife', use_sudo=True):
-                print colored('###########################################', 'blue')
-                print colored('##### Knife-zero correctly installed ######', 'blue')
-                print colored('###########################################', 'blue')
-            else:
-                print colored('###########################################', 'red')
-                print colored('###### Check chef-zero installation #######', 'red')
-                print colored('###########################################', 'red')
-        except:
-            run('chef gem install knife-zero')
-            if exists('/opt/chefdk/embedded/bin/knife', use_sudo=True):
-                print colored('###########################################', 'blue')
-                print colored('##### Knife-zero correctly installed ######', 'blue')
-                print colored('###########################################', 'blue')
-            else:
-                print colored('###########################################', 'red')
-                print colored('###### Check chef-zero installation #######', 'red')
-                print colored('###########################################', 'red')
+                sudo('knife node list')
+                sudo('knife search node "name:cli*"')
+                sudo('knife search node "platform:centos"')
 
+                # knife ssh "platform:centos*" --ssh-user ebarrirero hostname
+                # knife ssh "name:cli*" --ssh-user ebarrirero yum search vim
+
+                # knife zero converge "name:client1" -x ebarrirero
+                sudo('knife zero converge "name:*" --ssh-user'+usernamek)
+
+                sudo('knife cookbook create create_file')
+
+                for chef_envs in envs_list:
+                    sudo('knife environment create '+chef_envs+' --disable-editing')
+
+                # knife node environment set client1 development
+                # knife node environment set client2 production
+
+                # knife search node "chef_environment:development
+                # knife search node "chef_environment:development
+
+                # knife role create frontend
+                # knife role delete frontend
 
 def nfs_server_centos7(nfs_dir):
     """
