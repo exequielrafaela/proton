@@ -668,7 +668,7 @@ Initialize knife zero on RedHat/Centos OS
                     ServerList = [line.split()[0] for line in f]
                     for serverIp in ServerList:
                         print serverIp
-                        sudo('knife zero bootstrap '+usernamek+'@'+serverIp+' -N'+ str(client_index =+ 1))
+                        sudo('knife zero bootstrap '+usernamek+'@'+serverIp+' -N client'+ str(client_index =+ 1))
 
                 sudo('knife node list')
                 sudo('knife search node "name:cli*"')
