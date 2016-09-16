@@ -365,7 +365,7 @@ Add a user in RedHat/Centos based OS
                 print colored('WILL BE CREATED', 'green')
                 print colored('##################################', 'green')
                 sudo('useradd ' + usernamec + ' -m -d /home/' + usernamec)
-                sudo('echo "' + usernamec + ':' + usernamec + '" | chpasswd')
+                #sudo('echo "' + usernamec + ':' + usernamec + '" | chpasswd')
                 sudo('gpasswd -a ' + usernamec + ' wheel')
         except:
             ##else:
