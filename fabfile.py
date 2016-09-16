@@ -635,7 +635,7 @@ Install knife zero on RedHat/Centos OS
                 print colored('###########################################', 'red')
 
 
-def knifezero_conf_centos(usernamek, envs_list = []):
+def knifezero_conf_centos(usernamek, envs_list = ()):
     """
 Initialize knife zero on RedHat/Centos OS
     :param usernamek: chef admin user, must have permisses in all the remote servers
