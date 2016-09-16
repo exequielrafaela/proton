@@ -1,31 +1,24 @@
 # coding=utf-8
-# Fabfile to:
-#    - check the credentials for a certain user.
-#    - to invoke: fab -f file func()
-#    - $ fab -R local gen_key
-#    - $ fab -R dev push_key
-#    - $ fab -R dev test_key:username
-# NOTE: http://docs.fabfile.org/en/1.12/usage/env.html#roles
-
 
 """
 ORDER THE IMPORTS ALPHABETICALLY and DIVIDE IN 3 SECTIONS
 1st.standard library modules – e.g. sys, os, getopt, re
-2nd.third-party library modules (anything installed in Python’s site-packages directory) – e.g. mx.DateTime, ZODB, PIL.Image, etc.
-3rd.locally-developed modules
+2nd.third-party library modules (anything installed in Python’s site-packages directory)
+ – e.g. mx.DateTime, ZODB, PIL.Image, etc
+  3rd.locally-developed modules
 """
 
 # Import Fabric's API module#
-#from fabric.api import *
-#from fabric.api import hosts, sudo, settings, hide, env, execute, prompt, run, local, task, put, cd, get
-import os
-import apt
-import logging
-
+# from fabric.api import hosts, sudo, settings, hide, env, execute, prompt, run, local, task, put, cd, get
 from fabric.api import sudo, settings, env, run, local, put, cd, get
-from fabric.contrib.files import append, exists
+from fabric.contrib.files import append, exists, sed
 from termcolor import colored
+from distutils.util import strtobool
+import logging
+import os
 
+# import yum
+import apt
 import pwd
 import iptools
 import getpass
@@ -38,39 +31,28 @@ print config.CONFIG_DIR
 #  https://docs.python.org/2.7/howto/logging.html
 logging.basicConfig(filename='./logs/check_ssh.log', level=logging.DEBUG)
 logging.info('LOG STARTS')
-#logging.debug('This message should go to the log file')
-#logging.warning('And this, too')
+# logging.debug('This message should go to the log file')
+# logging.warning('And this, too')
 
 # Open the server list file and split the IP o each server.
-# http://www.tutorialspoint.com/python/string_split.htm
-# with open("./out_users_test.txt", "r") as f:
-#    ServerList = [line.split()[0] for line in f]
-with open("./conf/out_users_test.txt", "r") as f:
+ with open("./out_users_test.txt", "r") as f:
     ServerList = [line.split()[0] for line in f]
-    print(ServerList)
-
-#with open("./conf/servers/greycom_prd_haproxy.txt", "r") as f:
-#    GreyCom_prd_haproxy = [line.split()[0] for line in f]
-#    print(GreyCom_prd_haproxy)
 
 # In env.roledefs we define the remote servers. It can be IP Addrs or domain names.
 env.roledefs = {
     'local': ['localhost'],
-    'dev': ServerList,
-    'staging': ['user@staging.example.com'],
-    'production': ['user@production.example.com'],
-    #'greycom_prd_haproxy': GreyCom_prd_haproxy
+    'devtest': ServerList
 }
 
 # Fabric user and pass.
-#env.user = "root"
-#env.password = "toor"
-#env.key_filename = '/home/username/.ssh/id_rsa'
-#env.warn_only=True
-env.pararel=True
+# env.user = "root"
+# env.password = "toor"
+# env.key_filename = '/home/username/.ssh/id_rsa'
+# env.warn_only=True
+env.pararel = True
 env.shell = "/bin/sh -c"
-env.skip_bad_hosts=True
-env.timeout=5
+env.skip_bad_hosts = True
+env.timeout = 5
 
 
 def show_help():
@@ -109,6 +91,7 @@ Show proton help
         print ""
         print "s, q, quit, exit             Exit"
 
+
 def show_roles():
     """
 Show the fabric declared roles
@@ -116,6 +99,7 @@ Show the fabric declared roles
     """
     for key, value in sorted(env.roledefs.items()):
         print key, value
+
 
 def command(cmd):
     """
@@ -126,7 +110,8 @@ Run a command in the host/s
     with settings(warn_only=False):
         run(cmd)
 
-def file_send(localpath,remotepath):
+
+def file_send(localpath, remotepath):
     """
 Send a file to the host/s
     :param localpath: file local path
@@ -136,9 +121,10 @@ Send a file to the host/s
     eg: fab file_send:ssh_config,/etc/ssh/ssh_config
     """
     with settings(warn_only=False):
-        put(localpath,remotepath,use_sudo=True)
+        put(localpath, remotepath, use_sudo=True)
 
-def file_send_mod(localpath,remotepath,modep):
+
+def file_send_mod(localpath, remotepath, modep):
     """
 Send a file to the host/s specifying it's permissions
     :param localpath: file local path
@@ -147,9 +133,10 @@ Send a file to the host/s specifying it's permissions
     eg: fab -R dev file_send_mod:path/to/edited/ssh_config,/etc/ssh/ssh_config,0755
     """
     with settings(warn_only=False):
-        put(localpath,remotepath,mode=modep,use_sudo=True)
+        put(localpath, remotepath, mode=modep, use_sudo=True)
 
-def file_send_oldmod(localpath,remotepath):
+
+def file_send_oldmod(localpath, remotepath):
     """
 Send a file to the host/s mirroring local permissions
     :param localpath: file local path
@@ -157,7 +144,8 @@ Send a file to the host/s mirroring local permissions
     eg: fab -R dev file_send_oldmod:path/to/edited/ssh_config,/etc/ssh/ssh_config
     """
     with settings(warn_only=False):
-        put(localpath,remotepath,mirror_local_mode=True)
+        put(localpath, remotepath, mirror_local_mode=True)
+
 
 def file_get(remotepath, localpath):
     """
@@ -167,7 +155,8 @@ Retrievng a file from the host/s
     eg: fab -R dev get_file:/var/log/auth.log,/tmp/auth.log
     """
     with settings(warn_only=False):
-        get(remotepath,localpath+"."+env.host)
+        get(remotepath, localpath + "." + env.host)
+
 
 def sudo_command(cmd):
     """
@@ -186,35 +175,42 @@ Modify /etc/sudoers adding sudo NOPASSWD wheel group (Still Incomplete)
     with settings(warn_only=False):
         sudo('echo "%wheel        ALL=(ALL)       NOPASSWD: ALL" | (EDITOR="tee -a" visudo)')
 
-def apt_package(action,package):
+
+def apt_package(action, package):
     """
 Install/Upgrade an Debian apt based linux package
     :param action: "install" or "upgrade"
-    :param package:
+    :param package: name of the package to install
     """
     with settings(warn_only=False):
         hostvm = sudo('hostname')
         if action == "install":
             aptcache = apt.Cache()
             if aptcache[package].is_installed:
-                print colored('###############################################################################', 'yellow')
+                print colored('###############################################################################',
+                              'yellow')
                 print colored(package + ' ALREADY INSTALLED in:' + hostvm + '- IP:' + env.host_string, 'yellow')
-                print colored('###############################################################################', 'yellow')
+                print colored('###############################################################################',
+                              'yellow')
             else:
                 print colored('###############################################################################', 'blue')
                 print colored(package + ' WILL BE INSTALLED in:' + hostvm + '- IP:' + env.host_string, 'blue')
                 print colored('###############################################################################', 'blue')
                 sudo('apt-get update')
-                sudo('apt-get install '+package)
+                sudo('apt-get install ' + package)
                 aptcachenew = apt.Cache()
                 if aptcachenew[package].is_installed:
-                    print colored('##################################################################################', 'green')
+                    print colored('##################################################################################',
+                                  'green')
                     print colored(package + 'SUCCESFULLY INSTALLED in:' + hostvm + '- IP:' + env.host_string, 'green')
-                    print colored('##################################################################################', 'green')
+                    print colored('##################################################################################',
+                                  'green')
                 else:
-                    print colored('#################################################################################', 'red')
+                    print colored('#################################################################################',
+                                  'red')
                     print colored(package + 'INSTALLATION PROBLEM in:' + hostvm + '- IP:' + env.host_string, 'red')
-                    print colored('#################################################################################', 'red')
+                    print colored('#################################################################################',
+                                  'red')
 
         elif action == "upgrade":
             aptcache = apt.Cache()
@@ -223,7 +219,7 @@ Install/Upgrade an Debian apt based linux package
                 print colored(package + ' TO BE UPGRADED in:' + hostvm + '- IP:' + env.host_string, 'yellow')
                 print colored('############################################################################', 'yellow')
                 sudo('apt-get update')
-                sudo('apt-get install --only-upgrade '+package)
+                sudo('apt-get install --only-upgrade ' + package)
             else:
                 print colored('###########################################################################', 'red')
                 print colored(package + ' NOT INSTALLED in:' + hostvm + '- IP:' + env.host_string, 'red')
@@ -235,51 +231,75 @@ Install/Upgrade an Debian apt based linux package
             print colored('Usage eg2: $ fab -R dev apt_package:upgrade,gcc', 'red')
             print colored('############################################################################', 'blue')
 
+
 def yum_package(action, package):
+    """
+Install/Upgrade an RedHat/Centos yum based linux package
+    :param action: "install" or "upgrade"
+    :param package: name of the package to install
+    """
     with settings(warn_only=False):
         hostvm = sudo('hostname')
         if action == "install":
-            #yumcache = yum.YumBase()
-            #print(yumcache.rpmdb.searchNevra(name=package))
+            # yumcache = yum.YumBase()
+            # print(yumcache.rpmdb.searchNevra(name=package))
             try:
-                package_inst = sudo('yum list install '+package)
+                package_inst = sudo('yum list install ' + package)
                 print(package_inst)
-                #if yumcache.rpmdb.searchNevra(name=package):
+                # if yumcache.rpmdb.searchNevra(name=package):
                 # if not package_inst:
                 if package_inst == "":
-                    print colored('###############################################################################', 'blue')
+                    print colored('###############################################################################',
+                                  'blue')
                     print colored(package + ' WILL BE INSTALLED in:' + hostvm + '- IP:' + env.host_string, 'blue')
-                    print colored('###############################################################################', 'blue')
+                    print colored('###############################################################################',
+                                  'blue')
                     try:
-                        sudo('yum install -y '+package)
-                        #yumcache = yum.YumBase()
-                        #if yumcache.rpmdb.searchNevra(name=package):
+                        sudo('yum install -y ' + package)
+                        # yumcache = yum.YumBase()
+                        # if yumcache.rpmdb.searchNevra(name=package):
                         package_inst = sudo('yum list install ' + package)
-                        if (package_inst == ""):
-                            print colored('#################################################################################', 'red')
-                            print colored(package + ' INSTALLATION PROBLEM in:' + hostvm + '- IP:' + env.host_string, 'red')
-                            print colored('#################################################################################', 'red')
+                        if package_inst == "":
+                            print colored(
+                                '#################################################################################',
+                                'red')
+                            print colored(package + ' INSTALLATION PROBLEM in:' + hostvm + '- IP:' + env.host_string,
+                                          'red')
+                            print colored(
+                                '#################################################################################',
+                                'red')
                         else:
-                            print colored('##################################################################################', 'green')
-                            print colored(package + ' SUCCESFULLY INSTALLED in:' + hostvm + '- IP:' + env.host_string, 'green')
-                            print colored('##################################################################################', 'green')
+                            print colored(
+                                '##################################################################################',
+                                'green')
+                            print colored(package + ' SUCCESFULLY INSTALLED in:' + hostvm + '- IP:' + env.host_string,
+                                          'green')
+                            print colored(
+                                '##################################################################################',
+                                'green')
                     except:
-                            print colored('#################################################################################', 'red')
-                            print colored(package + ' INSTALLATION PROBLEM in:' + hostvm + '- IP:' + env.host_string, 'red')
-                            print colored('#################################################################################', 'red')
+                        print colored(
+                            '#################################################################################', 'red')
+                        print colored(package + ' INSTALLATION PROBLEM in:' + hostvm + '- IP:' + env.host_string, 'red')
+                        print colored(
+                            '#################################################################################', 'red')
                 else:
-                    print colored('###############################################################################', 'yellow')
+                    print colored('###############################################################################',
+                                  'yellow')
                     print colored(package + ' ALREADY INSTALLED in:' + hostvm + '- IP:' + env.host_string, 'yellow')
-                    print colored('###############################################################################', 'yellow')
+                    print colored('###############################################################################',
+                                  'yellow')
             except:
-                print colored('#################################################################################', 'red')
+                print colored('#################################################################################',
+                              'red')
                 print colored(package + ' INSTALLATION PROBLEM in:' + hostvm + '- IP:' + env.host_string, 'red')
-                print colored('#################################################################################', 'red')
+                print colored('#################################################################################',
+                              'red')
 
-        elif (action =="upgrade"  ):
-            #yumcache = yum.YumBase()
-            #print(yumcache.rpmdb.searchNevra(name=package))
-            #if yumcache.rpmdb.searchNevra(name=package):
+        elif action == "upgrade":
+            # yumcache = yum.YumBase()
+            # print(yumcache.rpmdb.searchNevra(name=package))
+            # if yumcache.rpmdb.searchNevra(name=package):
             try:
                 package_inst = sudo('yum list install ' + package)
                 print(package_inst)
@@ -288,10 +308,12 @@ def yum_package(action, package):
                     print colored(package + ' NOT INSTALLED in:' + hostvm + '- IP:' + env.host_string, 'red')
                     print colored('###########################################################################', 'red')
                 else:
-                    print colored('############################################################################', 'yellow')
+                    print colored('############################################################################',
+                                  'yellow')
                     print colored(package + ' TO BE UPGRADED in:' + hostvm + '- IP:' + env.host_string, 'yellow')
-                    print colored('############################################################################', 'yellow')
-                    sudo('yum update -y '+package)
+                    print colored('############################################################################',
+                                  'yellow')
+                    sudo('yum update -y ' + package)
             except:
                 print colored('###########################################################################', 'red')
                 print colored(package + ' NOT INSTALLED in:' + hostvm + '- IP:' + env.host_string, 'red')
@@ -303,96 +325,102 @@ def yum_package(action, package):
             print colored('Usage eg2: $ fab -R dev yum_package:upgrade,gcc', 'red')
             print colored('############################################################################', 'blue')
 
+
 def user_add_centos(usernamec):
+    """
+Add a user in RedHat/Centos based OS
+    :param usernamec: "username" to add
+    """
     with settings(warn_only=True):
-        #usernamep = prompt("Which USERNAME you like to CREATE & PUSH KEYS?")
-        #user_exists = sudo('cat /etc/passwd | grep '+usernamep)
-        #user_exists =sudo('grep "^'+usernamep+':" /etc/passwd')
-        ##user_exists = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamep)
-        #print colored(user_exists, 'green')
-        #print(env.host_string)
-        #sudo('uname -a')
+        # usernamep = prompt("Which USERNAME you like to CREATE & PUSH KEYS?")
+        # user_exists = sudo('cat /etc/passwd | grep '+usernamep)
+        # user_exists =sudo('grep "^'+usernamep+':" /etc/passwd')
+        # #user_exists = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamep)
+        # print colored(user_exists, 'green')
+        # print(env.host_string)
+        # sudo('uname -a')
 
         try:
-        ##if(user_exists != ""):
-            user_exists = sudo('cut -d: -f1 /etc/passwd | grep '+usernamec)
+            ##if(user_exists != ""):
+            user_exists = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamec)
             if (user_exists != ""):
                 print colored('##############################', 'green')
                 print colored('"' + usernamec + '" already exists', 'green')
                 print colored('##############################', 'green')
-                sudo('gpasswd -a ' + usernamep + ' wheel')
+                sudo('gpasswd -a ' + usernamec + ' wheel')
             else:
                 print colored('#################################', 'green')
                 print colored('"' + usernamec + '" doesnt exists', 'green')
                 print colored('WILL BE CREATED', 'green')
                 print colored('##################################', 'green')
                 sudo('useradd ' + usernamec + ' -m -d /home/' + usernamec)
-                #sudo('echo "' + usernamep + ':' + usernamep + '" | chpasswd')
-                sudo('gpasswd -a ' + usernamep + ' wheel')
+                # sudo('echo "' + usernamep + ':' + usernamep + '" | chpasswd')
+                sudo('gpasswd -a ' + usernamec + ' wheel')
         except:
-        ##else:
-            #print colored('######################################################', 'green')
-            #print colored('"' + usernamec + '" couldnt be created for some reason', 'green')
-            #print colored('######################################################', 'green')
-            print colored('#################################', 'green')
-            print colored('"' + usernamec + '" doesnt exists', 'green')
-            print colored('WILL BE CREATED', 'green')
-            print colored('##################################', 'green')
-            sudo('useradd ' + usernamec + ' -m -d /home/' + usernamec)
-            sudo('gpasswd -a ' + usernamec + ' wheel')
+            ##else:
+            print colored('######################################################', 'green')
+            print colored('"' + usernamec + '" couldnt be created for some reason', 'green')
+            print colored('######################################################', 'green')
 
-def change_pass(usernameu,upass):
+
+def change_pass(usernameu, upass):
+    """
+Change RedHat/Centos based OS user password
+    :param usernameu: "username" to change password
+    :param upass: "password" to be used
+    """
     with settings(warn_only=False):
         try:
-        ##if(user_exists != ""):
-            user_exists = sudo('cut -d: -f1 /etc/passwd | grep '+usernameu)
-            if (user_exists != ""):
+            ##if(user_exists != ""):
+            user_exists = sudo('cut -d: -f1 /etc/passwd | grep ' + usernameu)
+            if user_exists != "":
                 print colored('#######################################', 'green')
                 print colored('"' + usernameu + '" PASSWORD will be changed', 'green')
                 print colored('#######################################', 'green')
-                sudo('echo '+usernameu+':'+upass+' | chpasswd')
+                sudo('echo ' + usernameu + ':' + upass + ' | chpasswd')
             else:
                 print colored('#################################', 'red')
                 print colored('"' + usernameu + '" doesnt exists', 'red')
                 print colored('#################################', 'red')
         except:
-        ##else:
             print colored('#################################', 'red')
             print colored('"' + usernameu + '" doesnt exists', 'red')
             print colored('##################################', 'red')
 
+
 def key_gen(usernameg):
     with settings(warn_only=False):
-        #usernameg = prompt("Which USERNAME you like to GEN KEYS?")
-        #user_exists = sudo('cut -d: -f1 /etc/passwd | grep '+usernameg)
-        #user_exists = sudo('cat /etc/passwd | grep ' + usernameg)
+        # usernameg = prompt("Which USERNAME you like to GEN KEYS?")
+        # user_exists = sudo('cut -d: -f1 /etc/passwd | grep '+usernameg)
+        # user_exists = sudo('cat /etc/passwd | grep ' + usernameg)
         try:
             user_struct = pwd.getpwnam(usernameg)
-            user_exists = user_struct.pw_gecos.split (",")[0]
+            user_exists = user_struct.pw_gecos.split(",")[0]
             print colored(user_exists, 'green')
-            if (user_exists == "root"):
+            if user_exists == "root":
                 print colored('#######################################################', 'blue')
                 print colored('ROOT user CANT be changed', 'blue')
                 print colored('#######################################################', 'blue')
 
-            elif os.path.exists('/home/'+usernameg+'/.ssh/id_rsa'):
-                print colored(str(os.path.exists('/home/'+usernameg+'/.ssh/id_rsa')), 'blue')
+            elif os.path.exists('/home/' + usernameg + '/.ssh/id_rsa'):
+                print colored(str(os.path.exists('/home/' + usernameg + '/.ssh/id_rsa')), 'blue')
                 print colored('###########################################', 'blue')
-                print colored('username: '+usernameg+' KEYS already EXISTS', 'blue')
+                print colored('username: ' + usernameg + ' KEYS already EXISTS', 'blue')
                 print colored('###########################################', 'blue')
             else:
                 print colored('###########################################', 'blue')
                 print colored('username: ' + usernameg + ' Creating KEYS', 'blue')
                 print colored('###########################################', 'blue')
                 sudo("ssh-keygen -t rsa -f /home/" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
-                # http://unix.stackexchange.com/questions/36540/why-am-i-still-getting-a-password-prompt-with-ssh-with-public-key-authentication
+                # http://unix.stackexchange.com/questions/36540/why-am-i-still-getting-a-password-prompt-with-ssh
+                # -with-public-key-authentication
                 # sudo('chmod 700 /home/' + usernameg)
                 sudo('chmod 755 /home/' + usernameg)
                 sudo('chmod 755 /home/' + usernameg + '/.ssh')
                 sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
                 sudo('gpasswd -a ' + usernameg + ' wheel')
         except KeyError:
-            print colored('User '+usernameg+' does not exist', 'red')
+            print colored('User ' + usernameg + ' does not exist', 'red')
             print colored('#######################################################', 'blue')
             print colored('Consider that we generate user: username pass: username', 'blue')
             print colored('#######################################################', 'blue')
@@ -400,12 +428,14 @@ def key_gen(usernameg):
             sudo('useradd ' + usernameg + ' -m -d /home/' + usernameg)
             sudo('echo "' + usernameg + ':' + usernameg + '" | chpasswd')
             sudo("ssh-keygen -t rsa -f /home/" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
-            # http://unix.stackexchange.com/questions/36540/why-am-i-still-getting-a-password-prompt-with-ssh-with-public-key-authentication
+            # http://unix.stackexchange.com/questions/36540/why-am-i-still-getting-a-password-prompt-with-ssh
+            # -with-public-key-authentication
             # sudo('chmod 700 /home/' + usernameg)
             sudo('chmod 755 /home/' + usernameg)
             sudo('chmod 755 /home/' + usernameg + '/.ssh')
             sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
             sudo('gpasswd -a ' + usernameg + ' wheel')
+
 
 def key_read_file(key_file):
     with settings(warn_only=False):
@@ -415,27 +445,28 @@ def key_read_file(key_file):
         with open(key_file) as f:
             return f.read()
 
+
 def key_append(usernamea):
     with settings(warn_only=False):
-        if(usernamea == "root"):
-            key_file = '/'+ usernamea+'/.ssh/id_rsa.pub'
+        if (usernamea == "root"):
+            key_file = '/' + usernamea + '/.ssh/id_rsa.pub'
             key_text = key_read_file(key_file)
-            if exists('/'+usernamea+'/.ssh/authorized_keys', use_sudo=True):
+            if exists('/' + usernamea + '/.ssh/authorized_keys', use_sudo=True):
                 local('sudo chmod 701 /home/' + usernamea)
                 local('sudo chmod 741 /home/' + usernamea + '/.ssh')
                 local('sudo chmod 604 /home/' + usernamea + '/.ssh/id_rsa.pub')
                 print colored('#########################################', 'blue')
                 print colored('##### authorized_keys file exists #######', 'blue')
                 print colored('#########################################', 'blue')
-                append('/'+usernamea+'/.ssh/authorized_keys', key_text, use_sudo=True)
+                append('/' + usernamea + '/.ssh/authorized_keys', key_text, use_sudo=True)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
                 local('sudo chmod 700 /home/' + usernamea)
                 local('sudo chmod 700 /home/' + usernamea + '/.ssh')
                 local('sudo chmod 600 /home/' + usernamea + '/.ssh/id_rsa.pub')
             else:
-                sudo('mkdir -p /'+usernamea+'/.ssh/')
-                sudo('touch /'+usernamea+'/.ssh/authorized_keys')
-                append('/'+ usernamea+'/.ssh/authorized_keys', key_text, use_sudo=True)
+                sudo('mkdir -p /' + usernamea + '/.ssh/')
+                sudo('touch /' + usernamea + '/.ssh/authorized_keys')
+                append('/' + usernamea + '/.ssh/authorized_keys', key_text, use_sudo=True)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
                 # put('/home/'+usernamea+'/.ssh/authorized_keys', '/home/'+usernamea+'/.ssh/')
                 local('sudo chmod 700 /home/' + usernamea)
@@ -443,7 +474,7 @@ def key_append(usernamea):
                 local('sudo chmod 600 /home/' + usernamea + '/.ssh/id_rsa.pub')
 
         else:
-            key_file = '/home/'+usernamea+'/.ssh/id_rsa.pub'
+            key_file = '/home/' + usernamea + '/.ssh/id_rsa.pub'
             local('sudo chmod 701 /home/' + usernamea)
             local('sudo chmod 741 /home/' + usernamea + '/.ssh')
             local('sudo chmod 604 /home/' + usernamea + '/.ssh/id_rsa.pub')
@@ -451,70 +482,78 @@ def key_append(usernamea):
             local('sudo chmod 700 /home/' + usernamea)
             local('sudo chmod 700 /home/' + usernamea + '/.ssh')
             local('sudo chmod 600 /home/' + usernamea + '/.ssh/id_rsa.pub')
-            if exists('/home/'+usernamea+'/.ssh/authorized_keys', use_sudo=True):
+            if exists('/home/' + usernamea + '/.ssh/authorized_keys', use_sudo=True):
                 print colored('#########################################', 'blue')
                 print colored('##### authorized_keys file exists #######', 'blue')
                 print colored('#########################################', 'blue')
-                append('/home/'+usernamea+'/.ssh/authorized_keys', key_text, use_sudo=True)
+                append('/home/' + usernamea + '/.ssh/authorized_keys', key_text, use_sudo=True)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
             else:
-                sudo('mkdir -p /home/'+usernamea+'/.ssh/')
+                sudo('mkdir -p /home/' + usernamea + '/.ssh/')
                 sudo('touch /home/' + usernamea + '/.ssh/authorized_keys')
-                append('/home/'+usernamea+'/.ssh/authorized_keys', key_text, use_sudo=True)
+                append('/home/' + usernamea + '/.ssh/authorized_keys', key_text, use_sudo=True)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
-            #put('/home/'+usernamea+'/.ssh/authorized_keys', '/home/'+usernamea+'/.ssh/')
+                # put('/home/'+usernamea+'/.ssh/authorized_keys', '/home/'+usernamea+'/.ssh/')
+
 
 def key_test(usernamet):
+    """
+
+    :param usernamet:
+    """
     with settings(warn_only=False):
         # TAKE THE HOME DIR FROM /ETC/PASSWD
         hostvm = sudo('hostname')
         local('sudo chmod 701 /home/' + usernamet)
         local('sudo chmod 741 /home/' + usernamet + '/.ssh')
-        local_user=getpass.getuser()
-        if (os.path.exists('/home/'+local_user+'/temp/')):
+        local_user = getpass.getuser()
+        if os.path.exists('/home/' + local_user + '/temp/'):
             print colored('##################################', 'blue')
             print colored('##### Directory Exists ###########', 'blue')
             print colored('##################################', 'blue')
         else:
             local('mkdir ~/temp')
 
-        local('sudo cp /home/'+usernamet+'/.ssh/id_rsa ~/temp/id_rsa')
-        local('sudo chown -R '+local_user+':'+local_user+' ~/temp/id_rsa')
+        local('sudo cp /home/' + usernamet + '/.ssh/id_rsa ~/temp/id_rsa')
+        local('sudo chown -R ' + local_user + ':' + local_user + ' ~/temp/id_rsa')
         local('chmod 600 ~/temp/id_rsa')
-        #local('sudo chmod 604 /home/' + usernamet + '/.ssh/id_rsa')
+        # local('sudo chmod 604 /home/' + usernamet + '/.ssh/id_rsa')
 
         # FIX DONE! - Must copy the key temporaly with the proper permissions
         # in the home directory of the current user executing fabric to use it.
         # Temporally we comment the line 379 and the script must be run by
         # user that desires to test it keys
-        #[ntorres@jumphost fabric]$ ssh -i /home/ntorres/.ssh/id_rsa ntorres@10.0.3.113   Warning: Permanently added '10.0.3.113' (ECDSA) to the list of known hosts.
-        #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        #@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @
-        #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        #Permissions 0604 for '/home/ntorres/.ssh/id_rsa' are too open.
-        #It is required that your private key files are NOT accessible by others.
-        #This private key will be ignored.
-        #bad permissions: ignore key: /home/ntorres/.ssh/id_rsa
-        #Permission denied (publickey).
-        #NOTE:
-        #there is no way to bypass the keyfile permission check with ssh or ssh-add
-        #(and you can't trick it with named pipe or such). Besides, you do not actually want to trick ssh,' \
-        #' but just to be able to use your key files.
+        # [ntorres@jumphost fabric]$ ssh -i /home/ntorres/.ssh/id_rsa ntorres@10.0.3.113   Warning: Permanently added
+        #  '10.0.3.113' (ECDSA) to the list of known hosts.
+        # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        # @         WARNING: UNPROTECTED PRIVATE KEY FILE!          @
+        # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        # Permissions 0604 for '/home/ntorres/.ssh/id_rsa' are too open.
+        # It is required that your private key files are NOT accessible by others.
+        # This private key will be ignored.
+        # bad permissions: ignore key: /home/ntorres/.ssh/id_rsa
+        # Permission denied (publickey).
+        # NOTE:
+        # there is no way to bypass the keyfile permission check with ssh or ssh-add
+        # (and you can't trick it with named pipe or such). Besides, you do not actually want to trick ssh,' \
+        # ' but just to be able to use your key files.
 
-        if (os.path.exists('/home/'+usernamet+'/.ssh/')):
-            ssh_test = local('ssh -i ~/temp/id_rsa -o "StrictHostKeyChecking no" -q '+usernamet+'@'+env.host_string+' exit')
-            if (ssh_test.succeeded):
+        if (os.path.exists('/home/' + usernamet + '/.ssh/')):
+            ssh_test = local(
+                'ssh -i ~/temp/id_rsa -o "StrictHostKeyChecking no" -q ' + usernamet + '@' + env.host_string + ' exit')
+            if ssh_test.succeeded:
                 print colored('###################################################', 'blue')
-                print colored(usernamet+' WORKED! in:'+hostvm+' IP:'+env.host_string, 'blue')
+                print colored(usernamet + ' WORKED! in:' + hostvm + ' IP:' + env.host_string, 'blue')
                 print colored('###################################################', 'blue')
-                local('sudo chmod 700 /home/'+usernamet)
-                local('sudo chmod 700 /home/'+usernamet+'/.ssh')
-                #local('sudo chmod 600 /home/'+usernamet+'/.ssh/id_rsa')
+                local('sudo chmod 700 /home/' + usernamet)
+                local('sudo chmod 700 /home/' + usernamet + '/.ssh')
+                # local('sudo chmod 600 /home/'+usernamet+'/.ssh/id_rsa')
                 local('sudo rm ~/temp/id_rsa')
         else:
             print colored('###################################################', 'red')
-            print colored(usernamet+' FAIL! in:'+hostvm+'- IP:'+env.host_string, 'red')
+            print colored(usernamet + ' FAIL! in:' + hostvm + '- IP:' + env.host_string, 'red')
             print colored('###################################################', 'red')
+
 
 def ruby_install_centos():
     with settings(warn_only=False):
@@ -523,14 +562,16 @@ def ruby_install_centos():
         # yum groupinstall -y 'development tools'
         sudo('yum groupinstall "Development Tools"')
         sudo('yum install -y git-core zlib zlib-devel gcc-c++ patch readline readline-devel')
-        sudo('yum install -y libyaml-devel libffi-devel openssl-devel make bzip2 autoconf automake libtool bison curl sqlite-devel')
+        sudo(
+            'yum install -y libyaml-devel libffi-devel openssl-devel make bzip2 autoconf automake libtool bison curl sqlite-devel')
 
-        #with cd('/home/'+usernamei+'/'):
+        # with cd('/home/'+usernamei+'/'):
         with cd('~'):
             run('gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3')
             run('\curl -sSL https://get.rvm.io | bash -s stable --ruby')
             run('source ~/.rvm/scripts/rvm')
             run('gem install bundler')
+
 
 def kifezero_install_centos():
     with settings(warn_only=False):
@@ -547,7 +588,7 @@ def kifezero_install_centos():
 
         try:
             knifezero_inst = run('chef gem list | grep knife-zero')
-            if(knifezero_inst ==""):
+            if knifezero_inst == "":
                 run('chef gem install knife-zero')
             else:
                 print colored('##############################################', 'blue')
@@ -573,11 +614,67 @@ def kifezero_install_centos():
                 print colored('###### Check chef-zero installation #######', 'red')
                 print colored('###########################################', 'red')
 
+
+def kifezero_conf_centos(usernamek):
+    with settings(warn_only=False):
+        if exists('/home/' + usernamek + '/my_chef_repo', use_sudo=True):
+            print colored('#########################################', 'blue')
+            print colored('##### Chef repo dir already exists ######', 'blue')
+            print colored('#########################################', 'blue')
+        else:
+            print colored('################################################', 'red')
+            print colored('###### Dir my_chef_repo will be created  #######', 'red')
+            print colored('################################################', 'red')
+            run('mkdir /home/' + usernamek + '/my_chef_repo')
+
+        if exists('/home/' + usernamek + '/my_chef_repo/knife.rb', use_sudo=True):
+            print colored('#########################################', 'blue')
+            print colored('##### knife.rb conf already exists ######', 'blue')
+            print colored('#########################################', 'blue')
+        else:
+            print colored('#############################################', 'red')
+            print colored('###### knife.rb conf will be created  #######', 'red')
+            print colored('#############################################', 'red')
+            file_send_mod('./conf/chef/knife-zero/knife.rb', '/home/' + usernamek + '/my_chef_repo/', '600')
+
+        try:
+            knifezero_inst = run('chef gem list | grep knife-zero')
+            if (knifezero_inst == ""):
+                run('chef gem install knife-zero')
+            else:
+                print colored('##############################################', 'blue')
+                print colored('##### knife-zero already installed ###########', 'blue')
+                print colored('##############################################', 'blue')
+
+            if exists('/opt/chefdk/embedded/bin/knife', use_sudo=True):
+                print colored('###########################################', 'blue')
+                print colored('##### Knife-zero correctly installed ######', 'blue')
+                print colored('###########################################', 'blue')
+            else:
+                print colored('###########################################', 'red')
+                print colored('###### Check chef-zero installation #######', 'red')
+                print colored('###########################################', 'red')
+        except:
+            run('chef gem install knife-zero')
+            if exists('/opt/chefdk/embedded/bin/knife', use_sudo=True):
+                print colored('###########################################', 'blue')
+                print colored('##### Knife-zero correctly installed ######', 'blue')
+                print colored('###########################################', 'blue')
+            else:
+                print colored('###########################################', 'red')
+                print colored('###### Check chef-zero installation #######', 'red')
+                print colored('###########################################', 'red')
+
+
 def nfs_server_centos7(nfs_dir):
+    """
+
+    :param nfs_dir:
+    """
     with settings(warn_only=False):
         sudo('yum install -y nfs-utils libnfsidmap libnfsidmap-devel nfs4-acl-tools')
 
-        if exists('/var/'+nfs_dir, use_sudo=True):
+        if exists('/var/' + nfs_dir, use_sudo=True):
             print colored('###########################################', 'blue')
             print colored('####### Directory already created #########', 'blue')
             print colored('###########################################', 'blue')
@@ -585,24 +682,26 @@ def nfs_server_centos7(nfs_dir):
             print colored('###########################################', 'red')
             print colored('###### Creating NFS share Directory #######', 'red')
             print colored('###########################################', 'red')
-            sudo('mkdir /var/'+nfs_dir)
-            sudo('chmod -R 777 /var/'+nfs_dir+'/')
+            sudo('mkdir /var/' + nfs_dir)
+            sudo('chmod -R 777 /var/' + nfs_dir + '/')
         try:
-            ip_addr=sudo('ifconfig eth0 | awk \'/inet /{print substr($2,1)}\'')
-            netmask=sudo('ifconfig eth0 | awk \'/inet /{print substr($4,1)}\'')
+            ip_addr = sudo('ifconfig eth0 | awk \'/inet /{print substr($2,1)}\'')
+            netmask = sudo('ifconfig eth0 | awk \'/inet /{print substr($4,1)}\'')
             subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
             subnet = subnet_temp[0]
-            #sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_all_squash)" > /etc/exports')
-            sudo('echo "/var/'+nfs_dir+'     *(rw,sync,no_root_squash)" > /etc/exports')
+            # sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_all_squash)"
+            #  > /etc/exports')
+            sudo('echo "/var/' + nfs_dir + '     *(rw,sync,no_root_squash)" > /etc/exports')
         except:
             ip_addr = sudo('ifconfig enp0s8 | awk \'/inet /{print substr($2,1)}\'')
             etmask = sudo('ifconfig enp0s8 | awk \'/inet /{print substr($4,1)}\'')
             subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
             subnet = subnet_temp[0]
-            # sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_all_squash)" > /etc/exports')
+            # sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_all_squash)"
+            #  > /etc/exports')
             sudo('echo "/var/' + nfs_dir + '     *(rw,sync,no_root_squash)" > /etc/exports')
 
-        #sudo('sudo exportfs -a')
+        # sudo('sudo exportfs -a')
 
         sudo('systemctl enable rpcbind')
         sudo('systemctl start rpcbind')
@@ -610,38 +709,39 @@ def nfs_server_centos7(nfs_dir):
         sudo('systemctl enable nfs-server')
         sudo('systemctl start nfs-server')
 
-        #sudo firewall-cmd --zone=public --add-service=nfs --permanent
-        #sudo firewall-cmd --zone=public --add-service=rpc-bind --permanent
-        #sudo firewall-cmd --zone=public --add-service=mountd --permanent
-        #sudo firewall-cmd --reload
+        # sudo firewall-cmd --zone=public --add-service=nfs --permanent
+        # sudo firewall-cmd --zone=public --add-service=rpc-bind --permanent
+        # sudo firewall-cmd --zone=public --add-service=mountd --permanent
+        # sudo firewall-cmd --reload
 
-def cachefs_install(nfs_dir, nfs_server_ip, cachetag="mycache",cachedir="/var/cache/fscache", selinux='False'):
-    #fab -R dev cachefs_install:nfsshare,\"172.28.128.3\",mycache-test,/var/cache/fscache-test/
+
+def cachefs_install(nfs_dir, nfs_server_ip, cachetag="mycache", cachedir="/var/cache/fscache", selinux='False'):
+    # fab -R dev cachefs_install:nfsshare,\"172.28.128.3\",mycache-test,/var/cache/fscache-test/
     with settings(warn_only=False):
         ### INSTALL FS-CACHE PACKAGE ###
         sudo('yum install -y cachefilesd')
 
         ### CHECK IF SELINUX ENFORMENT is ENABLED ###
-        print colored('=====================================================' , 'blue')
-        print colored('RELOCATING THE CACHE WITH SELINUX ENFORCEMENT ENABLED' , 'blue')
-        print colored('=====================================================' , 'blue')
+        print colored('=====================================================', 'blue')
+        print colored('RELOCATING THE CACHE WITH SELINUX ENFORCEMENT ENABLED', 'blue')
+        print colored('=====================================================', 'blue')
         selinux = bool(strtobool(selinux))
-        #setenforce enforcing
+        # setenforce enforcing
         # setenforce permissive
         # sestatus
         try:
             selinux_mode = (sudo('sestatus | grep "Current mode:                   enforcing"'))
-            if(selinux_mode != ""):
-                selinux=bool(strtobool('True'))
+            if (selinux_mode != ""):
+                selinux = bool(strtobool('True'))
             else:
-                selinux=bool(strtobool('False'))
+                selinux = bool(strtobool('False'))
         except:
             selinux_mode = (sudo('sestatus | grep "Current mode:                   permissive"'))
-            if (selinux_mode != ""):
+            if selinux_mode != "":
                 selinux = bool(strtobool('False'))
             else:
                 selinux = bool(strtobool('True'))
-        #finally:
+        # finally:
         #   Peace of code that will be always executed no mater what
         ### END OF SELINUX ENFORMENT is ENABLED CHECK ###
 
@@ -669,7 +769,7 @@ def cachefs_install(nfs_dir, nfs_server_ip, cachetag="mycache",cachedir="/var/ca
                         print colored('##### Local Cache Dir already exists ######', 'yellow')
                         print colored('###########################################', 'yellow')
                     else:
-                        sudo('mkdir '+cachedir)
+                        sudo('mkdir ' + cachedir)
 
                     file_send_mod('/vagrant/scripts/conf/cachefs/cachefilesd.conf', '/etc/cachefilesd.conf', '664')
                     """
@@ -742,30 +842,33 @@ def cachefs_install(nfs_dir, nfs_server_ip, cachetag="mycache",cachedir="/var/ca
                 	#semodule -u '+cachetag+'.pp
                 """
                 else:
-                    print colored('#############################################################################', 'blue')
-                    print colored('##### Selinux supported in Permissive mode or when Selinux is disabled ######', 'blue')
-                    print colored('#############################################################################', 'blue')
+                    print colored('#############################################################################',
+                                  'blue')
+                    print colored('##### Selinux supported in Permissive mode or when Selinux is disabled ######',
+                                  'blue')
+                    print colored('#############################################################################',
+                                  'blue')
 
         else:
             print colored('#################################################################', 'red')
             print colored('##### cachefilesd conf does not exists (Check Instalation) ######', 'red')
             print colored('#################################################################', 'red')
 
-        ## get status ##
+        # get status #
         fscachestat = sudo('service cachefilesd status | grep Active | cut -d\' \' -f5')
         parts = fscachestat.split('\n')
         fscachestat = parts[1]
 
         if fscachestat == "inactive":
-            ## start it ##
+            # start it #
             sudo('service cachefilesd start')
             print colored('=================================', 'blue')
             print colored('         FSCACHE STARTED         ', 'blue')
             print colored('=================================', 'blue')
-            ## Uncoment start it at boot ##
+            # Uncoment start it at boot #
             # systemd enable cachefilesd.service
         elif fscachestat == "active":
-            ## stop it ##
+            # stop it #
             sudo('service cachefilesd restart')
             print colored('=================================', 'blue')
             print colored('        FSCACHE RE-STARTED       ', 'blue')
@@ -775,17 +878,16 @@ def cachefs_install(nfs_dir, nfs_server_ip, cachetag="mycache",cachedir="/var/ca
             print colored('##### cachefilesd Serv does not exists (Check Instalation) ######', 'red')
             print colored('################################################################', 'red')
 
-
         try:
-            part_mounted = sudo('df -h | grep /mnt/nfs/var/'+nfs_dir)
-            if(part_mounted ==""):
-                #mount nfs client with CacheFS support
-                sudo('mount -t nfs -o fsc '+nfs_server_ip+':/var/'+nfs_dir+' /mnt/nfs/var/'+nfs_dir+'/')
+            part_mounted = sudo('df -h | grep /mnt/nfs/var/' + nfs_dir)
+            if (part_mounted == ""):
+                # mount nfs client with CacheFS support
+                sudo('mount -t nfs -o fsc ' + nfs_server_ip + ':/var/' + nfs_dir + ' /mnt/nfs/var/' + nfs_dir + '/')
             else:
                 print colored('##################################################', 'yellow')
                 print colored('##### cachefilesd partition already mounted ######', 'yellow')
                 print colored('##################################################', 'yellow')
-                #sudo('mount -t nfs -o fsc ' + nfs_server_ip + ':/var/' + nfs_dir + ' /mnt/nfs/var/' + nfs_dir + '/')
+                # sudo('mount -t nfs -o fsc ' + nfs_server_ip + ':/var/' + nfs_dir + ' /mnt/nfs/var/' + nfs_dir + '/')
 
             sudo('cat /proc/fs/nfsfs/servers')
             sudo('cat /proc/fs/fscache/stats')
@@ -806,11 +908,12 @@ def cachefs_install(nfs_dir, nfs_server_ip, cachetag="mycache",cachedir="/var/ca
         print colored('==============================', 'blue')
         sudo('time cp /mnt/nfs/var/nfsshare/chefdk-0.17.17-1.el7.x86_64.rpm /dev/null')
 
-def nfs_client_centos7(nfs_dir,nfs_server_ip):
+
+def nfs_client_centos7(nfs_dir, nfs_server_ip):
     with settings(warn_only=False):
         sudo('yum install -y nfs-utils')
-        sudo('mkdir -p /mnt/nfs/var/'+nfs_dir)
-        sudo('mount -t nfs '+nfs_server_ip+':/var/'+nfs_dir+' /mnt/nfs/var/'+nfs_dir+'/')
+        sudo('mkdir -p /mnt/nfs/var/' + nfs_dir)
+        sudo('mount -t nfs ' + nfs_server_ip + ':/var/' + nfs_dir + ' /mnt/nfs/var/' + nfs_dir + '/')
         run('df -kh | grep nfs')
         run('mount | grep nfs')
 
@@ -822,11 +925,12 @@ def nfs_client_centos7(nfs_dir,nfs_server_ip):
             print colored('###### NFS client installation Fail #######', 'red')
             print colored('###########################################', 'red')
 
+
 def nfs_server_centos6(nfs_dir):
     with settings(warn_only=False):
         sudo('yum install -y nfs-utils nfs-utils-lib')
 
-        if exists('/var/'+nfs_dir, use_sudo=True):
+        if exists('/var/' + nfs_dir, use_sudo=True):
             print colored('###########################################', 'blue')
             print colored('####### Directory already created #########', 'blue')
             print colored('###########################################', 'blue')
@@ -834,32 +938,33 @@ def nfs_server_centos6(nfs_dir):
             print colored('###########################################', 'red')
             print colored('###### Creating NFS share Directory #######', 'red')
             print colored('###########################################', 'red')
-            sudo('mkdir /var/'+nfs_dir)
-            sudo('chmod -R 777 /var/'+nfs_dir+'/')
+            sudo('mkdir /var/' + nfs_dir)
+            sudo('chmod -R 777 /var/' + nfs_dir + '/')
 
         sudo('chkconfig nfs on')
         sudo('service rpcbind start')
         sudo('service nfs start')
 
-        ip_addr=sudo('ifconfig eth0 | awk \'/inet /{print substr($2,6)}\'')
-        netmask=sudo('ifconfig eth0 | awk \'/inet /{print substr($4,6)}\'')
+        ip_addr = sudo('ifconfig eth0 | awk \'/inet /{print substr($2,6)}\'')
+        netmask = sudo('ifconfig eth0 | awk \'/inet /{print substr($4,6)}\'')
         subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
         subnet = subnet_temp[0]
-        #sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_subtree_check)" > /etc/exports')
-        sudo('echo "/var/'+nfs_dir+'     *(rw,sync,no_root_squash)" > /etc/exports')
+        # sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_subtree_check)" > /etc/exports')
+        sudo('echo "/var/' + nfs_dir + '     *(rw,sync,no_root_squash)" > /etc/exports')
 
         sudo('sudo exportfs -a')
 
-        #sudo firewall-cmd --zone=public --add-service=nfs --permanent
-        #sudo firewall-cmd --zone=public --add-service=rpc-bind --permanent
-        #sudo firewall-cmd --zone=public --add-service=mountd --permanent
-        #sudo firewall-cmd --reload
+        # sudo firewall-cmd --zone=public --add-service=nfs --permanent
+        # sudo firewall-cmd --zone=public --add-service=rpc-bind --permanent
+        # sudo firewall-cmd --zone=public --add-service=mountd --permanent
+        # sudo firewall-cmd --reload
 
-def nfs_client_centos6(nfs_dir,nfs_server_ip):
+
+def nfs_client_centos6(nfs_dir, nfs_server_ip):
     with settings(warn_only=False):
         sudo('yum install -y nfs-utils nfs-utils-lib')
-        sudo('mkdir -p /mnt/nfs/var/'+nfs_dir+'/')
-        sudo('mount '+nfs_server_ip+':/var/'+nfs_dir+' /mnt/nfs/var/'+nfs_dir)
+        sudo('mkdir -p /mnt/nfs/var/' + nfs_dir + '/')
+        sudo('mount ' + nfs_server_ip + ':/var/' + nfs_dir + ' /mnt/nfs/var/' + nfs_dir)
         run('df - kh | grep nfs')
         run('mount | grep nfs')
 
@@ -871,12 +976,13 @@ def nfs_client_centos6(nfs_dir,nfs_server_ip):
             print colored('###### Check NFS Client configuration #####', 'red')
             print colored('###########################################', 'red')
 
+
 def nfs_server_ubuntu(nfs_dir):
     with settings(warn_only=False):
         sudo('apt-get update')
         sudo('apt-get -y install nfs-kernel-server')
 
-        if exists('/var/'+nfs_dir, use_sudo=True):
+        if exists('/var/' + nfs_dir, use_sudo=True):
             print colored('###########################################', 'blue')
             print colored('####### Directory already created #########', 'blue')
             print colored('###########################################', 'blue')
@@ -884,51 +990,52 @@ def nfs_server_ubuntu(nfs_dir):
             print colored('###########################################', 'red')
             print colored('###### Creating NFS share Directory #######', 'red')
             print colored('###########################################', 'red')
-            sudo('mkdir /var/'+nfs_dir)
-            #sudo('chmod -R 777 /var/'+nfs_dir+'/')
-            sudo('chown nobody:nogroup /var/'+nfs_dir+'/')
+            sudo('mkdir /var/' + nfs_dir)
+            # sudo('chmod -R 777 /var/'+nfs_dir+'/')
+            sudo('chown nobody:nogroup /var/' + nfs_dir + '/')
 
-        #sudo('chkconfig nfs on')
-        #sudo('service rpcbind start')
-        #sudo('service nfs start')
+        # sudo('chkconfig nfs on')
+        # sudo('service rpcbind start')
+        # sudo('service nfs start')
 
-        ip_addr=sudo('ifconfig eth0 | awk \'/inet /{print substr($2,6)}\'')
-        netmask=sudo('ifconfig eth0 | awk \'/inet /{print substr($4,6)}\'')
+        ip_addr = sudo('ifconfig eth0 | awk \'/inet /{print substr($2,6)}\'')
+        netmask = sudo('ifconfig eth0 | awk \'/inet /{print substr($4,6)}\'')
         subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
         subnet = subnet_temp[0]
-        #sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_subtree_check)" > /etc/exports')
-        sudo('echo "/var/'+nfs_dir+'     *(rw,sync,no_root_squash)" > /etc/exports')
+        # sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_subtree_check)" > /etc/exports')
+        sudo('echo "/var/' + nfs_dir + '     *(rw,sync,no_root_squash)" > /etc/exports')
 
         sudo('sudo exportfs -a')
 
         sudo('service nfs-kernel-server start')
 
-        #sudo firewall-cmd --zone=public --add-service=nfs --permanent
-        #sudo firewall-cmd --zone=public --add-service=rpc-bind --permanent
-        #sudo firewall-cmd --zone=public --add-service=mountd --permanent
-        #sudo firewall-cmd --reload
+        # sudo firewall-cmd --zone=public --add-service=nfs --permanent
+        # sudo firewall-cmd --zone=public --add-service=rpc-bind --permanent
+        # sudo firewall-cmd --zone=public --add-service=mountd --permanent
+        # sudo firewall-cmd --reload
 
-def haproxy_ws(action,ws_ip):
+
+def haproxy_ws(action, ws_ip):
     with settings(warn_only=False):
         with cd('/etc/haproxy'):
             try:
-                ws_conf = sudo('sudo cat haproxy.cfg | grep "'+ws_ip+':80 weight 1 check" | head -n1')
-                #ws_conf = str(ws_conf.lstrip())
+                ws_conf = sudo('sudo cat haproxy.cfg | grep "' + ws_ip + ':80 weight 1 check" | head -n1')
+                # ws_conf = str(ws_conf.lstrip())
                 print colored('=========================================', 'blue')
                 print colored('Server ' + ws_ip + ' FOUND in haproxy.cfg', 'blue')
                 print colored('=========================================', 'blue')
-                print colored (ws_conf, 'cyan', attrs=['bold'])
+                print colored(ws_conf, 'cyan', attrs=['bold'])
 
                 if ws_conf == "":
                     print colored('=========================================', 'red')
-                    print colored('Server '+ws_ip+' NOT FOUND in haproxy.cfg', 'red')
+                    print colored('Server ' + ws_ip + ' NOT FOUND in haproxy.cfg', 'red')
                     print colored('=========================================', 'red')
 
                 elif "disabled" in ws_conf and action == "add":
-                    #we erase the last word "disabled" & create the new file add_ws
+                    # we erase the last word "disabled" & create the new file add_ws
                     add_ws = ws_conf.rsplit(' ', 1)[0]
                     print colored('=========================================', 'blue')
-                    print colored('SERVER '+ws_ip+' WILL BE ADDED to the HLB', 'blue')
+                    print colored('SERVER ' + ws_ip + ' WILL BE ADDED to the HLB', 'blue')
                     print colored('=========================================', 'blue')
                     print colored('Line to be ADDED:', attrs=['bold'])
                     print colored(add_ws, 'cyan', attrs=['bold'])
@@ -939,9 +1046,10 @@ def haproxy_ws(action,ws_ip):
 
                     sudo('chmod 757 /etc/haproxy/')
                     sudo('chmod 606 /etc/haproxy/haproxy.cfg')
-                    sed('/etc/haproxy/haproxy.cfg', remove_ws, add_ws, limit='', use_sudo=True, backup='.bak', flags='', shell=False)
-                    #fabric.contrib.files.sed(filename, before, after, limit='', use_sudo=False, backup='.bak', flags='', shell=False)
-                    #sudo('sed -i "/'+remove_ws+'/c\'+add_ws+' haproxy.cfg')
+                    sed('/etc/haproxy/haproxy.cfg', remove_ws, add_ws, limit='', use_sudo=True, backup='.bak', flags='',
+                        shell=False)
+                    # fabric.contrib.files.sed(filename, before, after, limit='', use_sudo=False, backup='.bak', flags='', shell=False)
+                    # sudo('sed -i "/'+remove_ws+'/c\'+add_ws+' haproxy.cfg')
                     sudo('chmod 755 /etc/haproxy/')
                     sudo('chmod 600 /etc/haproxy/haproxy.cfg')
 
@@ -965,7 +1073,8 @@ def haproxy_ws(action,ws_ip):
 
                     sudo('chmod 757 /etc/haproxy/')
                     sudo('chmod 606 /etc/haproxy/haproxy.cfg')
-                    sed('/etc/haproxy/haproxy.cfg', remove_ws, add_ws, limit='', use_sudo=True, backup='.bak', flags='', shell=False)
+                    sed('/etc/haproxy/haproxy.cfg', remove_ws, add_ws, limit='', use_sudo=True, backup='.bak', flags='',
+                        shell=False)
                     sudo('chmod 755 /etc/haproxy/')
                     sudo('chmod 600 /etc/haproxy/haproxy.cfg')
 
@@ -984,38 +1093,39 @@ def haproxy_ws(action,ws_ip):
                 print colored('Problem found haproxy.cfg not found - check istallation', 'red')
                 print colored('=======================================================', 'red')
 
+
 def maltrail(role):
     with settings(warn_only=False):
         try:
-            #DEPENDENCIAS for AMAZON LINUX:
-            #sudo yum install libpcap-devel
-            #sudo yum install libnet
-            #sudo yum install python-devel
-            #sudo yum install gcc-c++
-            #sudo yum install git wget
-            #wget http://packages.psychotic.ninja/6/base/x86_64/RPMS/schedtool-1.3.0-12.el6.psychotic.x86_64.rpm
-            #sudo rpm -Uvh schedtool-1.3.0-12.el6.psychotic.x86_64.rpm
-            #wget http://www.coresecurity.com/system/files/pcapy-0.10.6.zip
-            #unzip pcapy-0.10.6.zip
-            #sudo python setup.py install
+            # DEPENDENCIAS for AMAZON LINUX:
+            # sudo yum install libpcap-devel
+            # sudo yum install libnet
+            # sudo yum install python-devel
+            # sudo yum install gcc-c++
+            # sudo yum install git wget
+            # wget http://packages.psychotic.ninja/6/base/x86_64/RPMS/schedtool-1.3.0-12.el6.psychotic.x86_64.rpm
+            # sudo rpm -Uvh schedtool-1.3.0-12.el6.psychotic.x86_64.rpm
+            # wget http://www.coresecurity.com/system/files/pcapy-0.10.6.zip
+            # unzip pcapy-0.10.6.zip
+            # sudo python setup.py install
             sudo('yum install -y git pcapy schedtool')
-            with cd('/home/'+env.user+'/'):
-                if exists('/home/'+env.user+'/maltrail', use_sudo=True):
+            with cd('/home/' + env.user + '/'):
+                if exists('/home/' + env.user + '/maltrail', use_sudo=True):
                     print colored('###########################################', 'blue')
                     print colored('####### Directory already created #########', 'blue')
                     print colored('###########################################', 'blue')
 
-                    if role=="sensor":
-                        with cd ('maltrail'):
+                    if role == "sensor":
+                        with cd('maltrail'):
                             sudo('python sensor.py')
                             sudo('ping -c 1 136.161.101.53')
                             sudo('cat /var/log/maltrail/$(date +"%Y-%m-%d").log')
 
-                    elif role=="server":
-                        with cd('/home/'+env.user+'/'):
+                    elif role == "server":
+                        with cd('/home/' + env.user + '/'):
                             run('[[ -d maltrail ]] || git clone https://github.com/stamparm/maltrail.git')
 
-                        with cd ('maltrail/'):
+                        with cd('maltrail/'):
                             sudo('python server.py')
                             sudo('ping -c 1 136.161.101.53')
                             sudo('cat /var/log/maltrail/$(date +"%Y-%m-%d").log')
@@ -1030,31 +1140,33 @@ def maltrail(role):
                     print colored('##########################################', 'red')
                     if role == "sensor":
                         run('git clone https://github.com/stamparm/maltrail.git')
-                        with cd ('maltrail/'):
+                        with cd('maltrail/'):
                             sudo('python sensor.py ')
                             sudo('ping -c 1 136.161.101.53')
                             sudo('cat /var/log/maltrail/$(date +"%Y-%m-%d").log')
                             ### FOR THE CLIENT ###
-                            #using configuration file '/home/ebarrirero/maltrail/maltrail.conf.sensor_ok'
-                            #using '/var/log/maltrail' for log storage
-                            #at least 384MB of free memory required
-                            #updating trails (this might take a while)...
-                            #loading trails...
-                            #1,135,525 trails loaded
+                            # using configuration file '/home/ebarrirero/maltrail/maltrail.conf.sensor_ok'
+                            # using '/var/log/maltrail' for log storage
+                            # at least 384MB of free memory required
+                            # updating trails (this might take a while)...
+                            # loading trails...
+                            # 1,135,525 trails loaded
 
                             ### NOTE: ###
-                            #in case of any problems with packet capture on virtual interface 'any',
-                            #please put all monitoring interfaces to promiscuous mode manually (e.g. 'sudo ifconfig eth0 promisc')
-                            #opening interface 'any'
-                            #setting capture filter 'udp or icmp or (tcp and (tcp[tcpflags] == tcp-syn or port 80 or port 1080 or
-                            #port 3128 or port 8000 or port 8080 or port 8118))'
-                            #preparing capture buffer...
-                            #creating 1 more processes (out of total 2)
-                            #please install 'schedtool' for better CPU scheduling
+                            # in case of any problems with packet capture on virtual interface 'any',
+                            # please put all monitoring interfaces to promiscuous mode manually
+                            #  (e.g. 'sudo ifconfig eth0 promisc')
+                            # opening interface 'any'
+                            # setting capture filter 'udp or icmp or (tcp and (tcp[tcpflags] == tcp-syn or port 80
+                            #  or port 1080 or
+                            # port 3128 or port 8000 or port 8080 or port 8118))'
+                            # preparing capture buffer...
+                            # creating 1 more processes (out of total 2)
+                            # please install 'schedtool' for better CPU scheduling
                     elif role == "server":
                         with cd('/home/' + env.user + '/'):
                             run('[[ -d maltrail ]] || git clone https://github.com/stamparm/maltrail.git')
-                        with cd ('maltrail/'):
+                        with cd('maltrail/'):
                             sudo('python server.py')
                             sudo('ping -c 1 136.161.101.53')
                             sudo('cat /var/log/maltrail/$(date +"%Y-%m-%d").log')
@@ -1064,62 +1176,67 @@ def maltrail(role):
                         print colored('Wrong arg: excects = "sensor" or "server"', 'red')
                         print colored('=========================================', 'red')
 
-                #To stop Sensor and Server instances (if running in background) execute the following:
-                #sudo pkill -f sensor.py
-                #pkill -f server.py
+                        # To stop Sensor and Server instances (if running in background) execute the following:
+                        # sudo pkill -f sensor.py
+                        # pkill -f server.py
 
-                #http://127.0.0.1:8338 (default credentials: admin:changeme!)
+                        # http://127.0.0.1:8338 (default credentials: admin:changeme!)
 
-                #If option LOG_SERVER is set, then all events are being sent remotely to the Server,
-                #otherwise they are stored directly into the logging directory set with option LOG_DIR,
-                #which can be found inside the maltrail.conf.sensor_ok file's section [All].
+                        # If option LOG_SERVER is set, then all events are being sent remotely to the Server,
+                        # otherwise they are stored directly into the logging directory set with option LOG_DIR,
+                        # which can be found inside the maltrail.conf.sensor_ok file's section [All].
 
-                #In case that the option UPDATE_SERVER is set, then all the trails are being pulled from
-                #the given location, otherwise they are being updated from trails definitions located inside
-                #the installation itself.
+                        # In case that the option UPDATE_SERVER is set, then all the trails are being pulled from
+                        # the given location, otherwise they are being updated from trails definitions located inside
+                        # the installation itself.
 
-                #Option UDP_ADDRESS contains the server's log collecting listening address
-                #(Note: use 0.0.0.0 to listen on all interfaces), while option UDP_PORT contains
-                #listening port value. If turned on, when used in combination with option LOG_SERVER,
-                #it can be used for distinct (multiple) Sensor <-> Server architecture.
+                        # Option UDP_ADDRESS contains the server's log collecting listening address
+                        # (Note: use 0.0.0.0 to listen on all interfaces), while option UDP_PORT contains
+                        # listening port value. If turned on, when used in combination with option LOG_SERVER,
+                        # it can be used for distinct (multiple) Sensor <-> Server architecture.
 
-                #Same as for Sensor, when running the Server (e.g. python server.py) for the first time
-                #and/or after a longer period of non-running, if option USE_SERVER_UPDATE_TRAILS is set to true,
-                # it will automatically update the trails from trail definitions (Note: stored inside the
-                # trails directory).
-                # Should server do the trail updates too (to support UPDATE_SERVER)
+                        # Same as for Sensor, when running the Server (e.g. python server.py) for the first time
+                        # and/or after a longer period of non-running, if option USE_SERVER_UPDATE_TRAILS is set to true,
+                        # it will automatically update the trails from trail definitions (Note: stored inside the
+                        # trails directory).
+                        # Should server do the trail updates too (to support UPDATE_SERVER)
 
         except:
             print colored('===========================', 'red')
             print colored('Problem installing MALTRAIL', 'red')
             print colored('===========================', 'red')
 
-def iptables(action,ip_addr):
+
+def iptables(action, ip_addr):
     with settings(warn_only=False):
         try:
+            print colored('===========================', 'red')
+            print colored('IPTABLES START', 'red')
+            print colored('===========================', 'red')
         except:
             print colored('===========================', 'red')
-            print colored('Problem installing MALTRAIL', 'red')
+            print colored('IPTABLES PROBLEM', 'red')
             print colored('===========================', 'red')
 
-    #62.210.148.246
-    #46.4.116.197
-    #51.254.97.23
-    #171.113.86.129
+            # 62.210.148.246
+            # 46.4.116.197
+            # 51.254.97.23
+            # 171.113.86.129
 
-    #iptables -A INPUT -s <ip> -j DROP
-    #iptables -A INPUT -s 62.210.148.246 -j DROP
-    #iptables -A INPUT -s 46.4.116.197 -j DROP
-    #iptables -A INPUT -s 51.254.97.23 -j DROP
-    #iptables -A INPUT -s 171.113.86.129 -j DROP
+            # iptables -A INPUT -s <ip> -j DROP
+            # iptables -A INPUT -s 62.210.148.246 -j DROP
+            # iptables -A INPUT -s 46.4.116.197 -j DROP
+            # iptables -A INPUT -s 51.254.97.23 -j DROP
+            # iptables -A INPUT -s 171.113.86.129 -j DROP
 
-    #iptables -A INPUT -s 62.24.252.133 -j DROP
-    #iptables -A INPUT -s 195.154.187.115 -j DROP
-    #iptables -A INPUT -s 176.9.131.69 -j DROP
-    #iptables -A INPUT -s 46.165.197.141 -j DROP
+            # iptables -A INPUT -s 62.24.252.133 -j DROP
+            # iptables -A INPUT -s 195.154.187.115 -j DROP
+            # iptables -A INPUT -s 176.9.131.69 -j DROP
+            # iptables -A INPUT -s 46.165.197.141 -j DROP
 
-    #for ip in list:
-    #        iptables -A INPUT
+            # for ip in list:
+            #        iptables -A INPUT
+
 
 """
 def db_backup():
