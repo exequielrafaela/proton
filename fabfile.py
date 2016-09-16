@@ -509,8 +509,8 @@ def key_append(usernamea):
 
 def key_test(usernamet):
     """
-
-    :param usernamet:
+Test SSH (authorized_keys) in the host
+    :param usernamet: "username" keys to test
     """
     with settings(warn_only=False):
         # TAKE THE HOME DIR FROM /ETC/PASSWD
@@ -584,7 +584,10 @@ def ruby_install_centos():
             run('gem install bundler')
 
 
-def kifezero_install_centos():
+def knifezero_install_centos():
+    """
+Install knife zero on RedHat/Centos OS
+    """
     with settings(warn_only=False):
         if exists('/tmp/chefdk-0.17.17-1.el7.x86_64.rpm', use_sudo=True):
             print colored('###################################################', 'blue')
@@ -626,7 +629,7 @@ def kifezero_install_centos():
                 print colored('###########################################', 'red')
 
 
-def kifezero_conf_centos(usernamek, envs_list = []):
+def knifezero_conf_centos(usernamek, envs_list = []):
     """
 Initialize knife zero on RedHat/Centos OS
     :param usernamek: chef admin user, must have permisses in all the remote servers
