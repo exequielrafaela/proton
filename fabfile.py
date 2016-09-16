@@ -669,7 +669,7 @@ Initialize knife zero on RedHat/Centos OS
                     for serverIp in ServerList:
                         print serverIp
                         chef_cli_index = str(client_index=+ 1)
-                        prin chef_cli_index
+                        print chef_cli_index
                         sudo('knife zero bootstrap '+usernamek+'@'+serverIp+' -N client'+chef_cli_index)
 
                 sudo('knife node list')
