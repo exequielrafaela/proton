@@ -1,6 +1,17 @@
 # coding=utf-8
 
 """
+# Fabfile to:
+#    - AUTOMATE SEVERAL LINUX INFRA TASKS.
+#    - to invoke: fab -f file -R role func:arguemnt1,argument2
+#    - $ fab -f /home/usernamex/fabfile.py -R local gen_key:username
+#
+#    - If the "fabfile.py" is in the current dir then just:
+#    - $ fab -R dev push_key:username
+#    - $ fab -R dev test_key:username
+"""
+
+"""
 ORDER THE IMPORTS ALPHABETICALLY and DIVIDE IN 3 SECTIONS
 1st.standard library modules – e.g. sys, os, getopt, re
 2nd.third-party library modules (anything installed in Python’s site-packages directory)
