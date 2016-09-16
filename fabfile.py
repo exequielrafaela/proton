@@ -35,7 +35,7 @@ logging.info('LOG STARTS')
 # logging.warning('And this, too')
 
 # Open the server list file and split the IP o each server.
- with open("./out_users_test.txt", "r") as f:
+with open("./out_users_test.txt", "r") as f:
     ServerList = [line.split()[0] for line in f]
 
 # In env.roledefs we define the remote servers. It can be IP Addrs or domain names.
@@ -616,6 +616,11 @@ def kifezero_install_centos():
 
 
 def kifezero_conf_centos(usernamek, envs_list = []):
+    """
+Initialize knife zero on RedHat/Centos OS
+    :param usernamek: chef admin user, must have permisses in all the remote servers
+    :param envs_list: list with the desired chef environments
+    """
     with settings(warn_only=False):
         if exists('/home/' + usernamek + '/my_chef_repo', use_sudo=True):
             print colored('#########################################', 'blue')
@@ -659,7 +664,7 @@ def kifezero_conf_centos(usernamek, envs_list = []):
 
                 for chef_envs in envs_list:
                     sudo('knife environment create '+chef_envs+' --disable-editing')
-
+                """
                 # knife node environment set client1 development
                 # knife node environment set client2 production
 
@@ -668,6 +673,12 @@ def kifezero_conf_centos(usernamek, envs_list = []):
 
                 # knife role create frontend
                 # knife role delete frontend
+                """
+        except:
+            print colored('########################################', 'red')
+            print colored('###### knife zero config problem #######', 'red')
+            print colored('########################################', 'red')
+
 
 def nfs_server_centos7(nfs_dir):
     """
