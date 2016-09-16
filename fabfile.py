@@ -664,8 +664,7 @@ Initialize knife zero on RedHat/Centos OS
 
         try:
             with cd ('/home/' + usernamek):
-                with open("./servers/out_users_test.txt", "r") as f:
-                    print "TEST!!!"
+                with open("./proton/servers/out_users_test.txt", "r") as f:
                     ServerList = [line.split()[0] for line in f]
                     for serverIp in ServerList:
                         print serverIp
