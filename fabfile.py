@@ -17,8 +17,8 @@ from distutils.util import strtobool
 import logging
 import os
 
-# import yum
-import apt
+#import yum
+#import apt
 import pwd
 import iptools
 import getpass
