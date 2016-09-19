@@ -22,7 +22,8 @@ ORDER THE IMPORTS ALPHABETICALLY and DIVIDE IN 3 SECTIONS
 # Import Fabric's API module#
 # from fabric.api import hosts, sudo, settings, hide, env, execute, prompt, run, local, task, put, cd, get
 from fabric.api import sudo, settings, env, run, local, put, cd, get
-from fabric.contrib.files import append, exists, sed, rsync_project
+from fabric.contrib.files import append, exists, sed
+from fabric.contrib.project import rsync_project
 from termcolor import colored
 from distutils.util import strtobool
 import logging
@@ -1459,6 +1460,11 @@ def disk_usage(tree_dir='/'):
         totalAvailSpaceNonRoot = float(disk.f_frsize*disk.f_bavail)
         print "available space for non-super user: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes " % (totalAvailSpaceNonRoot, totalAvailSpaceNonRoot/1024, totalAvailSpaceNonRoot/1024/1024, totalAvailSpaceNonRoot/1024/1024/1024)
 
+
+172.17.2.230
+240
+
+NYC
 
 """
 def sp_local(sp_dir):
