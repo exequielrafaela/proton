@@ -22,7 +22,7 @@ ORDER THE IMPORTS ALPHABETICALLY and DIVIDE IN 3 SECTIONS
 # Import Fabric's API module#
 # from fabric.api import hosts, sudo, settings, hide, env, execute, prompt, run, local, task, put, cd, get
 from fabric.api import sudo, settings, env, run, local, put, cd, get
-from fabric.contrib.files import append, exists, sed
+from fabric.contrib.files import append, exists, sed, rsync_project
 from termcolor import colored
 from distutils.util import strtobool
 import logging
@@ -1274,9 +1274,12 @@ def iptables(action, ip_addr):
             #        iptables -A INPUT
 
 
-"""
 def db_backup():
+    """
+
+    """
     with settings(warn_only=False):
+        """
         #Check the DBs in PRD
         mysql -h ggcc-prd.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "show databases"
         +--------------------+
@@ -1333,7 +1336,6 @@ def db_backup():
 
         mysql> select * from  mysql.user;
         mysql> describe mysql.user;
-        mysql> select User from mysql.user;
 
         mysql> select User from mysql.user;
         +----------------+
@@ -1389,7 +1391,7 @@ def db_backup():
 
         #mysql --defaults-file=scripts/conf/connect-stg/connect-stg-my.cnf -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -e "CREATE DATABASE grey_stg_v2"
         #mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "DROP DATABASE grey_stg_v2"
-        mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "CREATE DATABASE ggcc_stg_v2"
+        mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "CREATE DATABASE ggcc_stg_v3"
         mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "show databases;"
         Enter password:
         +--------------------+
@@ -1406,7 +1408,7 @@ def db_backup():
         +--------------------+
 
         DATE=`date +%Y-%m-%d`
-        mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p ggcc_stg_v2 < /ops/backups/ggcc_prd-$DATE.sql
+        mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p ggcc_stg_v3 < /ops/backups/ggcc_prd-$DATE.sql
 
         THEN IN STG
         If User not created:
@@ -1418,10 +1420,45 @@ def db_backup():
         #mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "grant all privileges on ggcc_stg_v2.* to 'grey_ggcc_user'@'%';"
 
         #To grant permisions for a certain user for a specific DB (for Connect)
-        mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "grant all on `ggcc_stg_v2`.* to 'ggcc_stg_user'@'%';"
+        mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "grant all on ggcc_stg_v3.* to 'ggcc_stg_user'@'%';"
 
         #Remove the dump
-"""
+        """
+
+
+def rsync(remote_dir='/srv/myproject/'):
+    with settings(warn_only=False):
+        rsync_project(
+            remote_dir="/srv/myproject/",
+            local_dir="./",
+            exclude=("*_local.py", "*.pyc",),
+            )
+
+
+def disk_usage(tree_dir='/'):
+    with settings(warn_only=False):
+        import os
+        disk = os.statvfs(tree_dir)
+        print "preferred file system block size: " + str(disk.f_bsize)
+        print "fundamental file system block size: " + str(disk.f_frsize)
+        print "total number of blocks in filesystem: " + str(disk.f_blocks)
+        print "total number of free blocks: " + str(disk.f_bfree)
+        print "free blocks available to non-super user: " + str(disk.f_bavail)
+        print "total number of file nodes: " + str(disk.f_files)
+        print "total number of free file nodes: " + str(disk.f_ffree)
+        print "free nodes available to non-super user: " + str(disk.f_favail)
+        print "flags: " + str(disk.f_flag)
+        print "miximum file name length: " + str(disk.f_namemax)
+        print "~~~~~~~~~~calculation of disk usage:~~~~~~~~~~"
+        totalBytes = float(disk.f_frsize*disk.f_blocks)
+        print "total space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (totalBytes, totalBytes/1024, totalBytes/1024/1024, totalBytes/1024/1024/1024)
+        totalUsedSpace = float(disk.f_frsize*(disk.f_blocks-disk.f_bfree))
+        print "used space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (totalUsedSpace, totalUsedSpace/1024, totalUsedSpace/1024/1024, totalUsedSpace/1024/1024/1024)
+        totalAvailSpace = float(disk.f_frsize*disk.f_bfree)
+        print "available space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (totalAvailSpace, totalAvailSpace/1024, totalAvailSpace/1024/1024, totalAvailSpace/1024/1024/1024)
+        totalAvailSpaceNonRoot = float(disk.f_frsize*disk.f_bavail)
+        print "available space for non-super user: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes " % (totalAvailSpaceNonRoot, totalAvailSpaceNonRoot/1024, totalAvailSpaceNonRoot/1024/1024, totalAvailSpaceNonRoot/1024/1024/1024)
+
 
 """
 def sp_local(sp_dir):
