@@ -1461,11 +1461,6 @@ def disk_usage(tree_dir='/'):
         print "available space for non-super user: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes " % (totalAvailSpaceNonRoot, totalAvailSpaceNonRoot/1024, totalAvailSpaceNonRoot/1024/1024, totalAvailSpaceNonRoot/1024/1024/1024)
 
 
-172.17.2.230
-240
-
-NYC
-
 """
 def sp_local(sp_dir):
     with settings(warn_only=False):
