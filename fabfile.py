@@ -1596,7 +1596,7 @@ Migrate Dev Connect DATA nyc1app204 to new Azure connect-dev-aio-01
         sudo('rsync -avzP --progress /etc/mysql/* 172.17.2.30:/etc/mysql')
 
         # Rsync mysql config files
-        sudo('rsync -avzP --progress /etc/shibboleth/* 172.17.2.30:/etc/shibboleth'
+        sudo('rsync -avzP --progress /etc/shibboleth/* 172.17.2.30:/etc/shibboleth')
 
 """
 def sp_local(sp_dir):
