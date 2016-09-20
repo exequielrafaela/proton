@@ -29,8 +29,8 @@ from distutils.util import strtobool
 import logging
 import os
 
-#import yum
-#import apt
+# import yum
+# import apt
 import pwd
 import iptools
 import getpass
@@ -316,7 +316,7 @@ Install/Upgrade an RedHat/Centos yum based linux package
             try:
                 package_inst = sudo('yum list install ' + package)
                 print(package_inst)
-                if (package_inst == ""):
+                if package_inst == "":
                     print colored('###########################################################################', 'red')
                     print colored(package + ' NOT INSTALLED in:' + hostvm + '- IP:' + env.host_string, 'red')
                     print colored('###########################################################################', 'red')
@@ -354,9 +354,9 @@ Add a user in RedHat/Centos based OS
         # sudo('uname -a')
 
         try:
-            ##if(user_exists != ""):
+            # if(user_exists != ""):
             user_exists = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamec)
-            if (user_exists != ""):
+            if user_exists != "":
                 print colored('##############################', 'green')
                 print colored('"' + usernamec + '" already exists', 'green')
                 print colored('##############################', 'green')
@@ -367,10 +367,10 @@ Add a user in RedHat/Centos based OS
                 print colored('WILL BE CREATED', 'green')
                 print colored('##################################', 'green')
                 sudo('useradd ' + usernamec + ' -m -d /home/' + usernamec)
-                #sudo('echo "' + usernamec + ':' + usernamec + '" | chpasswd')
+                # sudo('echo "' + usernamec + ':' + usernamec + '" | chpasswd')
                 sudo('gpasswd -a ' + usernamec + ' wheel')
         except:
-            ##else:
+            # else:
             print colored('######################################################', 'green')
             print colored('"' + usernamec + '" couldnt be created for some reason', 'green')
             print colored('######################################################', 'green')
@@ -384,7 +384,7 @@ Change RedHat/Centos based OS user password
     """
     with settings(warn_only=False):
         try:
-            ##if(user_exists != ""):
+            # if(user_exists != ""):
             user_exists = sudo('cut -d: -f1 /etc/passwd | grep ' + usernameu)
             if user_exists != "":
                 print colored('#######################################', 'green')
@@ -404,8 +404,7 @@ Change RedHat/Centos based OS user password
 def key_gen(usernameg):
     """
 Generate an SSH key for a certain
-    :param usernameu: "username" to change password
-    :param upass: "password" to be used
+    :param usernameg: "username" to change password
     """
     with settings(warn_only=False):
         # usernameg = prompt("Which USERNAME you like to GEN KEYS?")
@@ -456,15 +455,24 @@ Generate an SSH key for a certain
 
 
 def key_read_file(key_file):
+    """
+In the localhost read and return as a string the public ssh key file given as parameter
+    :param key_file: absolute path of the public ssh key
+    :return:
+    """
     with settings(warn_only=False):
         key_file = os.path.expanduser(key_file)
         if not key_file.endswith('pub'):
             raise RuntimeWarning('Trying to push non-public part of key pair')
-        with open(key_file) as f:
-            return f.read()
+        with open(key_file) as pyfile:
+            return pyfile.read()
 
 
 def key_append(usernamea):
+    """
+Append the public key string in the /home/usernamea/.ssh/authorized_keys of the host
+    :param usernamea: "username" to append the key to.
+    """
     with settings(warn_only=False):
         if (usernamea == "root"):
             key_file = '/' + usernamea + '/.ssh/id_rsa.pub'
@@ -636,12 +644,14 @@ Install knife zero on RedHat/Centos OS
                 print colored('###########################################', 'red')
 
 
-def knifezero_conf_centos(usernamek, envs_list = []):
+def knifezero_conf_centos(usernamek, envs_list=None):
     """
 Initialize knife zero on RedHat/Centos OS
     :param usernamek: chef admin user, must have permisses in all the remote servers
     :param envs_list: list with the desired chef environments
     """
+    if envs_list is None:
+        envs_list = []
     with settings(warn_only=False):
         if exists('/home/' + usernamek + '/my_chef_repo', use_sudo=True):
             print colored('#########################################', 'blue')
@@ -664,13 +674,13 @@ Initialize knife zero on RedHat/Centos OS
             file_send_mod('./conf/chef/knife-zero/knife.rb', '/home/' + usernamek + '/my_chef_repo/', '600')
 
         try:
-            with cd ('/home/' + usernamek +'/my_chef_repo'):
-                with open("./conf/servers/out_users_test.txt", "r") as f:
-                    ServerList = [line.split()[0] for line in f]
-                    for serverIp in ServerList:
+            with cd('/home/' + usernamek + '/my_chef_repo'):
+                with open("./conf/servers/out_users_test.txt", "r") as pyfile:
+                    serverlist = [line.split()[0] for line in pyfile]
+                    for serverIp in serverlist:
                         client_index = 0
                         client_index += 1
-                        run('knife zero bootstrap '+usernamek+'@'+serverIp+' -N client'+str(client_index))
+                        run('knife zero bootstrap ' + usernamek + '@' + serverIp + ' -N client' + str(client_index))
                         # knife bootstrap node_domain_or_IP -x username -P password -N name_for_node --sudo
 
                 sudo('knife node list')
@@ -681,12 +691,12 @@ Initialize knife zero on RedHat/Centos OS
                 # knife ssh "name:cli*" --ssh-user ebarrirero yum search vim
 
                 # knife zero converge "name:client1" -x ebarrirero
-                sudo('knife zero converge "name:*" --ssh-user'+usernamek)
+                sudo('knife zero converge "name:*" --ssh-user' + usernamek)
 
                 sudo('knife cookbook create create_file')
 
                 for chef_envs in envs_list:
-                    sudo('knife environment create '+chef_envs+' --disable-editing')
+                    sudo('knife environment create ' + chef_envs + ' --disable-editing')
                 """
                 # knife node environment set client1 development
                 # knife node environment set client2 production
@@ -705,8 +715,8 @@ Initialize knife zero on RedHat/Centos OS
 
 def nfs_server_centos7(nfs_dir):
     """
-
-    :param nfs_dir:
+Installing NFS Server on a Centos7 host
+    :param nfs_dir: NFS Server directory to be shared
     """
     with settings(warn_only=False):
         sudo('yum install -y nfs-utils libnfsidmap libnfsidmap-devel nfs4-acl-tools')
@@ -722,18 +732,18 @@ def nfs_server_centos7(nfs_dir):
             sudo('mkdir /var/' + nfs_dir)
             sudo('chmod -R 777 /var/' + nfs_dir + '/')
         try:
-            ip_addr = sudo('ifconfig eth0 | awk \'/inet /{print substr($2,1)}\'')
-            netmask = sudo('ifconfig eth0 | awk \'/inet /{print substr($4,1)}\'')
-            subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
-            subnet = subnet_temp[0]
+            # ip_addr = sudo('ifconfig eth0 | awk \'/inet /{print substr($2,1)}\'')
+            # netmask = sudo('ifconfig eth0 | awk \'/inet /{print substr($4,1)}\'')
+            # subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
+            # subnet = subnet_temp[0]
             # sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_all_squash)"
             #  > /etc/exports')
             sudo('echo "/var/' + nfs_dir + '     *(rw,sync,no_root_squash)" > /etc/exports')
         except:
-            ip_addr = sudo('ifconfig enp0s8 | awk \'/inet /{print substr($2,1)}\'')
-            etmask = sudo('ifconfig enp0s8 | awk \'/inet /{print substr($4,1)}\'')
-            subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
-            subnet = subnet_temp[0]
+            # ip_addr = sudo('ifconfig enp0s8 | awk \'/inet /{print substr($2,1)}\'')
+            # netmask = sudo('ifconfig enp0s8 | awk \'/inet /{print substr($4,1)}\'')
+            # subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
+            # subnet = subnet_temp[0]
             # sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_all_squash)"
             #  > /etc/exports')
             sudo('echo "/var/' + nfs_dir + '     *(rw,sync,no_root_squash)" > /etc/exports')
@@ -753,12 +763,20 @@ def nfs_server_centos7(nfs_dir):
 
 
 def cachefs_install(nfs_dir, nfs_server_ip, cachetag="mycache", cachedir="/var/cache/fscache", selinux='False'):
-    # fab -R dev cachefs_install:nfsshare,\"172.28.128.3\",mycache-test,/var/cache/fscache-test/
+    """
+cachefilesd (NFS Cache) installation function
+fab -R dev cachefs_install:nfsshare,\"172.28.128.3\",mycache-test,/var/cache/fscache-test/
+    :param nfs_dir: NFS Server directory
+    :param nfs_server_ip: NFS Server IP Address
+    :param cachetag: Tag to identify the NFS cache in case we have many caches
+    :param cachedir: NFS Cache directory
+    :param selinux: "False" or "True"
+    """
     with settings(warn_only=False):
-        ### INSTALL FS-CACHE PACKAGE ###
+        # INSTALL FS-CACHE PACKAGE #
         sudo('yum install -y cachefilesd')
 
-        ### CHECK IF SELINUX ENFORMENT is ENABLED ###
+        # CHECK IF SELINUX ENFORMENT is ENABLED #
         print colored('=====================================================', 'blue')
         print colored('RELOCATING THE CACHE WITH SELINUX ENFORCEMENT ENABLED', 'blue')
         print colored('=====================================================', 'blue')
@@ -780,10 +798,10 @@ def cachefs_install(nfs_dir, nfs_server_ip, cachetag="mycache", cachedir="/var/c
                 selinux = bool(strtobool('True'))
         # finally:
         #   Peace of code that will be always executed no mater what
-        ### END OF SELINUX ENFORMENT is ENABLED CHECK ###
+        # END OF SELINUX ENFORMENT is ENABLED CHECK #
 
-        ### CONFIGURING FS-CACHE SELINUX ###
-        ### We'll use the documentation folder to host them ###
+        # CONFIGURING FS-CACHE SELINUX #
+        # We'll use the documentation folder to host them #
         if exists('/etc/cachefilesd.conf', use_sudo=True):
             print colored('#################################', 'yellow')
             print colored('##### CACHEFS conf file OK ######', 'yellow')
@@ -800,7 +818,7 @@ def cachefs_install(nfs_dir, nfs_server_ip, cachetag="mycache", cachedir="/var/c
             # simple.  The security policy that governs access to the cache must be changed.
 
             with cd('/usr/share/doc/cachefilesd-*/'):
-                if (selinux == False):
+                if selinux is False:
                     if exists(cachedir, use_sudo=True):
                         print colored('###########################################', 'yellow')
                         print colored('##### Local Cache Dir already exists ######', 'yellow')
@@ -934,7 +952,7 @@ def cachefs_install(nfs_dir, nfs_server_ip, cachetag="mycache", cachedir="/var/c
             print colored('##### Problem mounting cachefilesd ######', 'red')
             print colored('#########################################', 'red')
 
-        ### TESTING ###
+        # TESTING #
         print colored('===============================', 'blue')
         print colored('        FILE NOT CACHED        ', 'blue')
         print colored('===============================', 'blue')
@@ -947,6 +965,11 @@ def cachefs_install(nfs_dir, nfs_server_ip, cachetag="mycache", cachedir="/var/c
 
 
 def nfs_client_centos7(nfs_dir, nfs_server_ip):
+    """
+Installing NFS Client for Centos7 system host/s
+    :param nfs_dir: NFS Server directory
+    :param nfs_server_ip: NFS Server IP Address
+    """
     with settings(warn_only=False):
         sudo('yum install -y nfs-utils')
         sudo('mkdir -p /mnt/nfs/var/' + nfs_dir)
@@ -964,6 +987,10 @@ def nfs_client_centos7(nfs_dir, nfs_server_ip):
 
 
 def nfs_server_centos6(nfs_dir):
+    """
+Installing NFS Server on a Centos6 host
+    :param nfs_dir: NFS Server directory to be shared
+    """
     with settings(warn_only=False):
         sudo('yum install -y nfs-utils nfs-utils-lib')
 
@@ -986,7 +1013,8 @@ def nfs_server_centos6(nfs_dir):
         netmask = sudo('ifconfig eth0 | awk \'/inet /{print substr($4,6)}\'')
         subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
         subnet = subnet_temp[0]
-        # sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_subtree_check)" > /etc/exports')
+        # sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_subtree_check)"
+        #  > /etc/exports')
         sudo('echo "/var/' + nfs_dir + '     *(rw,sync,no_root_squash)" > /etc/exports')
 
         sudo('sudo exportfs -a')
@@ -1015,6 +1043,10 @@ def nfs_client_centos6(nfs_dir, nfs_server_ip):
 
 
 def nfs_server_ubuntu(nfs_dir):
+    """
+Install in the host7s NFS Server under Debian/Ubuntu based systems
+    :param nfs_dir: NFS directory to be shared
+    """
     with settings(warn_only=False):
         sudo('apt-get update')
         sudo('apt-get -y install nfs-kernel-server')
@@ -1039,7 +1071,8 @@ def nfs_server_ubuntu(nfs_dir):
         netmask = sudo('ifconfig eth0 | awk \'/inet /{print substr($4,6)}\'')
         subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
         subnet = subnet_temp[0]
-        # sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_subtree_check)" > /etc/exports')
+        # sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask +
+        # '(rw,sync,no_root_squash,no_subtree_check)" > /etc/exports')
         sudo('echo "/var/' + nfs_dir + '     *(rw,sync,no_root_squash)" > /etc/exports')
 
         sudo('sudo exportfs -a')
@@ -1277,7 +1310,7 @@ def iptables(action, ip_addr):
 
 def db_backup():
     """
-
+MySQLdump backup
     """
     with settings(warn_only=False):
         """
@@ -1433,7 +1466,7 @@ def rsync(remote_dir='/srv/myproject/'):
             remote_dir="/srv/myproject/",
             local_dir="./",
             exclude=("*_local.py", "*.pyc",),
-            )
+        )
 
 
 def disk_usage(tree_dir='/'):
@@ -1451,15 +1484,119 @@ def disk_usage(tree_dir='/'):
         print "flags: " + str(disk.f_flag)
         print "miximum file name length: " + str(disk.f_namemax)
         print "~~~~~~~~~~calculation of disk usage:~~~~~~~~~~"
-        totalBytes = float(disk.f_frsize*disk.f_blocks)
-        print "total space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (totalBytes, totalBytes/1024, totalBytes/1024/1024, totalBytes/1024/1024/1024)
-        totalUsedSpace = float(disk.f_frsize*(disk.f_blocks-disk.f_bfree))
-        print "used space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (totalUsedSpace, totalUsedSpace/1024, totalUsedSpace/1024/1024, totalUsedSpace/1024/1024/1024)
-        totalAvailSpace = float(disk.f_frsize*disk.f_bfree)
-        print "available space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (totalAvailSpace, totalAvailSpace/1024, totalAvailSpace/1024/1024, totalAvailSpace/1024/1024/1024)
-        totalAvailSpaceNonRoot = float(disk.f_frsize*disk.f_bavail)
-        print "available space for non-super user: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes " % (totalAvailSpaceNonRoot, totalAvailSpaceNonRoot/1024, totalAvailSpaceNonRoot/1024/1024, totalAvailSpaceNonRoot/1024/1024/1024)
+        totalBytes = float(disk.f_frsize * disk.f_blocks)
+        print "total space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (
+            totalBytes, totalBytes / 1024, totalBytes / 1024 / 1024, totalBytes / 1024 / 1024 / 1024)
+        totalUsedSpace = float(disk.f_frsize * (disk.f_blocks - disk.f_bfree))
+        print "used space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (
+            totalUsedSpace, totalUsedSpace / 1024, totalUsedSpace / 1024 / 1024, totalUsedSpace / 1024 / 1024 / 1024)
+        totalAvailSpace = float(disk.f_frsize * disk.f_bfree)
+        print "available space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (
+            totalAvailSpace, totalAvailSpace / 1024, totalAvailSpace / 1024 / 1024,
+            totalAvailSpace / 1024 / 1024 / 1024)
+        totalAvailSpaceNonRoot = float(disk.f_frsize * disk.f_bavail)
+        print "available space for non-super user: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes " % (
+            totalAvailSpaceNonRoot, totalAvailSpaceNonRoot / 1024, totalAvailSpaceNonRoot / 1024 / 1024,
+            totalAvailSpaceNonRoot / 1024 / 1024 / 1024)
 
+
+def connect_package_migration():
+    """
+Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
+    """
+    with settings(warn_only=False):
+        print colored('=================================', 'blue')
+        print colored('INSTALLING : "APACHE2 WebqServer"', 'blue')
+        print colored('=================================', 'blue')
+        sudo('yum install -y httpd-manual-2.2.3-91.el5.centos httpd-2.2.3-91.el5.centos')
+
+        print colored('===========================', 'blue')
+        print colored('INSTALLING : "MYSQL Server"', 'blue')
+        print colored('===========================', 'blue')
+        sudo('yum install -y  mysql-server-5.0.95-5.el5_9 mod_auth_mysql-3.0.0-3.2.el5_3 MySQL-python-1.2.3-0.1.c1.el5')
+        sudo('yum install -y mysql-devel-5.0.95-5.el5_9 perl-DBD-MySQL-3.0007-2.el5 mysql-5.0.95-5.el5_9'
+             ' mysql-connector-odbc-3.51.26r1127-2.el5')
+        sudo('yum install -y libdbi-dbd-mysql-0.8.1a-1.2.2 mysql-5.0.95-5.el5_9')
+
+        print colored('==================', 'blue')
+        print colored('INSTALLING : "PHP"', 'blue')
+        print colored('==================', 'blue')
+        sudo(
+            'yum install -y php53-xml-5.3.3-26.el5_11 php53-dba-5.3.3-26.el5_11 php53-pspell-5.3.3-26.el5_11'
+            ' php53-5.3.3-26.el5_11')
+        sudo(
+            'yum install -y php53-devel-5.3.3-26.el5_11 php53-common-5.3.3-26.el5_11 php53-bcmath-5.3.3-26.el5_11'
+            ' php53-intl-5.3.3-26.el5_11')
+        sudo(
+            'yum install -y php53-mapi-7.1.14-1.el5 php53-interbase-5.3.3-1.el5 php53-recode-5.3.3-1.el5'
+            ' php53-mcrypt-5.3.3-1.el5')
+        sudo(
+            'yum install -y php53-pdo-5.3.3-26.el5_11 php53-odbc-5.3.3-26.el5_11 php53-process-5.3.3-26.el5_11'
+            ' php53-imap-5.3.3-26.el5_11')
+        sudo(
+            'yum install -y php53-gd-5.3.3-26.el5_11 php53-cli-5.3.3-26.el5_11 php53-xmlrpc-5.3.3-26.el5_11'
+            ' php53-ldap-5.3.3-26.el5_11')
+        sudo(
+            'yum install -y php53-enchant-5.3.3-1.el5 php53-php-gettext-1.0.11-3.el5 php53-snmp-5.3.3-26.el5_11'
+            ' php53-tidy-5.3.3-1.el5')
+        sudo(
+            'yum install -y php53-pgsql-5.3.3-26.el5_11 php53-soap-5.3.3-26.el5_11 postfix-2.3.3-7.el5'
+            ' php53-mssql-5.3.3-1.el5')
+        sudo('yum install -y php53-mysql-5.3.3-26.el5_11 php53-mbstring-5.3.3-26.el5_11')
+
+        # [ebarrirero@nyc1app204 shibboleth]$ sudo rpm -ql php53
+        # /etc/httpd/conf.d/php.conf
+        # /usr/lib64/httpd/modules/libphp5.so
+        # /var/lib/php/session
+        # /var/www/icons/php.gif
+
+        print colored('============================', 'blue')
+        print colored('INSTALLING : SHIBBOLETH Auth', 'blue')
+        print colored('============================', 'blue')
+        sudo('yum install -y shibboleth-2.5.6-3.1')
+
+        print colored('===================', 'blue')
+        print colored('INSTALLING : "CRON"', 'blue')
+        print colored('===================', 'blue')
+        sudo('yum install -y crontabs anacron vixie-cron')
+
+        print colored('===================================', 'blue')
+        print colored('INSTALLING : "NEW RELIC" Monitoring', 'blue')
+        print colored('===================================', 'blue')
+        sudo('yum install -y newrelic-php5 newrelic-repo newrelic-daemon newrelic-php5-common newrelic-sysmond')
+
+        print colored('==================', 'blue')
+        print colored('INSTALLING : "NTP"', 'blue')
+        print colored('==================', 'blue')
+        sudo('yum install -y ntp')
+
+        print colored('============================', 'blue')
+        print colored('INSTALLING : "SNMP"', 'blue')
+        print colored('============================', 'blue')
+        sudo('yum install -y net-snmp-libs net-snmp net-snmp-utils')
+
+
+def connect_data_migration():
+    """
+Migrate Dev Connect DATA nyc1app204 to new Azure connect-dev-aio-01
+    """
+    with settings(warn_only=False):
+        # Rsync web root
+        sudo('rsync -avzP --progress /var/www/* apache@172.17.2.30:/var/www')
+
+        # Rsync the apache configuration files
+        sudo('rsync -avzP --progress /etc/httpd/* apache@172.17.2.30:/etc/httpd')
+
+        # Rsync php configuration
+        sudo('scp /etc/php.ini root@172.17.2.30:/etc/')
+        sudo('rsync -avzP --progress /etc/php.d/ 172.17.2.30:/etc/php.d')
+        sudo('rsync -avzP --progress /usr/include/php/ 172.17.2.30:/usr/include/php')
+
+        # Rsync mysql config files
+        sudo('rsync -avzP --progress /etc/mysql/* 172.17.2.30:/etc/mysql')
+
+        # Rsync mysql config files
+        sudo('rsync -avzP --progress /etc/shibboleth/* 172.17.2.30:/etc/shibboleth'
 
 """
 def sp_local(sp_dir):
