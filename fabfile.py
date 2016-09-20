@@ -290,7 +290,7 @@ Install/Upgrade an RedHat/Centos yum based linux package
                             print colored(
                                 '##################################################################################',
                                 'green')
-                    except:
+                    except SystemExit:
                         print colored(
                             '#################################################################################', 'red')
                         print colored(package + ' INSTALLATION PROBLEM in:' + hostvm + '- IP:' + env.host_string, 'red')
@@ -302,7 +302,7 @@ Install/Upgrade an RedHat/Centos yum based linux package
                     print colored(package + ' ALREADY INSTALLED in:' + hostvm + '- IP:' + env.host_string, 'yellow')
                     print colored('###############################################################################',
                                   'yellow')
-            except:
+            except SystemExit:
                 print colored('#################################################################################',
                               'red')
                 print colored(package + ' INSTALLATION PROBLEM in:' + hostvm + '- IP:' + env.host_string, 'red')
@@ -327,7 +327,7 @@ Install/Upgrade an RedHat/Centos yum based linux package
                     print colored('############################################################################',
                                   'yellow')
                     sudo('yum update -y ' + package)
-            except:
+            except SystemExit:
                 print colored('###########################################################################', 'red')
                 print colored(package + ' NOT INSTALLED in:' + hostvm + '- IP:' + env.host_string, 'red')
                 print colored('###########################################################################', 'red')
@@ -369,7 +369,7 @@ Add a user in RedHat/Centos based OS
                 sudo('useradd ' + usernamec + ' -m -d /home/' + usernamec)
                 # sudo('echo "' + usernamec + ':' + usernamec + '" | chpasswd')
                 sudo('gpasswd -a ' + usernamec + ' wheel')
-        except:
+        except SystemExit:
             # else:
             print colored('######################################################', 'green')
             print colored('"' + usernamec + '" couldnt be created for some reason', 'green')
@@ -395,7 +395,7 @@ Change RedHat/Centos based OS user password
                 print colored('#################################', 'red')
                 print colored('"' + usernameu + '" doesnt exists', 'red')
                 print colored('#################################', 'red')
-        except:
+        except SystemExit:
             print colored('#################################', 'red')
             print colored('"' + usernameu + '" doesnt exists', 'red')
             print colored('##################################', 'red')
@@ -564,7 +564,7 @@ Test SSH (authorized_keys) in the host
         # (and you can't trick it with named pipe or such). Besides, you do not actually want to trick ssh,' \
         # ' but just to be able to use your key files.
 
-        if (os.path.exists('/home/' + usernamet + '/.ssh/')):
+        if os.path.exists('/home/' + usernamet + '/.ssh/'):
             ssh_test = local(
                 'ssh -i ~/temp/id_rsa -o "StrictHostKeyChecking no" -q ' + usernamet + '@' + env.host_string + ' exit')
             if ssh_test.succeeded:
@@ -582,14 +582,17 @@ Test SSH (authorized_keys) in the host
 
 
 def ruby_install_centos():
+    """
+Install ruby via rvm in Centos based system
+    """
     with settings(warn_only=False):
         # sudo('yum ruby ruby-devel rubygems')
         # yum groupinstall -y development
         # yum groupinstall -y 'development tools'
         sudo('yum groupinstall "Development Tools"')
         sudo('yum install -y git-core zlib zlib-devel gcc-c++ patch readline readline-devel')
-        sudo(
-            'yum install -y libyaml-devel libffi-devel openssl-devel make bzip2 autoconf automake libtool bison curl sqlite-devel')
+        sudo('yum install -y libyaml-devel libffi-devel openssl-devel make bzip2 autoconf automake libtool'
+             ' bison curl sqlite-devel')
 
         # with cd('/home/'+usernamei+'/'):
         with cd('~'):
@@ -632,7 +635,7 @@ Install knife zero on RedHat/Centos OS
                 print colored('###########################################', 'red')
                 print colored('###### Check chef-zero installation #######', 'red')
                 print colored('###########################################', 'red')
-        except:
+        except SystemExit:
             run('chef gem install knife-zero')
             if exists('/opt/chefdk/embedded/bin/knife', use_sudo=True):
                 print colored('###########################################', 'blue')
@@ -707,7 +710,7 @@ Initialize knife zero on RedHat/Centos OS
                 # knife role create frontend
                 # knife role delete frontend
                 """
-        except:
+        except SystemExit:
             print colored('########################################', 'red')
             print colored('###### knife zero config problem #######', 'red')
             print colored('########################################', 'red')
@@ -739,7 +742,7 @@ Installing NFS Server on a Centos7 host
             # sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_all_squash)"
             #  > /etc/exports')
             sudo('echo "/var/' + nfs_dir + '     *(rw,sync,no_root_squash)" > /etc/exports')
-        except:
+        except SystemExit:
             # ip_addr = sudo('ifconfig enp0s8 | awk \'/inet /{print substr($2,1)}\'')
             # netmask = sudo('ifconfig enp0s8 | awk \'/inet /{print substr($4,1)}\'')
             # subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
@@ -980,7 +983,7 @@ Installing NFS Client for Centos7 system host/s
         try:
             run('touch /mnt/nfs/var/nfsshare/test_nfs')
 
-        except:
+        except SystemExit:
             print colored('###########################################', 'red')
             print colored('###### NFS client installation Fail #######', 'red')
             print colored('###########################################', 'red')
@@ -1009,10 +1012,10 @@ Installing NFS Server on a Centos6 host
         sudo('service rpcbind start')
         sudo('service nfs start')
 
-        ip_addr = sudo('ifconfig eth0 | awk \'/inet /{print substr($2,6)}\'')
-        netmask = sudo('ifconfig eth0 | awk \'/inet /{print substr($4,6)}\'')
-        subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
-        subnet = subnet_temp[0]
+        # ip_addr = sudo('ifconfig eth0 | awk \'/inet /{print substr($2,6)}\'')
+        # netmask = sudo('ifconfig eth0 | awk \'/inet /{print substr($4,6)}\'')
+        # subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
+        # subnet = subnet_temp[0]
         # sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_subtree_check)"
         #  > /etc/exports')
         sudo('echo "/var/' + nfs_dir + '     *(rw,sync,no_root_squash)" > /etc/exports')
@@ -1026,6 +1029,11 @@ Installing NFS Server on a Centos6 host
 
 
 def nfs_client_centos6(nfs_dir, nfs_server_ip):
+    """
+Installing NFS Client for Centos6 system host/s
+    :param nfs_dir: NFS Server directory
+    :param nfs_server_ip: NFS Server IP Address
+    """
     with settings(warn_only=False):
         sudo('yum install -y nfs-utils nfs-utils-lib')
         sudo('mkdir -p /mnt/nfs/var/' + nfs_dir + '/')
@@ -1036,7 +1044,7 @@ def nfs_client_centos6(nfs_dir, nfs_server_ip):
         try:
             run('touch /mnt/nfs/var/nfsshare/test_nfs')
 
-        except:
+        except SystemExit:
             print colored('###########################################', 'red')
             print colored('###### Check NFS Client configuration #####', 'red')
             print colored('###########################################', 'red')
@@ -1086,6 +1094,11 @@ Install in the host7s NFS Server under Debian/Ubuntu based systems
 
 
 def haproxy_ws(action, ws_ip):
+    """
+Add/Remove a WS from a Haproxy Load Balancer
+    :param action: "add" or "remove"
+    :param ws_ip: Web Server IP Address
+    """
     with settings(warn_only=False):
         with cd('/etc/haproxy'):
             try:
@@ -1118,7 +1131,8 @@ def haproxy_ws(action, ws_ip):
                     sudo('chmod 606 /etc/haproxy/haproxy.cfg')
                     sed('/etc/haproxy/haproxy.cfg', remove_ws, add_ws, limit='', use_sudo=True, backup='.bak', flags='',
                         shell=False)
-                    # fabric.contrib.files.sed(filename, before, after, limit='', use_sudo=False, backup='.bak', flags='', shell=False)
+                    # fabric.contrib.files.sed(filename, before, after, limit='', use_sudo=False,
+                    #  backup='.bak', flags='', shell=False)
                     # sudo('sed -i "/'+remove_ws+'/c\'+add_ws+' haproxy.cfg')
                     sudo('chmod 755 /etc/haproxy/')
                     sudo('chmod 600 /etc/haproxy/haproxy.cfg')
@@ -1158,7 +1172,7 @@ def haproxy_ws(action, ws_ip):
                     print colored('===========================================================================', 'red')
                     print colored('WRONG ARGs or conditions unmets, eg: trying to add a WS that already exists', 'red')
                     print colored('===========================================================================', 'red')
-            except:
+            except SystemExit:
                 print colored('=======================================================', 'red')
                 print colored('Problem found haproxy.cfg not found - check istallation', 'red')
                 print colored('=======================================================', 'red')
@@ -1466,6 +1480,10 @@ MySQLdump backup
 
 
 def rsync(remote_dir='/srv/myproject/'):
+    """
+Python fabric rsync
+    :param remote_dir:
+    """
     with settings(warn_only=False):
         rsync_project(
             remote_dir="/srv/myproject/",
@@ -1517,19 +1535,30 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
             sudo('yum install -y httpd-manual-2.2.3-91.el5.centos httpd-2.2.3-91.el5.centos')
         except SystemExit:
             sudo('yum install -y httpd')
+            sudo('systemctl start httpd.service')
+            sudo('systemctl enable httpd.service')
 
         print colored('===========================', 'blue')
         print colored('INSTALLING : "MYSQL Server"', 'blue')
         print colored('===========================', 'blue')
         try:
-            sudo('yum install -y  mysql-server-5.0.95-5.el5_9 mod_auth_mysql-3.0.0-3.2.el5_3 MySQL-python-1.2.3-0.1.c1.el5')
+            sudo('wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm')
+            sudo('rpm -ivh mysql-community-release-el7-5.noarch.rpm')
+            sudo('yum update')
+            sudo('yum install -y  mysql-server-5.0.95-5.el5_9 mod_auth_mysql-3.0.0-3.2.el5_3 '
+                 'MySQL-python-1.2.3-0.1.c1.el5')
             sudo('yum install -y mysql-devel-5.0.95-5.el5_9 perl-DBD-MySQL-3.0007-2.el5 mysql-5.0.95-5.el5_9'
-             ' mysql-connector-odbc-3.51.26r1127-2.el5')
+                 ' mysql-connector-odbc-3.51.26r1127-2.el5')
             sudo('yum install -y libdbi-dbd-mysql-0.8.1a-1.2.2 mysql-5.0.95-5.el5_9')
+            sudo('systemctl start mysqld')
         except SystemExit:
-            print colored('==================', 'red')
-            print colored('Problem Installing', 'red')
-            print colored('==================', 'red')
+            sudo('wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm')
+            sudo('rpm -ivh mysql-community-release-el7-5.noarch.rpm')
+            sudo('yum update')
+            sudo('yum install -y  mysql-server mod_auth_mysql MySQL-python')
+            sudo('yum install -y mysql-devel perl-DBD-MySQL mysql mysql-connector-odbc')
+            sudo('yum install -y libdbi-dbd-mysql')
+            sudo('systemctl start mysqld')
 
         print colored('==================', 'blue')
         print colored('INSTALLING : "PHP"', 'blue')
@@ -1610,6 +1639,7 @@ Migrate Dev Connect DATA nyc1app204 to new Azure connect-dev-aio-01
 
         # Rsync mysql config files
         sudo('rsync -avzP --progress /etc/shibboleth/* 172.17.2.30:/etc/shibboleth')
+
 
 """
 def sp_local(sp_dir):
