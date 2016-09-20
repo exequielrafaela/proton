@@ -1513,15 +1513,23 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
         print colored('=================================', 'blue')
         print colored('INSTALLING : "APACHE2 WebqServer"', 'blue')
         print colored('=================================', 'blue')
-        sudo('yum install -y httpd-manual-2.2.3-91.el5.centos httpd-2.2.3-91.el5.centos')
+        try:
+            sudo('yum install -y httpd-manual-2.2.3-91.el5.centos httpd-2.2.3-91.el5.centos')
+        except SystemExit:
+            sudo('yum install -y httpd')
 
         print colored('===========================', 'blue')
         print colored('INSTALLING : "MYSQL Server"', 'blue')
         print colored('===========================', 'blue')
-        sudo('yum install -y  mysql-server-5.0.95-5.el5_9 mod_auth_mysql-3.0.0-3.2.el5_3 MySQL-python-1.2.3-0.1.c1.el5')
-        sudo('yum install -y mysql-devel-5.0.95-5.el5_9 perl-DBD-MySQL-3.0007-2.el5 mysql-5.0.95-5.el5_9'
+        try:
+            sudo('yum install -y  mysql-server-5.0.95-5.el5_9 mod_auth_mysql-3.0.0-3.2.el5_3 MySQL-python-1.2.3-0.1.c1.el5')
+            sudo('yum install -y mysql-devel-5.0.95-5.el5_9 perl-DBD-MySQL-3.0007-2.el5 mysql-5.0.95-5.el5_9'
              ' mysql-connector-odbc-3.51.26r1127-2.el5')
-        sudo('yum install -y libdbi-dbd-mysql-0.8.1a-1.2.2 mysql-5.0.95-5.el5_9')
+            sudo('yum install -y libdbi-dbd-mysql-0.8.1a-1.2.2 mysql-5.0.95-5.el5_9')
+        except SystemExit:
+            print colored('==================', 'red')
+            print colored('Problem Installing', 'red')
+            print colored('==================', 'red')
 
         print colored('==================', 'blue')
         print colored('INSTALLING : "PHP"', 'blue')
