@@ -474,7 +474,7 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
     :param usernamea: "username" to append the key to.
     """
     with settings(warn_only=False):
-        if (usernamea == "root"):
+        if usernamea == "root":
             key_file = '/' + usernamea + '/.ssh/id_rsa.pub'
             key_text = key_read_file(key_file)
             if exists('/' + usernamea + '/.ssh/authorized_keys', use_sudo=True):
@@ -676,7 +676,7 @@ Initialize knife zero on RedHat/Centos OS
         try:
             with cd('/home/' + usernamek + '/my_chef_repo'):
                 with open("./conf/servers/out_users_test.txt", "r") as pyfile:
-                    serverlist = [line.split()[0] for line in pyfile]
+                    serverlist = [lineIntext.split()[0] for lineIntext in pyfile]
                     for serverIp in serverlist:
                         client_index = 0
                         client_index += 1
@@ -1067,10 +1067,10 @@ Install in the host7s NFS Server under Debian/Ubuntu based systems
         # sudo('service rpcbind start')
         # sudo('service nfs start')
 
-        ip_addr = sudo('ifconfig eth0 | awk \'/inet /{print substr($2,6)}\'')
-        netmask = sudo('ifconfig eth0 | awk \'/inet /{print substr($4,6)}\'')
-        subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
-        subnet = subnet_temp[0]
+        # ip_addr = sudo('ifconfig eth0 | awk \'/inet /{print substr($2,6)}\'')
+        # netmask = sudo('ifconfig eth0 | awk \'/inet /{print substr($4,6)}\'')
+        # subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
+        # subnet = subnet_temp[0]
         # sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask +
         # '(rw,sync,no_root_squash,no_subtree_check)" > /etc/exports')
         sudo('echo "/var/' + nfs_dir + '     *(rw,sync,no_root_squash)" > /etc/exports')
@@ -1278,6 +1278,11 @@ def maltrail(role):
 
 
 def iptables(action, ip_addr):
+    """
+Modifiy iptables rules
+    :param action:
+    :param ip_addr:
+    """
     with settings(warn_only=False):
         try:
             print colored('===========================', 'red')
