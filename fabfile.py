@@ -34,6 +34,7 @@ import os
 import pwd
 import iptools
 import getpass
+import time
 
 import config
 
@@ -1179,6 +1180,10 @@ Add/Remove a WS from a Haproxy Load Balancer
 
 
 def maltrail(role):
+    """
+Instaling maltrail IDS as Server or Sensor
+    :param role: "server" or "sernsor"
+    """
     with settings(warn_only=False):
         try:
             # DEPENDENCIAS for AMAZON LINUX:
@@ -1228,7 +1233,7 @@ def maltrail(role):
                             sudo('python sensor.py ')
                             sudo('ping -c 1 136.161.101.53')
                             sudo('cat /var/log/maltrail/$(date +"%Y-%m-%d").log')
-                            ### FOR THE CLIENT ###
+                            # FOR THE CLIENT #
                             # using configuration file '/home/ebarrirero/maltrail/maltrail.conf.sensor_ok'
                             # using '/var/log/maltrail' for log storage
                             # at least 384MB of free memory required
@@ -1236,7 +1241,7 @@ def maltrail(role):
                             # loading trails...
                             # 1,135,525 trails loaded
 
-                            ### NOTE: ###
+                            # NOTE: #
                             # in case of any problems with packet capture on virtual interface 'any',
                             # please put all monitoring interfaces to promiscuous mode manually
                             #  (e.g. 'sudo ifconfig eth0 promisc')
@@ -1280,12 +1285,13 @@ def maltrail(role):
                         # it can be used for distinct (multiple) Sensor <-> Server architecture.
 
                         # Same as for Sensor, when running the Server (e.g. python server.py) for the first time
-                        # and/or after a longer period of non-running, if option USE_SERVER_UPDATE_TRAILS is set to true,
+                        # and/or after a longer period of non-running, if option
+                        #  USE_SERVER_UPDATE_TRAILS is set to true,
                         # it will automatically update the trails from trail definitions (Note: stored inside the
                         # trails directory).
                         # Should server do the trail updates too (to support UPDATE_SERVER)
 
-        except:
+        except SystemExit:
             print colored('===========================', 'red')
             print colored('Problem installing MALTRAIL', 'red')
             print colored('===========================', 'red')
@@ -1302,7 +1308,7 @@ Modifiy iptables rules
             print colored('===========================', 'red')
             print colored('IPTABLES START', 'red')
             print colored('===========================', 'red')
-        except:
+        except SystemExit:
             print colored('===========================', 'red')
             print colored('IPTABLES PROBLEM', 'red')
             print colored('===========================', 'red')
@@ -1327,12 +1333,254 @@ Modifiy iptables rules
             #        iptables -A INPUT
 
 
-def db_backup():
+def mysql_backup(host_ip="127.0.0.1", dst_dir="/tmp/"):
     """
 MySQLdump backup
+    :param host_ip: MySQL Server IP Address
+    :param dst_dir: mysqldump destination directory
     """
     with settings(warn_only=False):
-        """
+        sudo('mysql -h '+host_ip+' -u root -p "show databases;"')
+        # +--------------------+
+        # | Database           |
+        # +--------------------+
+        # | information_schema |
+        # | ggcc_prd           |
+        # | innodb             |
+        # | mysql              |
+        # | performance_schema |
+        # | tmp                |
+        # +--------------------+
+
+        date = str(time.strftime("%x") + time.strftime("%X"))
+
+        sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction ' + host_ip +
+             ' -u root -p --all-databases >'
+             ' '+dst_dir+'/backup-'+date+'.sql')
+        #check that the backup was created with a grep.
+
+        sudo('mysql -h ' + host_ip + ' -u root -p "show databases;"')
+
+        # +--------------------+
+        # | Database           |
+        # +--------------------+
+        # | information_schema |
+        # | ggcc_stg           |
+        # | ggcc_stg_v1        |
+        # | ggcc_stg_v2        |
+        # | innodb             |
+        # | mysql              |
+        # | performance_schema |
+        # | tmp                |
+        # +--------------------+
+
+def mysql_restore(mysqldump_fpath, host_ip="127.0.0.1"):
+    """
+MySQLdump restore
+    :param mysqldump_fpath: mysqldump ".sql" file absolute path
+    :param dst_dir: mysqldump file pass w/ the absolute path directory
+    """
+    with settings(warn_only=False):
+        sudo('mysql -h ' + host_ip + ' -u root -p "show databases;"')
+        sudo('mysql ' + host_ip + '-u root -p < '+mysqldump_fpath)
+        sudo('mysql -h ' + host_ip + ' -u root -p "show databases;"')
+
+def rsync(remote_dir='/srv/myproject/'):
+    """
+Python fabric rsync
+    :param remote_dir:
+    """
+    with settings(warn_only=False):
+        rsync_project(
+            remote_dir="/srv/myproject/",
+            local_dir="./",
+            exclude=("*_local.py", "*.pyc",),
+        )
+
+
+def disk_usage(tree_dir='/'):
+    with settings(warn_only=False):
+        import os
+        disk = os.statvfs(tree_dir)
+        print "preferred file system block size: " + str(disk.f_bsize)
+        print "fundamental file system block size: " + str(disk.f_frsize)
+        print "total number of blocks in filesystem: " + str(disk.f_blocks)
+        print "total number of free blocks: " + str(disk.f_bfree)
+        print "free blocks available to non-super user: " + str(disk.f_bavail)
+        print "total number of file nodes: " + str(disk.f_files)
+        print "total number of free file nodes: " + str(disk.f_ffree)
+        print "free nodes available to non-super user: " + str(disk.f_favail)
+        print "flags: " + str(disk.f_flag)
+        print "miximum file name length: " + str(disk.f_namemax)
+        print "~~~~~~~~~~calculation of disk usage:~~~~~~~~~~"
+        totalBytes = float(disk.f_frsize * disk.f_blocks)
+        print "total space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (
+            totalBytes, totalBytes / 1024, totalBytes / 1024 / 1024, totalBytes / 1024 / 1024 / 1024)
+        totalUsedSpace = float(disk.f_frsize * (disk.f_blocks - disk.f_bfree))
+        print "used space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (
+            totalUsedSpace, totalUsedSpace / 1024, totalUsedSpace / 1024 / 1024, totalUsedSpace / 1024 / 1024 / 1024)
+        totalAvailSpace = float(disk.f_frsize * disk.f_bfree)
+        print "available space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (
+            totalAvailSpace, totalAvailSpace / 1024, totalAvailSpace / 1024 / 1024,
+            totalAvailSpace / 1024 / 1024 / 1024)
+        totalAvailSpaceNonRoot = float(disk.f_frsize * disk.f_bavail)
+        print "available space for non-super user: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes " % (
+            totalAvailSpaceNonRoot, totalAvailSpaceNonRoot / 1024, totalAvailSpaceNonRoot / 1024 / 1024,
+            totalAvailSpaceNonRoot / 1024 / 1024 / 1024)
+
+
+def connect_package_migration():
+    """
+Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
+    """
+    with settings(warn_only=False):
+        sudo('yum update')
+        print colored('=================================', 'blue')
+        print colored('INSTALLING : "APACHE2 WebqServer"', 'blue')
+        print colored('=================================', 'blue')
+        try:
+            sudo('yum install -y httpd-manual-2.2.3-91.el5.centos httpd-2.2.3-91.el5.centos')
+            sudo('systemctl start httpd.service')
+            sudo('systemctl enable httpd.service')
+        except SystemExit:
+            sudo('yum install -y httpd')
+            sudo('systemctl start httpd.service')
+            sudo('systemctl enable httpd.service')
+
+        print colored('===========================', 'blue')
+        print colored('INSTALLING : "MYSQL Server"', 'blue')
+        print colored('===========================', 'blue')
+        try:
+            sudo('wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm')
+            sudo('rpm -ivh mysql-community-release-el7-5.noarch.rpm')
+            sudo('yum update')
+            sudo('yum install -y  mysql-server-5.0.95-5.el5_9 mod_auth_mysql-3.0.0-3.2.el5_3 '
+                 'MySQL-python-1.2.3-0.1.c1.el5')
+            sudo('yum install -y mysql-devel-5.0.95-5.el5_9 perl-DBD-MySQL-3.0007-2.el5 mysql-5.0.95-5.el5_9'
+                 ' mysql-connector-odbc-3.51.26r1127-2.el5')
+            sudo('yum install -y libdbi-dbd-mysql-0.8.1a-1.2.2 mysql-5.0.95-5.el5_9')
+            sudo('systemctl start mysqld')
+            sudo('mysql_secure_installation')
+            sudo('chkconfig mysqld on')
+        except SystemExit:
+            sudo('wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm')
+            sudo('rpm -ivh mysql-community-release-el7-5.noarch.rpm')
+            sudo('yum update')
+            sudo('yum install -y mysql-server mod_auth_mysql MySQL-python')
+            sudo('yum install -y mysql-devel perl-DBD-MySQL mysql mysql-connector-odbc')
+            sudo('yum install -y libdbi-dbd-mysql')
+            sudo('systemctl start mysqld')
+            sudo('mysql_secure_installation')
+            sudo('chkconfig mysqld on')
+
+        print colored('==================', 'blue')
+        print colored('INSTALLING : "PHP"', 'blue')
+        print colored('==================', 'blue')
+        # opcache (a partir de 5.6)
+        try:
+            sudo('yum install -y php53-xml-5.3.3-26.el5_11 php53-dba-5.3.3-26.el5_11 php53-pspell-5.3.3-26.el5_11'
+                 ' php53-5.3.3-26.el5_11')
+            sudo('yum install -y php53-devel-5.3.3-26.el5_11 php53-common-5.3.3-26.el5_11 php53-bcmath-5.3.3-26.el5_11'
+                 ' php53-intl-5.3.3-26.el5_11')
+            sudo('yum install -y php53-mapi-7.1.14-1.el5 php53-interbase-5.3.3-1.el5 php53-recode-5.3.3-1.el5'
+                 ' php53-mcrypt-5.3.3-1.el5')
+            sudo('yum install -y php53-pdo-5.3.3-26.el5_11 php53-odbc-5.3.3-26.el5_11 php53-process-5.3.3-26.el5_11'
+                 ' php53-imap-5.3.3-26.el5_11')
+            sudo('yum install -y php53-gd-5.3.3-26.el5_11 php53-cli-5.3.3-26.el5_11 php53-xmlrpc-5.3.3-26.el5_11'
+                 ' php53-ldap-5.3.3-26.el5_11')
+            sudo('yum install -y php53-enchant-5.3.3-1.el5 php53-php-gettext-1.0.11-3.el5 php53-snmp-5.3.3-26.el5_11'
+                 ' php53-tidy-5.3.3-1.el5')
+            sudo('yum install -y php53-pgsql-5.3.3-26.el5_11 php53-soap-5.3.3-26.el5_11 php53-mssql-5.3.3-1.el5')
+            sudo('yum install -y php53-mysql-5.3.3-26.el5_11 php53-mbstring-5.3.3-26.el5_11')
+            sudo('systemctl restart httpd.service')
+            sudo('firewall-cmd --permanent --zone=public --add-service=http')
+            sudo('firewall-cmd --permanent --zone=public --add-service=https')
+            sudo('firewall-cmd --reload')
+        except SystemExit:
+            sudo('yum install -y php php-mysql php-devel php-common php-gd php-cli')
+            sudo('yum install -y php53-xml php53-dba php53-pspell php-bcmath php-intl php53-mapi '
+                 'php-interbase php-recode php-mcrypt php-pdo php-odbc php-process php-imap php-xmlrpc php-ldap')
+            sudo('yum install -y php-enchant php-php-gettext php-snmp php-tidy')
+            sudo('yum install -y php-pgsql php-soap php-mssql php-mbstring')
+            sudo('systemctl restart httpd.service')
+            sudo('firewall-cmd --permanent --zone=public --add-service=http')
+            sudo('firewall-cmd --permanent --zone=public --add-service=https')
+            sudo('firewall-cmd --reload')
+
+            # [ebarrirero@nyc1app204 shibboleth]$ sudo rpm -ql php53
+            # /etc/httpd/conf.d/php.conf
+            # /usr/lib64/httpd/modules/libphp5.so
+            # /var/lib/php/session
+            # /var/www/icons/php.gif
+
+        print colored('============================', 'blue')
+        print colored('INSTALLING : SHIBBOLETH Auth', 'blue')
+        print colored('============================', 'blue')
+        try:
+            sudo ('curl -o /etc/yum.repos.d/shibboleth.repo '
+                  'http://download.opensuse.org/repositories/security://shibboleth/CentOS_7/security:shibboleth.repo')
+            sudo('yum install -y shibboleth-2.5.6-3.1')
+            ​sudo('yum install shibboleth')
+            sudo('systemctl start shibd.service')
+
+        except SystemExit:
+            sudo('yum install -y shibboleth-2.5.6-3.1')
+
+        print colored('===================', 'blue')
+        print colored('INSTALLING : "CRON"', 'blue')
+        print colored('===================', 'blue')
+        sudo('yum install -y crontabs anacron vixie-cron')
+
+        print colored('===================================', 'blue')
+        print colored('INSTALLING : "NEW RELIC" Monitoring', 'blue')
+        print colored('===================================', 'blue')
+        sudo('yum install -y newrelic-php5 newrelic-repo newrelic-daemon newrelic-php5-common newrelic-sysmond')
+
+        print colored('===================================', 'blue')
+        print colored('INSTALLING : "NEW RELIC" Monitoring', 'blue')
+        print colored('===================================', 'blue')
+        sudo('yum install postfix-2.3.3-7.el5')
+
+        print colored('==================', 'blue')
+        print colored('INSTALLING : "NTP"', 'blue')
+        print colored('==================', 'blue')
+        sudo('yum install -y ntp')
+
+        print colored('============================', 'blue')
+        print colored('INSTALLING : "SNMP"', 'blue')
+        print colored('============================', 'blue')
+        sudo('yum install -y net-snmp-libs net-snmp net-snmp-utils')
+
+
+def connect_data_migration():
+    """
+Migrate Dev Connect DATA nyc1app204 to new Azure connect-dev-aio-01
+    """
+    with settings(warn_only=False):
+        # Rsync web root
+        sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
+
+        # Rsync the apache configuration files
+        sudo('rsync -avzP --progress /etc/httpd/ apache@172.17.2.30:/etc/httpd.old/')
+
+        # Rsync php configuration
+
+        # comparar memory limit => llevarlo a 512mb o 1gb
+        sudo('scp /etc/php.ini root@172.17.2.30:/etc/php.ini.old/')
+
+        sudo('rsync -avzP --progress /etc/php.d/ 172.17.2.30:/etc/php.d.old/')
+        sudo('rsync -avzP --progress /usr/include/php/ 172.17.2.30:/usr/include/php.old/')
+
+        # Rsync mysql config files
+        sudo('rsync -avzP --progress /etc/mysql/ 172.17.2.30:/etc/mysql.old/')
+
+        # Rsync mysql config files
+        sudo('rsync -avzP --progress /etc/shibboleth/ 172.17.2.30:/etc/shibboleth.old/')
+
+
+"""
+def db_backup():
+    with settings(warn_only=False):
         #Check the DBs in PRD
         mysql -h ggcc-prd.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "show databases"
         +--------------------+
@@ -1476,170 +1724,31 @@ MySQLdump backup
         mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "grant all on ggcc_stg_v3.* to 'ggcc_stg_user'@'%';"
 
         #Remove the dump
-        """
 
+        #Extra - adding a certain host to root user
+        mysql> GRANT ALL PRIVILEGES ON *.* TO 'root'@'chef.grey.com' IDENTIFIED BY 'Temp01';
+        Query OK, 0 rows affected (0.12 sec)
 
-def rsync(remote_dir='/srv/myproject/'):
-    """
-Python fabric rsync
-    :param remote_dir:
-    """
-    with settings(warn_only=False):
-        rsync_project(
-            remote_dir="/srv/myproject/",
-            local_dir="./",
-            exclude=("*_local.py", "*.pyc",),
-        )
+        mysql> SELECT User, Host, Password FROM mysql.user;
+        +----------------+----------------------------+------------------+
+        | User           | Host                       | Password         |
+        +----------------+----------------------------+------------------+
+        | root           | localhost                  | 365fe285580134fc |
+        | root           | nyc1app202.ggg.grey.global |                  |
+        | root           | 127.0.0.1                  |                  |
+        |                | localhost                  |                  |
+        |                | nyc1app202.ggg.grey.global |                  |
+        | buddy          | localhost                  | 687bda6114dbbe68 |
+        | q2a            | localhost                  | 51c6a9a9362c2c8f |
+        | bu_user        | localhost                  | 38a1f09a2141ea8a |
+        | buddy          | %                          | 687bda6114dbbe68 |
+        | newuser        | %                          | 365fe285580134fc |
+        | yourlsdev_user | localhost                  | 619850b40fb16757 |
+        | root           | chef.grey.com              | 365fe285580134fc |
+        +----------------+----------------------------+------------------+
+        12 rows in set (0.00 sec)
 
-
-def disk_usage(tree_dir='/'):
-    with settings(warn_only=False):
-        import os
-        disk = os.statvfs(tree_dir)
-        print "preferred file system block size: " + str(disk.f_bsize)
-        print "fundamental file system block size: " + str(disk.f_frsize)
-        print "total number of blocks in filesystem: " + str(disk.f_blocks)
-        print "total number of free blocks: " + str(disk.f_bfree)
-        print "free blocks available to non-super user: " + str(disk.f_bavail)
-        print "total number of file nodes: " + str(disk.f_files)
-        print "total number of free file nodes: " + str(disk.f_ffree)
-        print "free nodes available to non-super user: " + str(disk.f_favail)
-        print "flags: " + str(disk.f_flag)
-        print "miximum file name length: " + str(disk.f_namemax)
-        print "~~~~~~~~~~calculation of disk usage:~~~~~~~~~~"
-        totalBytes = float(disk.f_frsize * disk.f_blocks)
-        print "total space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (
-            totalBytes, totalBytes / 1024, totalBytes / 1024 / 1024, totalBytes / 1024 / 1024 / 1024)
-        totalUsedSpace = float(disk.f_frsize * (disk.f_blocks - disk.f_bfree))
-        print "used space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (
-            totalUsedSpace, totalUsedSpace / 1024, totalUsedSpace / 1024 / 1024, totalUsedSpace / 1024 / 1024 / 1024)
-        totalAvailSpace = float(disk.f_frsize * disk.f_bfree)
-        print "available space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (
-            totalAvailSpace, totalAvailSpace / 1024, totalAvailSpace / 1024 / 1024,
-            totalAvailSpace / 1024 / 1024 / 1024)
-        totalAvailSpaceNonRoot = float(disk.f_frsize * disk.f_bavail)
-        print "available space for non-super user: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes " % (
-            totalAvailSpaceNonRoot, totalAvailSpaceNonRoot / 1024, totalAvailSpaceNonRoot / 1024 / 1024,
-            totalAvailSpaceNonRoot / 1024 / 1024 / 1024)
-
-
-def connect_package_migration():
-    """
-Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
-    """
-    with settings(warn_only=False):
-        print colored('=================================', 'blue')
-        print colored('INSTALLING : "APACHE2 WebqServer"', 'blue')
-        print colored('=================================', 'blue')
-        try:
-            sudo('yum install -y httpd-manual-2.2.3-91.el5.centos httpd-2.2.3-91.el5.centos')
-        except SystemExit:
-            sudo('yum install -y httpd')
-            sudo('systemctl start httpd.service')
-            sudo('systemctl enable httpd.service')
-
-        print colored('===========================', 'blue')
-        print colored('INSTALLING : "MYSQL Server"', 'blue')
-        print colored('===========================', 'blue')
-        try:
-            sudo('wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm')
-            sudo('rpm -ivh mysql-community-release-el7-5.noarch.rpm')
-            sudo('yum update')
-            sudo('yum install -y  mysql-server-5.0.95-5.el5_9 mod_auth_mysql-3.0.0-3.2.el5_3 '
-                 'MySQL-python-1.2.3-0.1.c1.el5')
-            sudo('yum install -y mysql-devel-5.0.95-5.el5_9 perl-DBD-MySQL-3.0007-2.el5 mysql-5.0.95-5.el5_9'
-                 ' mysql-connector-odbc-3.51.26r1127-2.el5')
-            sudo('yum install -y libdbi-dbd-mysql-0.8.1a-1.2.2 mysql-5.0.95-5.el5_9')
-            sudo('systemctl start mysqld')
-        except SystemExit:
-            sudo('wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm')
-            sudo('rpm -ivh mysql-community-release-el7-5.noarch.rpm')
-            sudo('yum update')
-            sudo('yum install -y  mysql-server mod_auth_mysql MySQL-python')
-            sudo('yum install -y mysql-devel perl-DBD-MySQL mysql mysql-connector-odbc')
-            sudo('yum install -y libdbi-dbd-mysql')
-            sudo('systemctl start mysqld')
-
-        print colored('==================', 'blue')
-        print colored('INSTALLING : "PHP"', 'blue')
-        print colored('==================', 'blue')
-        sudo(
-            'yum install -y php53-xml-5.3.3-26.el5_11 php53-dba-5.3.3-26.el5_11 php53-pspell-5.3.3-26.el5_11'
-            ' php53-5.3.3-26.el5_11')
-        sudo(
-            'yum install -y php53-devel-5.3.3-26.el5_11 php53-common-5.3.3-26.el5_11 php53-bcmath-5.3.3-26.el5_11'
-            ' php53-intl-5.3.3-26.el5_11')
-        sudo(
-            'yum install -y php53-mapi-7.1.14-1.el5 php53-interbase-5.3.3-1.el5 php53-recode-5.3.3-1.el5'
-            ' php53-mcrypt-5.3.3-1.el5')
-        sudo(
-            'yum install -y php53-pdo-5.3.3-26.el5_11 php53-odbc-5.3.3-26.el5_11 php53-process-5.3.3-26.el5_11'
-            ' php53-imap-5.3.3-26.el5_11')
-        sudo(
-            'yum install -y php53-gd-5.3.3-26.el5_11 php53-cli-5.3.3-26.el5_11 php53-xmlrpc-5.3.3-26.el5_11'
-            ' php53-ldap-5.3.3-26.el5_11')
-        sudo(
-            'yum install -y php53-enchant-5.3.3-1.el5 php53-php-gettext-1.0.11-3.el5 php53-snmp-5.3.3-26.el5_11'
-            ' php53-tidy-5.3.3-1.el5')
-        sudo(
-            'yum install -y php53-pgsql-5.3.3-26.el5_11 php53-soap-5.3.3-26.el5_11 postfix-2.3.3-7.el5'
-            ' php53-mssql-5.3.3-1.el5')
-        sudo('yum install -y php53-mysql-5.3.3-26.el5_11 php53-mbstring-5.3.3-26.el5_11')
-
-        # [ebarrirero@nyc1app204 shibboleth]$ sudo rpm -ql php53
-        # /etc/httpd/conf.d/php.conf
-        # /usr/lib64/httpd/modules/libphp5.so
-        # /var/lib/php/session
-        # /var/www/icons/php.gif
-
-        print colored('============================', 'blue')
-        print colored('INSTALLING : SHIBBOLETH Auth', 'blue')
-        print colored('============================', 'blue')
-        sudo('yum install -y shibboleth-2.5.6-3.1')
-
-        print colored('===================', 'blue')
-        print colored('INSTALLING : "CRON"', 'blue')
-        print colored('===================', 'blue')
-        sudo('yum install -y crontabs anacron vixie-cron')
-
-        print colored('===================================', 'blue')
-        print colored('INSTALLING : "NEW RELIC" Monitoring', 'blue')
-        print colored('===================================', 'blue')
-        sudo('yum install -y newrelic-php5 newrelic-repo newrelic-daemon newrelic-php5-common newrelic-sysmond')
-
-        print colored('==================', 'blue')
-        print colored('INSTALLING : "NTP"', 'blue')
-        print colored('==================', 'blue')
-        sudo('yum install -y ntp')
-
-        print colored('============================', 'blue')
-        print colored('INSTALLING : "SNMP"', 'blue')
-        print colored('============================', 'blue')
-        sudo('yum install -y net-snmp-libs net-snmp net-snmp-utils')
-
-
-def connect_data_migration():
-    """
-Migrate Dev Connect DATA nyc1app204 to new Azure connect-dev-aio-01
-    """
-    with settings(warn_only=False):
-        # Rsync web root
-        sudo('rsync -avzP --progress /var/www/* apache@172.17.2.30:/var/www')
-
-        # Rsync the apache configuration files
-        sudo('rsync -avzP --progress /etc/httpd/* apache@172.17.2.30:/etc/httpd')
-
-        # Rsync php configuration
-        sudo('scp /etc/php.ini root@172.17.2.30:/etc/')
-        sudo('rsync -avzP --progress /etc/php.d/ 172.17.2.30:/etc/php.d')
-        sudo('rsync -avzP --progress /usr/include/php/ 172.17.2.30:/usr/include/php')
-
-        # Rsync mysql config files
-        sudo('rsync -avzP --progress /etc/mysql/* 172.17.2.30:/etc/mysql')
-
-        # Rsync mysql config files
-        sudo('rsync -avzP --progress /etc/shibboleth/* 172.17.2.30:/etc/shibboleth')
-
+"""
 
 """
 def sp_local(sp_dir):
