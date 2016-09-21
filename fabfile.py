@@ -77,30 +77,10 @@ Show proton help
         print ""
         print "Commands list:"
         print ""
+        print "fab show_help                Change behaviour mode to passive"
         print "fab -l                       To list all the fabric functions defined in proton"
-        print "fab show_help               Change behaviour mode to passive"
-        print "fab show_roles              Change behaviour mode to aggressive"
-        print ""
-        print "verbose on                   Turn verbose mode on (it shows more information)"
-        print "verbose off                  Turn verbose mode off"
-        print "email on                     Turn e-mail report on"
-        print "email off                    Turn e-mail report off"
-        print ""
-        print "show statistics, stats       Show the statistics of the current instance."
-        print ""
-        print "clean logs                   Remove all log files"
-        print "clean results                Remove all results files"
-        print "clean calls                  Remove all the recorded calls"
-        print "clean all                    Remove all files"
-        print "                             (Use these commands carefully)"
-        print ""
-        print "hangup all                   Hang up all calls"
-        print ""
-        print "show warranty                Show the program warrany"
-        print "show license                 Show the program license"
-        print ""
-        print "modify extension             To add or delete an Extension"
-        print "restart                      To restart Artemisa"
+        print "fab -d \"task_name\"         To list all the fabric functions defined in proton"
+        print "fab show_roles               Change behaviour mode to aggressive"
         print ""
         print "s, q, quit, exit             Exit"
 
@@ -1401,6 +1381,10 @@ Python fabric rsync
 
 
 def disk_usage(tree_dir='/'):
+    """
+Check a certain folder Disk Usage
+    :param tree_dir:
+    """
     with settings(warn_only=False):
         import os
         disk = os.statvfs(tree_dir)
