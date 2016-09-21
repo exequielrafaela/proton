@@ -1,7 +1,7 @@
 # coding=utf-8
 
 """
-======================================================================
+========================================================================
 | Fabfile to:                                                           |
 |    - AUTOMATE SEVERAL LINUX INFRA TASKS.                              |
 |    - to invoke: fab -f file -R role func:arguemnt1,argument2          |
@@ -10,7 +10,9 @@
 |    - If the "fabfile.py" is in the current dir then just:             |
 |    - $ fab -R dev push_key:username                                   |
 |    - $ fab -R dev test_key:username                                   |
-=======================================================================
+|                                                                       |
+|    - $ fab show_help for more information                             |
+========================================================================
 """
 
 """
