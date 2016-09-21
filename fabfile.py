@@ -1374,6 +1374,7 @@ MySQLdump backup
         # | tmp                |
         # +--------------------+
 
+
 def mysql_restore(mysqldump_fpath, host_ip="127.0.0.1"):
     """
 MySQLdump restore
@@ -1384,6 +1385,7 @@ MySQLdump restore
         sudo('mysql -h ' + host_ip + ' -u root -p "show databases;"')
         sudo('mysql ' + host_ip + '-u root -p < '+mysqldump_fpath)
         sudo('mysql -h ' + host_ip + ' -u root -p "show databases;"')
+
 
 def rsync(remote_dir='/srv/myproject/'):
     """
@@ -1520,11 +1522,13 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
             sudo ('curl -o /etc/yum.repos.d/shibboleth.repo '
                   'http://download.opensuse.org/repositories/security://shibboleth/CentOS_7/security:shibboleth.repo')
             sudo('yum install -y shibboleth-2.5.6-3.1')
-            ​sudo('yum install shibboleth')
             sudo('systemctl start shibd.service')
 
         except SystemExit:
-            sudo('yum install -y shibboleth-2.5.6-3.1')
+            sudo ('curl -o /etc/yum.repos.d/shibboleth.repo '
+                  'http://download.opensuse.org/repositories/security://shibboleth/CentOS_7/security:shibboleth.repo')
+            sudo('yum install -y shibboleth')
+            sudo('systemctl start shibd.service')
 
         print colored('===================', 'blue')
         print colored('INSTALLING : "CRON"', 'blue')
@@ -1539,7 +1543,7 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
         print colored('===================================', 'blue')
         print colored('INSTALLING : "NEW RELIC" Monitoring', 'blue')
         print colored('===================================', 'blue')
-        sudo('yum install postfix-2.3.3-7.el5')
+        sudo('yum install -y postfix')
 
         print colored('==================', 'blue')
         print colored('INSTALLING : "NTP"', 'blue')
