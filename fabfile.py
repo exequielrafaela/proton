@@ -1441,27 +1441,25 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
         print colored('INSTALLING : "MYSQL Server"', 'blue')
         print colored('===========================', 'blue')
         try:
-
             sudo('wget -P /home/vagrant/ http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm')
             with cd ('/home/vagrant/'):
                 if exists('mysql-community-release-el7-5.noarch.rpm', use_sudo=True):
-                    print colored('##########################', 'blue')
-                    print colored('##### MySQL File OK ######', 'blue')
-                    print colored('##########################', 'blue')
+                    print colored('################################################', 'blue')
+                    print colored('##### MySQL Repository File downloaded OK ######', 'blue')
+                    print colored('################################################', 'blue')
                     try:
-                        print colored('#####################$############', 'blue')
-                        print colored('####### INSTALLING MYSQL #########', 'blue')
-                        print colored('##################################', 'blue')
+                        print colored('#########################################', 'blue')
+                        print colored('####### ADDING MySQL Repository #########', 'blue')
+                        print colored('#########################################', 'blue')
                         sudo('rpm -ivh mysql-community-release-el7-5.noarch.rpm')
                     except:
                         print colored('##############################################', 'red')
                         print colored('####### FAIL to add MySQL repository #########', 'red')
                         print colored('##############################################', 'red')
                 else:
-                    print colored('#################################', 'red')
-                    print colored('##### File does not exists ######', 'red')
-                    print colored('#################################', 'red')
-
+                    print colored('######################################', 'red')
+                    print colored('##### Repo File does not exists ######', 'red')
+                    print colored('######################################', 'red')
             sudo('yum update')
             sudo('yum install -y mysql-server-5.0.95-5.el5_9 mod_auth_mysql-3.0.0-3.2.el5_3 '
                  'MySQL-python-1.2.3-0.1.c1.el5')
@@ -1475,22 +1473,22 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
             sudo('wget -P /home/vagrant/ http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm')
             with cd('/home/vagrant/'):
                 if exists('mysql-community-release-el7-5.noarch.rpm', use_sudo=True):
-                    print colored('##########################', 'blue')
-                    print colored('##### MySQL File OK ######', 'blue')
-                    print colored('##########################', 'blue')
+                    print colored('################################################', 'blue')
+                    print colored('##### MySQL Repository File downloaded OK ######', 'blue')
+                    print colored('################################################', 'blue')
                     try:
-                        print colored('#####################$############', 'blue')
-                        print colored('####### INSTALLING MYSQL #########', 'blue')
-                        print colored('##################################', 'blue')
+                        print colored('#########################################', 'blue')
+                        print colored('####### ADDING MySQL Repository #########', 'blue')
+                        print colored('#########################################', 'blue')
                         sudo('rpm -ivh mysql-community-release-el7-5.noarch.rpm')
                     except:
                         print colored('##############################################', 'red')
                         print colored('####### FAIL to add MySQL repository #########', 'red')
                         print colored('##############################################', 'red')
                 else:
-                    print colored('#################################', 'red')
-                    print colored('##### File does not exists ######', 'red')
-                    print colored('#################################', 'red')
+                    print colored('######################################', 'red')
+                    print colored('##### Repo File does not exists ######', 'red')
+                    print colored('######################################', 'red')
             sudo('yum update')
             sudo('yum install -y mysql-server mod_auth_mysql MySQL-python')
             sudo('yum install -y mysql-devel perl-DBD-MySQL mysql mysql-connector-odbc')
