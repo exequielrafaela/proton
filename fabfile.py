@@ -1,14 +1,16 @@
 # coding=utf-8
 
 """
-# Fabfile to:
-#    - AUTOMATE SEVERAL LINUX INFRA TASKS.
-#    - to invoke: fab -f file -R role func:arguemnt1,argument2
-#    - $ fab -f /home/usernamex/fabfile.py -R local gen_key:username
-#
-#    - If the "fabfile.py" is in the current dir then just:
-#    - $ fab -R dev push_key:username
-#    - $ fab -R dev test_key:username
+======================================================================
+| Fabfile to:                                                           |
+|    - AUTOMATE SEVERAL LINUX INFRA TASKS.                              |
+|    - to invoke: fab -f file -R role func:arguemnt1,argument2          |
+|    - $ fab -f /home/usernamex/fabfile.py -R local gen_key:username    |
+|                                                                       |
+|    - If the "fabfile.py" is in the current dir then just:             |
+|    - $ fab -R dev push_key:username                                   |
+|    - $ fab -R dev test_key:username                                   |
+=======================================================================
 """
 
 """
@@ -79,7 +81,7 @@ Show proton help
         print ""
         print "fab show_help                Change behaviour mode to passive"
         print "fab -l                       To list all the fabric functions defined in proton"
-        print "fab -d \"task_name\"         To list all the fabric functions defined in proton"
+        print "fab -d \"task_name\"           To list all the fabric functions defined in proton"
         print "fab show_roles               Change behaviour mode to aggressive"
         print ""
         print "s, q, quit, exit             Exit"
