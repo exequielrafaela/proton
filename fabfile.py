@@ -1412,7 +1412,9 @@ MySQLdump backup
         # | tmp                |
         # +--------------------+
 
-        date = str(time.strftime("%x") + time.strftime("%X"))
+        date = str(time.strftime("%x"))
+        date.replace("/", "-")
+
         sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction -u root -p --all-databases >'
              ' ' + dst_dir + 'backup-' + date + '.sql')
         # check that the backup was created with a grep.
