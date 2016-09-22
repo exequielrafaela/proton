@@ -1374,6 +1374,7 @@ MySQLdump backup
             print colored('MySQL query problem', 'red')
             print colored('===================', 'red')
 
+
 def mysql_grant_remote_cx(mysql_pass,remote_ip,mysql_ip="127.0.0.1"):
     """
 MySQLdump backup
@@ -1412,7 +1413,7 @@ MySQLdump backup
         # +--------------------+
 
         date = str(time.strftime("%x") + time.strftime("%X"))
-        sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction -h -u root -p --all-databases >'
+        sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction -u root -p --all-databases >'
              ' ' + dst_dir + '/backup-' + date + '.sql')
         # check that the backup was created with a grep.
         file_get(dst_dir + '/backup-' + date + '.sql', dst_dir + '/backup-' + date + '.sql')
