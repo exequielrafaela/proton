@@ -1317,6 +1317,64 @@ Modifiy iptables rules
             #        iptables -A INPUT
 
 
+def musql_install_client_centos7():
+    """
+Install the mysql client in a Centos7 based OS
+    """
+    with settings(warn_only=False):
+        print colored('===========================', 'blue')
+        print colored('INSTALLING : "MYSQL Client"', 'blue')
+        print colored('===========================', 'blue')
+
+        if exists('/etc/yum.repos.d/mysql-community.repo') and exists('/etc/yum.repos.d/mysql-community-source.repo'):
+            print colored('############################################', 'blue')
+            print colored('##### MySQL Repository already exists ######', 'blue')
+            print colored('############################################', 'blue')
+        else:
+            sudo('wget -P /home/vagrant/ http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm')
+            with cd('/home/vagrant/'):
+                if exists('mysql-community-release-el7-5.noarch.rpm', use_sudo=True):
+                    print colored('################################################', 'blue')
+                    print colored('##### MySQL Repository File downloaded OK ######', 'blue')
+                    print colored('################################################', 'blue')
+                    try:
+                        print colored('#########################################', 'blue')
+                        print colored('####### ADDING MySQL Repository #########', 'blue')
+                        print colored('#########################################', 'blue')
+                        sudo('rpm -ivh mysql-community-release-el7-5.noarch.rpm')
+                    except SystemExit:
+                        print colored('##############################################', 'red')
+                        print colored('####### FAIL to add MySQL repository #########', 'red')
+                        print colored('##############################################', 'red')
+                else:
+                    print colored('######################################', 'red')
+                    print colored('##### Repo File does not exists ######', 'red')
+                    print colored('######################################', 'red')
+
+        try:
+            sudo('yum install -y mysql mysql-community-client')
+        except SystemExit:
+            print colored('#################################################', 'red')
+            print colored('####### Problem installing MySQL CLIENT #########', 'red')
+            print colored('#################################################', 'red')
+
+
+def mysql_sh_db_user(mysql_ip="127.0.0.1"):
+    """
+MySQLdump backup
+    :param host_ip: MySQL Server IP Address
+    :param dst_dir: mysqldump destination directory
+    """
+    with settings(warn_only=False):
+        try:
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "show databases;"')
+        except SystemExit:
+            print colored('===================', 'red')
+            print colored('MySQL query problem', 'red')
+            print colored('===================', 'red')
+
+
 def mysql_backup(host_ip="127.0.0.1", dst_dir="/tmp/"):
     """
 MySQLdump backup
@@ -1469,7 +1527,7 @@ LAMP Stack installation in Centos7 OS.
         try:
             sudo('yum install -y mysql-server-5.0.95-5.el5_9 mod_auth_mysql-3.0.0-3.2.el5_3 '
                  'MySQL-python-1.2.3-0.1.c1.el5')
-            sudo('yum install -y mysql-devel-5.0.95-5.el5_9 perl-DBD-MySQL-3.0007-2.el5 mysql-5.0.95-5.el5_9'
+            sudo('yum install -y mysql-devel-5.0.95-5.el5_9 perl-DBD-MySQL-3.0007-2.el5'
                  ' mysql-connector-odbc-3.51.26r1127-2.el5')
             sudo('yum install -y libdbi-dbd-mysql-0.8.1a-1.2.2 mysql-5.0.95-5.el5_9')
             sudo('systemctl start mysqld')
@@ -1482,7 +1540,6 @@ LAMP Stack installation in Centos7 OS.
             sudo('systemctl start mysqld')
             sudo('mysql_secure_installation')
             sudo('chkconfig mysqld on')
-
 
         print colored('==================', 'blue')
         print colored('INSTALLING : "PHP"', 'blue')
@@ -1523,11 +1580,11 @@ LAMP Stack installation in Centos7 OS.
                 print colored('##### Firewall not running ######', 'red')
                 print colored('#################################', 'red')
 
-            # [ebarrirero@nyc1app204 shibboleth]$ sudo rpm -ql php53
-            # /etc/httpd/conf.d/php.conf
-            # /usr/lib64/httpd/modules/libphp5.so
-            # /var/lib/php/session
-            # /var/www/icons/php.gif
+                # [ebarrirero@nyc1app204 shibboleth]$ sudo rpm -ql php53
+                # /etc/httpd/conf.d/php.conf
+                # /usr/lib64/httpd/modules/libphp5.so
+                # /var/lib/php/session
+                # /var/www/icons/php.gif
 
 
 def install_various_centos7():
@@ -1577,13 +1634,12 @@ Install custom list of packets
         sudo('yum install -y newrelic-php5 newrelic-repo newrelic-daemon newrelic-php5-common newrelic-sysmond')
 
         try:
-            #nrsysmond-config --set license_key=YOUR_9LICENSE_KEY
+            # nrsysmond-config --set license_key=YOUR_9LICENSE_KEY
             sudo('/etc/init.d/newrelic-sysmond start')
         except SystemExit:
             print colored('###########################################', 'red')
             print colored('##### FAIL to start NewRelic agent ########', 'red')
             print colored('###########################################', 'red')
-
 
         print colored('======================', 'blue')
         print colored('INSTALLING : "POSTFIX"', 'blue')
