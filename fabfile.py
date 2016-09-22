@@ -1413,7 +1413,7 @@ MySQLdump backup
         # +--------------------+
 
         date = str(time.strftime("%x"))
-        date.replace("/", "-")
+        date.replace("/", "-",3)
 
         sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction -u root -p --all-databases >'
              ' ' + dst_dir + 'backup-' + date + '.sql')
