@@ -1419,9 +1419,9 @@ Check a certain folder Disk Usage
             totalAvailSpaceNonRoot / 1024 / 1024 / 1024)
 
 
-def connect_package_migration():
+def install_lamp_centos7():
     """
-Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
+LAMP Stack installation in Centos7 OS.
     """
     with settings(warn_only=False):
         sudo('yum update')
@@ -1529,6 +1529,12 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
             # /var/lib/php/session
             # /var/www/icons/php.gif
 
+
+def install_various_centos7():
+    """
+Install custom list of packets
+    """
+    with settings(warn_only=False):
         print colored('============================', 'blue')
         print colored('INSTALLING : SHIBBOLETH Auth', 'blue')
         print colored('============================', 'blue')
@@ -1565,12 +1571,19 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
                 sudo('rpm -Uvh https://yum.newrelic.com/pub/newrelic/el5/x86_64/newrelic-repo-5-3.noarch.rpm')
             except SystemExit:
                 print colored('##############################################', 'red')
-                print colored('####### FAIL to add NewRelic repository #########', 'red')
+                print colored('##### FAIL to add NewRelic repository ########', 'red')
                 print colored('##############################################', 'red')
 
         sudo('yum install -y newrelic-php5 newrelic-repo newrelic-daemon newrelic-php5-common newrelic-sysmond')
-        #nrsysmond-config --set license_key=YOUR_9LICENSE_KEY
-        sudo('/etc/init.d/newrelic-sysmond start')
+
+        try:
+            #nrsysmond-config --set license_key=YOUR_9LICENSE_KEY
+            sudo('/etc/init.d/newrelic-sysmond start')
+        except SystemExit:
+            print colored('###########################################', 'red')
+            print colored('##### FAIL to start NewRelic agent ########', 'red')
+            print colored('###########################################', 'red')
+
 
         print colored('======================', 'blue')
         print colored('INSTALLING : "POSTFIX"', 'blue')
@@ -1588,9 +1601,9 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
         sudo('yum install -y net-snmp-libs net-snmp net-snmp-utils')
 
 
-def connect_data_migration():
+def rsync_data_migration():
     """
-Migrate Dev Connect DATA nyc1app204 to new Azure connect-dev-aio-01
+Migrate the data from a LAMP Server to a new one
     """
     with settings(warn_only=False):
         # Rsync web root
