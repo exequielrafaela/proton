@@ -1467,7 +1467,6 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
                     print colored('######################################', 'red')
 
         try:
-            sudo('yum update')
             sudo('yum install -y mysql-server-5.0.95-5.el5_9 mod_auth_mysql-3.0.0-3.2.el5_3 '
                  'MySQL-python-1.2.3-0.1.c1.el5')
             sudo('yum install -y mysql-devel-5.0.95-5.el5_9 perl-DBD-MySQL-3.0007-2.el5 mysql-5.0.95-5.el5_9'
@@ -1477,7 +1476,6 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
             sudo('mysql_secure_installation')
             sudo('chkconfig mysqld on')
         except SystemExit:
-            sudo('yum update')
             sudo('yum install -y mysql-server mod_auth_mysql MySQL-python')
             sudo('yum install -y mysql-devel perl-DBD-MySQL mysql mysql-connector-odbc')
             sudo('yum install -y libdbi-dbd-mysql')
@@ -1571,10 +1569,12 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
                 print colored('##############################################', 'red')
 
         sudo('yum install -y newrelic-php5 newrelic-repo newrelic-daemon newrelic-php5-common newrelic-sysmond')
+        #nrsysmond-config --set license_key=YOUR_9LICENSE_KEY
+        sudo('/etc/init.d/newrelic-sysmond start')
 
-        print colored('===================================', 'blue')
-        print colored('INSTALLING : "NEW RELIC" Monitoring', 'blue')
-        print colored('===================================', 'blue')
+        print colored('======================', 'blue')
+        print colored('INSTALLING : "POSTFIX"', 'blue')
+        print colored('======================', 'blue')
         sudo('yum install -y postfix')
 
         print colored('==================', 'blue')
