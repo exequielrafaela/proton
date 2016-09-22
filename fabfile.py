@@ -1516,9 +1516,14 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
             sudo('yum install -y php-enchant php-php-gettext php-snmp php-tidy')
             sudo('yum install -y php-pgsql php-soap php-mssql php-mbstring')
             sudo('systemctl restart httpd.service')
-            sudo('firewall-cmd --permanent --zone=public --add-service=http')
-            sudo('firewall-cmd --permanent --zone=public --add-service=https')
-            sudo('firewall-cmd --reload')
+            try:
+                sudo('firewall-cmd --permanent --zone=public --add-service=http')
+                sudo('firewall-cmd --permanent --zone=public --add-service=https')
+                sudo('firewall-cmd --reload')
+            except SystemExit:
+                print colored('#################################', 'red')
+                print colored('##### Firewall not running ######', 'red')
+                print colored('#################################', 'red')
 
             # [ebarrirero@nyc1app204 shibboleth]$ sudo rpm -ql php53
             # /etc/httpd/conf.d/php.conf
