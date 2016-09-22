@@ -1374,6 +1374,22 @@ MySQLdump backup
             print colored('MySQL query problem', 'red')
             print colored('===================', 'red')
 
+def mysql_grant_remote_cx(mysql_pass,remote_ip,mysql_ip="127.0.0.1"):
+    """
+MySQLdump backup
+    :param host_ip: MySQL Server IP Address
+    :param dst_dir: mysqldump destination directory
+    """
+    with settings(warn_only=False):
+        try:
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "GRANT ALL PRIVILEGES ON *.* TO \'root\'@\''+remote_ip+'\' IDENTIFIED BY \''+mysql_pass+'\';')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
+        except SystemExit:
+            print colored('===================', 'red')
+            print colored('MySQL query problem', 'red')
+            print colored('===================', 'red')
+
 
 def mysql_backup(host_ip="127.0.0.1", dst_dir="/tmp/"):
     """
