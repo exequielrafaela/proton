@@ -1414,9 +1414,9 @@ MySQLdump backup
 
         date = str(time.strftime("%x") + time.strftime("%X"))
         sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction -u root -p --all-databases >'
-             ' ' + dst_dir + '/backup-' + date + '.sql')
+             ' ' + dst_dir + 'backup-' + date + '.sql')
         # check that the backup was created with a grep.
-        file_get(dst_dir + '/backup-' + date + '.sql', dst_dir + '/backup-' + date + '.sql')
+        file_get(dst_dir + 'backup-' + date + '.sql', dst_dir + 'backup-' + date + '.sql')
 
 def mysql_restore(mysqldump_fpath, host_ip="127.0.0.1"):
     """
