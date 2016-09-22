@@ -1413,7 +1413,7 @@ MySQLdump backup
 
         date = str(time.strftime("%x") + time.strftime("%X"))
 
-        sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction ' + mysql_ip +
+        sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction -h ' + mysql_ip +
              ' -u root -p --all-databases >'
              ' ' + dst_dir + '/backup-' + date + '.sql')
         # check that the backup was created with a grep.
