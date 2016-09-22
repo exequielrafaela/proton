@@ -1427,9 +1427,9 @@ MySQLdump restore
     :param dst_dir: mysqldump file pass w/ the absolute path directory
     """
     with settings(warn_only=False):
-        sudo('mysql -h ' + host_ip + ' -u root -p "show databases;"')
+        sudo('mysql -h ' + host_ip + ' -u root -p -e "show databases;"')
         sudo('mysql -h ' + host_ip + ' -u root -p < ' + mysqldump_fpath)
-        sudo('mysql -h ' + host_ip + ' -u root -p "show databases;"')
+        sudo('mysql -h ' + host_ip + ' -u root -p -e "show databases;"')
 
 
 def rsync(remote_dir='/srv/myproject/'):
