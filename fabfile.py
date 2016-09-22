@@ -1554,6 +1554,22 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
         print colored('===================================', 'blue')
         print colored('INSTALLING : "NEW RELIC" Monitoring', 'blue')
         print colored('===================================', 'blue')
+
+        if exists('/etc/yum.repos.d/newrelic.repo'):
+            print colored('###############################################', 'blue')
+            print colored('##### NewRelic Repository already exists ######', 'blue')
+            print colored('###############################################', 'blue')
+        else:
+            try:
+                print colored('############################################', 'blue')
+                print colored('####### ADDING NreRelic Repository #########', 'blue')
+                print colored('############################################', 'blue')
+                sudo('rpm -Uvh https://yum.newrelic.com/pub/newrelic/el5/x86_64/newrelic-repo-5-3.noarch.rpm')
+            except SystemExit:
+                print colored('##############################################', 'red')
+                print colored('####### FAIL to add NewRelic repository #########', 'red')
+                print colored('##############################################', 'red')
+
         sudo('yum install -y newrelic-php5 newrelic-repo newrelic-daemon newrelic-php5-common newrelic-sysmond')
 
         print colored('===================================', 'blue')
