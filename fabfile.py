@@ -1383,8 +1383,9 @@ MySQLdump backup
     with settings(warn_only=False):
         try:
             sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "GRANT ALL PRIVILEGES ON *.* TO \'root\'@\''+remote_ip+'\' IDENTIFIED BY \''+mysql_pass+'\';')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "GRANT ALL PRIVILEGES ON *.* TO \'root\'@\''+remote_ip+'\' IDENTIFIED BY \''+mysql_pass+'\';"')
             sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
+            #DROP USER 'root'@'chef.grey.com';
         except SystemExit:
             print colored('===================', 'red')
             print colored('MySQL query problem', 'red')
