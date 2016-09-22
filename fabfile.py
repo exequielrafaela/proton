@@ -1392,14 +1392,14 @@ MySQLdump backup
             print colored('===================', 'red')
 
 
-def mysql_backup(host_ip="127.0.0.1", dst_dir="/tmp/"):
+def mysql_backup(mysql_ip="127.0.0.1", dst_dir="/tmp/"):
     """
 MySQLdump backup
     :param host_ip: MySQL Server IP Address
     :param dst_dir: mysqldump destination directory
     """
     with settings(warn_only=False):
-        sudo('mysql -h ' + host_ip + ' -u root -p "show databases;"')
+        sudo('mysql -h ' + mysql_ip + ' -u root -p -e "show databases;"')
         # +--------------------+
         # | Database           |
         # +--------------------+
@@ -1413,25 +1413,10 @@ MySQLdump backup
 
         date = str(time.strftime("%x") + time.strftime("%X"))
 
-        sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction ' + host_ip +
+        sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction ' + mysql_ip +
              ' -u root -p --all-databases >'
              ' ' + dst_dir + '/backup-' + date + '.sql')
         # check that the backup was created with a grep.
-
-        sudo('mysql -h ' + host_ip + ' -u root -p "show databases;"')
-
-        # +--------------------+
-        # | Database           |
-        # +--------------------+
-        # | information_schema |
-        # | ggcc_stg           |
-        # | ggcc_stg_v1        |
-        # | ggcc_stg_v2        |
-        # | innodb             |
-        # | mysql              |
-        # | performance_schema |
-        # | tmp                |
-        # +--------------------+
 
 
 def mysql_restore(mysqldump_fpath, host_ip="127.0.0.1"):
