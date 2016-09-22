@@ -1428,7 +1428,7 @@ MySQLdump restore
     """
     with settings(warn_only=False):
         sudo('mysql -h ' + host_ip + ' -u root -p "show databases;"')
-        sudo('mysql ' + host_ip + '-u root -p < ' + mysqldump_fpath)
+        sudo('mysql -h ' + host_ip + ' -u root -p < ' + mysqldump_fpath)
         sudo('mysql -h ' + host_ip + ' -u root -p "show databases;"')
 
 
