@@ -774,11 +774,11 @@ fab -R dev cachefs_install:nfsshare,\"172.28.128.3\",mycache-test,/var/cache/fsc
         # sestatus
         try:
             selinux_mode = (sudo('sestatus | grep "Current mode:                   enforcing"'))
-            if (selinux_mode != ""):
+            if selinux_mode != "":
                 selinux = bool(strtobool('True'))
             else:
                 selinux = bool(strtobool('False'))
-        except:
+        except SystemExit:
             selinux_mode = (sudo('sestatus | grep "Current mode:                   permissive"'))
             if selinux_mode != "":
                 selinux = bool(strtobool('False'))
@@ -923,7 +923,7 @@ fab -R dev cachefs_install:nfsshare,\"172.28.128.3\",mycache-test,/var/cache/fsc
 
         try:
             part_mounted = sudo('df -h | grep /mnt/nfs/var/' + nfs_dir)
-            if (part_mounted == ""):
+            if part_mounted == "":
                 # mount nfs client with CacheFS support
                 sudo('mount -t nfs -o fsc ' + nfs_server_ip + ':/var/' + nfs_dir + ' /mnt/nfs/var/' + nfs_dir + '/')
             else:
@@ -935,7 +935,7 @@ fab -R dev cachefs_install:nfsshare,\"172.28.128.3\",mycache-test,/var/cache/fsc
             sudo('cat /proc/fs/nfsfs/servers')
             sudo('cat /proc/fs/fscache/stats')
 
-        except:
+        except SystemExit:
             print colored('#########################################', 'red')
             print colored('##### Problem mounting cachefilesd ######', 'red')
             print colored('#########################################', 'red')
@@ -1324,7 +1324,7 @@ MySQLdump backup
     :param dst_dir: mysqldump destination directory
     """
     with settings(warn_only=False):
-        sudo('mysql -h '+host_ip+' -u root -p "show databases;"')
+        sudo('mysql -h ' + host_ip + ' -u root -p "show databases;"')
         # +--------------------+
         # | Database           |
         # +--------------------+
@@ -1340,8 +1340,8 @@ MySQLdump backup
 
         sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction ' + host_ip +
              ' -u root -p --all-databases >'
-             ' '+dst_dir+'/backup-'+date+'.sql')
-        #check that the backup was created with a grep.
+             ' ' + dst_dir + '/backup-' + date + '.sql')
+        # check that the backup was created with a grep.
 
         sudo('mysql -h ' + host_ip + ' -u root -p "show databases;"')
 
@@ -1367,7 +1367,7 @@ MySQLdump restore
     """
     with settings(warn_only=False):
         sudo('mysql -h ' + host_ip + ' -u root -p "show databases;"')
-        sudo('mysql ' + host_ip + '-u root -p < '+mysqldump_fpath)
+        sudo('mysql ' + host_ip + '-u root -p < ' + mysqldump_fpath)
         sudo('mysql -h ' + host_ip + ' -u root -p "show databases;"')
 
 
@@ -1440,26 +1440,34 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
         print colored('===========================', 'blue')
         print colored('INSTALLING : "MYSQL Server"', 'blue')
         print colored('===========================', 'blue')
-        try:
+
+        if exists('/etc/yum.repos.d/mysql-community.repo') and exists('/etc/yum.repos.d/mysql-community-source.repo'):
+            print colored('############################################', 'blue')
+            print colored('##### MySQL Repository already exists ######', 'blue')
+            print colored('############################################', 'blue')
+        else:
             sudo('wget -P /home/vagrant/ http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm')
-            with cd ('/home/vagrant/'):
-                if exists('mysql-community-release-el7-5.noarch.rpm', use_sudo=True):
-                    print colored('################################################', 'blue')
-                    print colored('##### MySQL Repository File downloaded OK ######', 'blue')
-                    print colored('################################################', 'blue')
-                    try:
-                        print colored('#########################################', 'blue')
-                        print colored('####### ADDING MySQL Repository #########', 'blue')
-                        print colored('#########################################', 'blue')
-                        sudo('rpm -ivh mysql-community-release-el7-5.noarch.rpm')
-                    except:
-                        print colored('##############################################', 'red')
-                        print colored('####### FAIL to add MySQL repository #########', 'red')
-                        print colored('##############################################', 'red')
-                else:
-                    print colored('######################################', 'red')
-                    print colored('##### Repo File does not exists ######', 'red')
-                    print colored('######################################', 'red')
+            try:
+                with cd('/home/vagrant/'):
+                    if exists('mysql-community-release-el7-5.noarch.rpm', use_sudo=True):
+                        print colored('################################################', 'blue')
+                        print colored('##### MySQL Repository File downloaded OK ######', 'blue')
+                        print colored('################################################', 'blue')
+                        try:
+                            print colored('#########################################', 'blue')
+                            print colored('####### ADDING MySQL Repository #########', 'blue')
+                            print colored('#########################################', 'blue')
+                            sudo('rpm -ivh mysql-community-release-el7-5.noarch.rpm')
+                        except SystemExit:
+                            print colored('##############################################', 'red')
+                            print colored('####### FAIL to add MySQL repository #########', 'red')
+                            print colored('##############################################', 'red')
+                    else:
+                        print colored('######################################', 'red')
+                        print colored('##### Repo File does not exists ######', 'red')
+                        print colored('######################################', 'red')
+
+        try:
             sudo('yum update')
             sudo('yum install -y mysql-server-5.0.95-5.el5_9 mod_auth_mysql-3.0.0-3.2.el5_3 '
                  'MySQL-python-1.2.3-0.1.c1.el5')
@@ -1469,26 +1477,7 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
             sudo('systemctl start mysqld')
             sudo('mysql_secure_installation')
             sudo('chkconfig mysqld on')
-        except SystemExit:
-            sudo('wget -P /home/vagrant/ http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm')
-            with cd('/home/vagrant/'):
-                if exists('mysql-community-release-el7-5.noarch.rpm', use_sudo=True):
-                    print colored('################################################', 'blue')
-                    print colored('##### MySQL Repository File downloaded OK ######', 'blue')
-                    print colored('################################################', 'blue')
-                    try:
-                        print colored('#########################################', 'blue')
-                        print colored('####### ADDING MySQL Repository #########', 'blue')
-                        print colored('#########################################', 'blue')
-                        sudo('rpm -ivh mysql-community-release-el7-5.noarch.rpm')
-                    except:
-                        print colored('##############################################', 'red')
-                        print colored('####### FAIL to add MySQL repository #########', 'red')
-                        print colored('##############################################', 'red')
-                else:
-                    print colored('######################################', 'red')
-                    print colored('##### Repo File does not exists ######', 'red')
-                    print colored('######################################', 'red')
+        except SystemError:
             sudo('yum update')
             sudo('yum install -y mysql-server mod_auth_mysql MySQL-python')
             sudo('yum install -y mysql-devel perl-DBD-MySQL mysql mysql-connector-odbc')
@@ -1496,6 +1485,7 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
             sudo('systemctl start mysqld')
             sudo('mysql_secure_installation')
             sudo('chkconfig mysqld on')
+
 
         print colored('==================', 'blue')
         print colored('INSTALLING : "PHP"', 'blue')
@@ -1541,14 +1531,14 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
         print colored('INSTALLING : SHIBBOLETH Auth', 'blue')
         print colored('============================', 'blue')
         try:
-            sudo ('curl -o /etc/yum.repos.d/shibboleth.repo '
-                  'http://download.opensuse.org/repositories/security://shibboleth/CentOS_7/security:shibboleth.repo')
+            sudo('curl -o /etc/yum.repos.d/shibboleth.repo '
+                 'http://download.opensuse.org/repositories/security://shibboleth/CentOS_7/security:shibboleth.repo')
             sudo('yum install -y shibboleth-2.5.6-3.1')
             sudo('systemctl start shibd.service')
 
         except SystemExit:
-            sudo ('curl -o /etc/yum.repos.d/shibboleth.repo '
-                  'http://download.opensuse.org/repositories/security://shibboleth/CentOS_7/security:shibboleth.repo')
+            sudo('curl -o /etc/yum.repos.d/shibboleth.repo '
+                 'http://download.opensuse.org/repositories/security://shibboleth/CentOS_7/security:shibboleth.repo')
             sudo('yum install -y shibboleth')
             sudo('systemctl start shibd.service')
 
