@@ -1476,7 +1476,7 @@ Migrate Dev Connect PACKAGES nyc1app204 to new Azure connect-dev-aio-01
             sudo('systemctl start mysqld')
             sudo('mysql_secure_installation')
             sudo('chkconfig mysqld on')
-        except SystemError:
+        except SystemExit:
             sudo('yum update')
             sudo('yum install -y mysql-server mod_auth_mysql MySQL-python')
             sudo('yum install -y mysql-devel perl-DBD-MySQL mysql mysql-connector-odbc')
