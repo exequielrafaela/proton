@@ -1375,6 +1375,58 @@ MySQLdump backup
             print colored('===================', 'red')
 
 
+def mysql_create_db(db_name, mysql_ip="127.0.0.1"):
+    """
+MySQLdump backup
+    :param db_name: Database name to be created
+    :param mysql_ip: MySQL Server IP Address
+    """
+    with settings(warn_only=False):
+        try:
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "CREATE DATABASE '+db_name+';"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "show databases;"')
+        except SystemExit:
+            print colored('===================', 'red')
+            print colored('MySQL query problem', 'red')
+            print colored('===================', 'red')
+
+
+def mysql_create_local_user(db_user, db_user_pass="db_user", mysql_ip="127.0.0.1"):
+    """
+MySQLdump backup
+    :param db_user: Username to be created
+    :param mysql_ip: MySQL Server IP Address
+    """
+    with settings(warn_only=False):
+        try:
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "CREATE USER '+db_user+'@localhost IDENTIFIED BY \''+db_user_pass+'\';"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
+        except SystemExit:
+            print colored('===================', 'red')
+            print colored('MySQL query problem', 'red')
+            print colored('===================', 'red')
+
+
+def mysql_create_local_user(db_name, db_user, db_user_pass="db_user", mysql_ip="127.0.0.1"):
+    """
+MySQLdump backup
+    :param db_name: Database name to be created
+    :param db_user: Database Username to grant access to
+    :param db_user_pass: Database Username password
+    :param mysql_ip: MySQL Server IP Address
+    """
+    with settings(warn_only=False):
+        try:
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "GRANT ALL PRIVILEGES ON '+db_name+'.* TO '+db_user+'@localhost IDENTIFIED BY \''+db_user_pass+'\';"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
+        except SystemExit:
+            print colored('===================', 'red')
+            print colored('MySQL query problem', 'red')
+            print colored('===================', 'red')
+
+
 def mysql_grant_remote_cx(mysql_pass,remote_ip,mysql_ip="127.0.0.1"):
     """
 MySQLdump backup
