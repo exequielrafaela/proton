@@ -27,7 +27,7 @@ ORDER THE IMPORTS ALPHABETICALLY and DIVIDE IN 3 SECTIONS
 # from fabric.api import hosts, sudo, settings, hide, env, execute, prompt, run, local, task, put, cd, get
 from fabric.api import sudo, settings, env, run, local, put, cd, get
 from fabric.contrib.files import append, exists, sed
-from fabric.contrib.project import rsync_project
+from fabric.contrib.project import rsync_project, upload_project
 from termcolor import colored
 from distutils.util import strtobool
 import logging
@@ -1362,8 +1362,7 @@ Install the mysql client in a Centos7 based OS
 def mysql_sh_db_user(mysql_ip="127.0.0.1"):
     """
 MySQLdump backup
-    :param host_ip: MySQL Server IP Address
-    :param dst_dir: mysqldump destination directory
+    :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
         try:
@@ -1383,7 +1382,7 @@ Create a MySQL Database with the given db_name
     """
     with settings(warn_only=False):
         try:
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "CREATE DATABASE '+db_name+';"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "CREATE DATABASE ' + db_name + ';"')
             sudo('mysql -h ' + mysql_ip + ' -u root -p -e "show databases;"')
         except SystemExit:
             print colored('===================', 'red')
@@ -1401,7 +1400,8 @@ Create a localhost MySQL user
     with settings(warn_only=False):
         try:
             sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "CREATE USER '+db_user+'@localhost IDENTIFIED BY \''+db_user_pass+'\';"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "CREATE USER ' + db_user + '@localhost IDENTIFIED BY'
+                                                                                     ' \'' + db_user_pass + '\';"')
             sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
         except SystemExit:
             print colored('===================', 'red')
@@ -1426,7 +1426,8 @@ to database 'wordpress'
     with settings(warn_only=False):
         try:
             sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "GRANT ALL PRIVILEGES ON '+db_name+'.* TO '+db_user+'@localhost IDENTIFIED BY \''+db_user_pass+'\';"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "GRANT ALL PRIVILEGES ON ' + db_name + '.* TO '
+                 + db_user + '@localhost IDENTIFIED BY \'' + db_user_pass + '\';"')
             sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
         except SystemExit:
             print colored('===================', 'red')
@@ -1434,7 +1435,7 @@ to database 'wordpress'
             print colored('===================', 'red')
 
 
-def mysql_grant_remote_cx(mysql_pass,remote_ip,mysql_ip="127.0.0.1"):
+def mysql_grant_remote_cx(mysql_pass, remote_ip, mysql_ip="127.0.0.1"):
     """
 Grant MySQL remote conection from a certain host
     :param mysql_pass: MySQL Server root password
@@ -1444,9 +1445,10 @@ Grant MySQL remote conection from a certain host
     with settings(warn_only=False):
         try:
             sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "GRANT ALL PRIVILEGES ON *.* TO \'root\'@\''+remote_ip+'\' IDENTIFIED BY \''+mysql_pass+'\';"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "GRANT ALL PRIVILEGES ON *.* TO \'root\'@\''
+                 + remote_ip + '\' IDENTIFIED BY \'' + mysql_pass + '\';"')
             sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
-            #DROP USER 'root'@'chef.grey.com';
+            # DROP USER 'root'@'chef.grey.com';
         except SystemExit:
             print colored('===================', 'red')
             print colored('MySQL query problem', 'red')
@@ -1483,26 +1485,16 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         file_get(dst_dir + 'backup-' + date + '.sql', dst_dir + 'backup-' + date + '.sql')
 
 
-def mysql_restore(mysqldump_fpath, host_ip="127.0.0.1"):
+def mysql_restore(mysqldump_fpath, mysql_ip="127.0.0.1"):
     """
 MySQLdump restore
     :param mysqldump_fpath: mysqldump ".sql" file absolute path
-    :param dst_dir: mysqldump file pass w/ the absolute path directory
+    :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
-        sudo('mysql -h ' + host_ip + ' -u root -p -e "show databases;"')
-        sudo('mysql -h ' + host_ip + ' -u root -p < ' + mysqldump_fpath)
-        sudo('mysql -h ' + host_ip + ' -u root -p -e "show databases;"')
-
-
-def rsync(local_dir,remote_dir):
-    """
-Python fabric rsync
-    :param local_dir:
-    :param remote_dir:
-    """
-    with settings(warn_only=False):
-        rsync_project(remote_dir,local_dir)
+        sudo('mysql -h ' + mysql_ip + ' -u root -p -e "show databases;"')
+        sudo('mysql -h ' + mysql_ip + ' -u root -p < ' + mysqldump_fpath)
+        sudo('mysql -h ' + mysql_ip + ' -u root -p -e "show databases;"')
 
 
 def disk_usage(tree_dir='/'):
@@ -1524,20 +1516,21 @@ Check a certain folder Disk Usage
         print "flags: " + str(disk.f_flag)
         print "miximum file name length: " + str(disk.f_namemax)
         print "~~~~~~~~~~calculation of disk usage:~~~~~~~~~~"
-        totalBytes = float(disk.f_frsize * disk.f_blocks)
+        total_bytes = float(disk.f_frsize * disk.f_blocks)
         print "total space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (
-            totalBytes, totalBytes / 1024, totalBytes / 1024 / 1024, totalBytes / 1024 / 1024 / 1024)
-        totalUsedSpace = float(disk.f_frsize * (disk.f_blocks - disk.f_bfree))
+            total_bytes, total_bytes / 1024, total_bytes / 1024 / 1024, total_bytes / 1024 / 1024 / 1024)
+        total_used_space = float(disk.f_frsize * (disk.f_blocks - disk.f_bfree))
         print "used space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (
-            totalUsedSpace, totalUsedSpace / 1024, totalUsedSpace / 1024 / 1024, totalUsedSpace / 1024 / 1024 / 1024)
-        totalAvailSpace = float(disk.f_frsize * disk.f_bfree)
+            total_used_space, total_used_space / 1024, total_used_space / 1024 / 1024,
+            total_used_space / 1024 / 1024 / 1024)
+        total_avail_space = float(disk.f_frsize * disk.f_bfree)
         print "available space: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes" % (
-            totalAvailSpace, totalAvailSpace / 1024, totalAvailSpace / 1024 / 1024,
-            totalAvailSpace / 1024 / 1024 / 1024)
-        totalAvailSpaceNonRoot = float(disk.f_frsize * disk.f_bavail)
+            total_avail_space, total_avail_space / 1024, total_avail_space / 1024 / 1024,
+            total_avail_space / 1024 / 1024 / 1024)
+        total_avail_space_non_root = float(disk.f_frsize * disk.f_bavail)
         print "available space for non-super user: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes " % (
-            totalAvailSpaceNonRoot, totalAvailSpaceNonRoot / 1024, totalAvailSpaceNonRoot / 1024 / 1024,
-            totalAvailSpaceNonRoot / 1024 / 1024 / 1024)
+            total_avail_space_non_root, total_avail_space_non_root / 1024, total_avail_space_non_root / 1024 / 1024,
+            total_avail_space_non_root / 1024 / 1024 / 1024)
 
 
 def install_lamp_centos7():
@@ -1720,31 +1713,90 @@ Install custom list of packets
         sudo('yum install -y net-snmp-libs net-snmp net-snmp-utils')
 
 
-def rsync_data_migration():
+def rsync(local_dir, remote_dir, exclude, default_opts, extra_opts):
+    """
+Python fabric rsync
+    :param local_dir:
+    :param remote_dir:
+    :param exclude:
+    :param default_opts:
+    :param extra_opts:
+    """
+    with settings(warn_only=False):
+        rsync_project(remote_dir, local_dir, exclude, default_opts, extra_opts)
+
+
+def rsync_data_from_server():
     """
 Migrate the data from a LAMP Server to a new one
     """
     with settings(warn_only=False):
         # Rsync web root
-        rsync_project('/var/www/', '/var/www/', extra_opts='-avzP --progress')
+        # sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
+        rsync_project(local_dir='/tmp/var/www/', remote_dir='/var/www/', default_opts='-avzP --progress', use_sudo=True)
 
-        sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
         # Rsync the apache configuration files
-        sudo('rsync -avzP --progress /etc/httpd/ apache@172.17.2.30:/etc/httpd.old/')
+        # sudo('rsync -avzP --progress /etc/httpd/ apache@172.17.2.30:/etc/httpd.old/')
+        rsync_project(local_dir='/tmp/etc/httpd/', remote_dir='/etc/httpd/', default_opts='-avzP --progress',
+                      use_sudo=True)
 
         # Rsync php configuration
-
         # comparar memory limit => llevarlo a 512mb o 1gb
-        sudo('scp /etc/php.ini root@172.17.2.30:/etc/php.ini.old/')
-
-        sudo('rsync -avzP --progress /etc/php.d/ 172.17.2.30:/etc/php.d.old/')
-        sudo('rsync -avzP --progress /usr/include/php/ 172.17.2.30:/usr/include/php.old/')
+        # sudo('scp /etc/php.ini root@172.17.2.30:/etc/php.ini.old/')
+        upload_project(local_dir='/tmp/etc/php.ini', remote_dir='/etc/php.ini', use_sudo=True)
+        # sudo('rsync -avzP --progress /etc/php.d/ 172.17.2.30:/etc/php.d.old/')
+        rsync_project(local_dir='/tmp/etc/php.d/', remote_dir='/etc/php.d/', default_opts='-avzP --progress',
+                      use_sudo=True)
+        # sudo('rsync -avzP --progress /usr/include/php/ 172.17.2.30:/usr/include/php.old/')
+        rsync_project(local_dir='/tmp/usr/include/php/', ramote_dir='/usr/include/php/',
+                      default_opts='-avzP --progress',
+                      use_sudo=True)
 
         # Rsync mysql config files
-        sudo('rsync -avzP --progress /etc/mysql/ 172.17.2.30:/etc/mysql.old/')
+        # sudo('rsync -avzP --progress /etc/mysql/ 172.17.2.30:/etc/mysql.old/')
+        rsync_project(local_dir='/tmp/etc/mysql/', ramote_dir='/etc/mysql/', default_opts='-avzP --progress',
+                      use_sudo=True)
+
+        # Rsync shibboleth config files
+        # sudo('rsync -avzP --progress /etc/shibboleth/ 172.17.2.30:/etc/shibboleth.old/')
+        rsync_project(local_dir='/tmp/etc/shibboleth/', ramote_dir='/etc/shibboleth/', default_opts='-avzP --progress',
+                      use_sudo=True)
+
+def rsync_data_to_server():
+    """
+Migrate the data from a LAMP Server to a new one
+    """
+    with settings(warn_only=False):
+        # Rsync web root
+        # sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
+        rsync_project(local_dir='/tmp/var/www/', remote_dir='/var/www/', default_opts='-avzP --progress', use_sudo=True)
+
+        # Rsync the apache configuration files
+        # sudo('rsync -avzP --progress /etc/httpd/ apache@172.17.2.30:/etc/httpd.old/')
+        rsync_project(local_dir='/tmp/etc/httpd/', remote_dir='/etc/httpd/', default_opts='-avzP --progress',
+                      use_sudo=True)
+
+        # Rsync php configuration
+        # comparar memory limit => llevarlo a 512mb o 1gb
+        # sudo('scp /etc/php.ini root@172.17.2.30:/etc/php.ini.old/')
+        upload_project(local_dir='/tmp/etc/php.ini', remote_dir='/etc/php.ini', use_sudo=True)
+        # sudo('rsync -avzP --progress /etc/php.d/ 172.17.2.30:/etc/php.d.old/')
+        rsync_project(local_dir='/tmp/etc/php.d/', remote_dir='/etc/php.d/', default_opts='-avzP --progress',
+                      use_sudo=True)
+        # sudo('rsync -avzP --progress /usr/include/php/ 172.17.2.30:/usr/include/php.old/')
+        rsync_project(local_dir='/tmp/usr/include/php/', ramote_dir='/usr/include/php/',
+                      default_opts='-avzP --progress',
+                      use_sudo=True)
 
         # Rsync mysql config files
-        sudo('rsync -avzP --progress /etc/shibboleth/ 172.17.2.30:/etc/shibboleth.old/')
+        # sudo('rsync -avzP --progress /etc/mysql/ 172.17.2.30:/etc/mysql.old/')
+        rsync_project(local_dir='/tmp/etc/mysql/', ramote_dir='/etc/mysql/', default_opts='-avzP --progress',
+                      use_sudo=True)
+
+        # Rsync shibboleth config files
+        # sudo('rsync -avzP --progress /etc/shibboleth/ 172.17.2.30:/etc/shibboleth.old/')
+        rsync_project(local_dir='/tmp/etc/shibboleth/', ramote_dir='/etc/shibboleth/', default_opts='-avzP --progress',
+                      use_sudo=True)
 
 
 """
