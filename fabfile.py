@@ -1819,10 +1819,11 @@ Migrate the data from a LAMP Server to a new one
                 # sudo('scp /etc/php.ini root@172.17.2.30:/etc/php.ini.old/')
                 upload_project(local_dir='/tmp/etc/', remote_dir='/etc/php.ini', use_sudo=True)
                 # sudo('rsync -avzP --progress /etc/php.d/ 172.17.2.30:/etc/php.d.old/')
-                rsync_project(local_dir='/tmp/etc/php.d', remote_dir='/etc/php.d/', default_opts='-avzP --progress')
+                rsync_project(local_dir='/tmp/etc/php.d', remote_dir='/etc/php.d/', default_opts='-avzP --progress',
+                              upload=False)
                 # sudo('rsync -avzP --progress /usr/include/php/ 172.17.2.30:/usr/include/php.old/')
                 rsync_project(local_dir='/tmp//usr/include/php/', remote_dir='/usr/include/php/',
-                              default_opts='-avzP --progress')
+                              default_opts='-avzP --progress',upload=False)
             except SystemExit:
                 print colored('##########################################', 'red')
                 print colored('##### FAIL to RSYNC PHP Config Files #####', 'red')
@@ -1839,10 +1840,11 @@ Migrate the data from a LAMP Server to a new one
                 # sudo('scp /etc/php.ini root@172.17.2.30:/etc/php.ini.old/')
                 upload_project(local_dir='/tmp/etc/', remote_dir='/etc/php.ini', use_sudo=True)
                 # sudo('rsync -avzP --progress /etc/php.d/ 172.17.2.30:/etc/php.d.old/')
-                rsync_project(local_dir='/tmp/etc/php.d', remote_dir='/etc/php.d/', default_opts='-avzP --progress')
+                rsync_project(local_dir='/tmp/etc/php.d', remote_dir='/etc/php.d/', default_opts='-avzP --progress',
+                              upload=False)
                 # sudo('rsync -avzP --progress /usr/include/php/ 172.17.2.30:/usr/include/php.old/')
                 rsync_project(local_dir='/tmp//usr/include/php/', remote_dir='/usr/include/php/',
-                              default_opts='-avzP --progress')
+                              default_opts='-avzP --progress',upload=False)
             except SystemExit:
                 print colored('##########################################', 'red')
                 print colored('##### FAIL to RSYNC PHP Config Files #####', 'red')
@@ -1862,7 +1864,8 @@ Migrate the data from a LAMP Server to a new one
                 print colored('#########################', 'blue')
                 # Rsync mysql config files
                 # sudo('rsync -avzP --progress /etc/mysql/ 172.17.2.30:/etc/mysql.old/')
-                rsync_project(local_dir='/tmp/etc/mysql/', remote_dir='/etc/mysql/', default_opts='-avzP --progress')
+                rsync_project(local_dir='/tmp/etc/mysql/', remote_dir='/etc/mysql/', default_opts='-avzP --progress',
+                              upload=False)
             except SystemExit:
                 print colored('############################################', 'red')
                 print colored('##### FAIL to RSYNC MySQL Config Files #####', 'red')
@@ -1875,7 +1878,8 @@ Migrate the data from a LAMP Server to a new one
                 print colored('#########################', 'blue')
                 # Rsync mysql config files
                 # sudo('rsync -avzP --progress /etc/mysql/ 172.17.2.30:/etc/mysql.old/')
-                rsync_project(local_dir='/tmp/etc/mysql/', remote_dir='/etc/mysql/', default_opts='-avzP --progress')
+                rsync_project(local_dir='/tmp/etc/mysql/', remote_dir='/etc/mysql/', default_opts='-avzP --progress',
+                              upload=False)
             except SystemExit:
                 print colored('############################################', 'red')
                 print colored('##### FAIL to RSYNC MySQL Config Files #####', 'red')
@@ -1896,7 +1900,7 @@ Migrate the data from a LAMP Server to a new one
                 # Rsync shibboleth config files
                 # sudo('rsync -avzP --progress /etc/shibboleth/ 172.17.2.30:/etc/shibboleth.old/')
                 rsync_project(local_dir='/tmp/etc/shibboleth/', remote_dir='/etc/shibboleth/',
-                              default_opts='-avzP --progress')
+                              default_opts='-avzP --progress',upload=False)
             except SystemExit:
                 print colored('#################################################', 'red')
                 print colored('##### FAIL to RSYNC Shibboleth Config Files #####', 'red')
@@ -1910,7 +1914,7 @@ Migrate the data from a LAMP Server to a new one
                 # Rsync shibboleth config files
                 # sudo('rsync -avzP --progress /etc/shibboleth/ 172.17.2.30:/etc/shibboleth.old/')
                 rsync_project(local_dir='/tmp/etc/shibboleth/', remote_dir='/etc/shibboleth/',
-                              default_opts='-avzP --progress')
+                              default_opts='-avzP --progress',upload=False)
             except SystemExit:
                 print colored('#################################################', 'red')
                 print colored('##### FAIL to RSYNC Shibboleth Config Files #####', 'red')
