@@ -1866,7 +1866,7 @@ Migrate the data from a LAMP Server to a new one
                 print colored('##### FAIL to RSYNC MySQL Config Files #####', 'red')
                 print colored('############################################', 'red')
         else:
-            local('mkdir -p /etc/mysql')
+            local('mkdir -p /tmp/etc/mysql')
             try:
                 print colored('#########################', 'blue')
                 print colored('####### RSYNCKING #######', 'blue')
@@ -1900,7 +1900,7 @@ Migrate the data from a LAMP Server to a new one
                 print colored('##### FAIL to RSYNC Shibboleth Config Files #####', 'red')
                 print colored('#################################################', 'red')
         else:
-            local('mkdir -p /etc/shibboleth')
+            local('mkdir -p /tmp/etc/shibboleth')
             try:
                 print colored('#########################', 'blue')
                 print colored('####### RSYNCKING #######', 'blue')
