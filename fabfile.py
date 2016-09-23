@@ -1752,7 +1752,7 @@ Migrate the data from a LAMP Server to a new one
                 print colored('##### FAIL to RSYNC Apache Document Root #####', 'red')
                 print colored('##############################################', 'red')
         else:
-            sudo('mkdir -p /tmp/var/www')
+            local('mkdir -p /tmp/var/www')
             try:
                 print colored('#########################', 'blue')
                 print colored('####### RSYNCKING #######', 'blue')
