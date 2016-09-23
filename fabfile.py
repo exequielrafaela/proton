@@ -1781,8 +1781,8 @@ Migrate the data from a LAMP Server to a new one
                 print colored('#########################', 'blue')
                 # Rsync the apache configuration files
                 # sudo('rsync -avzP --progress /etc/httpd/ apache@172.17.2.30:/etc/httpd.old/')
-                # rsync_project(local_dir='/tmp/etc/httpd/', remote_dir='/etc/httpd/', default_opts='-avzP --progress')
-                rsync_project(local_dir='/tmp/etc/httpd/', remote_dir='/etc/httpd/')
+                rsync_project(local_dir='/tmp/etc/httpd/', remote_dir='/etc/httpd/', default_opts='-avzP --progress',
+                              upload=False)
             except SystemExit:
                 print colored('#############################################', 'red')
                 print colored('##### FAIL to RSYNC Apache Config Files #####', 'red')
@@ -1795,8 +1795,8 @@ Migrate the data from a LAMP Server to a new one
                 print colored('#########################', 'blue')
                 # Rsync the apache configuration files
                 # sudo('rsync -avzP --progress /etc/httpd/ apache@172.17.2.30:/etc/httpd.old/')
-                # rsync_project(local_dir='/tmp/etc/httpd/', remote_dir='/etc/httpd/', default_opts='-avzP --progress')
-                rsync_project(local_dir='/tmp/etc/httpd/', remote_dir='/etc/httpd/')
+                rsync_project(local_dir='/tmp/etc/httpd/', remote_dir='/etc/httpd/', default_opts='-avzP --progress',
+                              upload=False)
             except SystemExit:
                 print colored('#############################################', 'red')
                 print colored('##### FAIL to RSYNC Apache Config files #####', 'red')
