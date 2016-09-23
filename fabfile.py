@@ -1804,7 +1804,7 @@ Migrate the data from a LAMP Server to a new one
         print colored('SYNC: PHP Config Files', 'blue')
         print colored('======================', 'blue')
 
-        if (os.path.isdir("/etc/php.d") and os.path.isdir("/usr/include/php")):
+        if (os.path.isdir("/tmp/etc/php.d") and os.path.isdir("/usr/include/php")):
             print colored('###############################', 'blue')
             print colored('##### PHP folders exists ######', 'blue')
             print colored('###############################', 'blue')
@@ -1850,7 +1850,7 @@ Migrate the data from a LAMP Server to a new one
         print colored('SYNC: MySQL Config Files', 'blue')
         print colored('========================', 'blue')
 
-        if (os.path.isdir("/etc/mysql")):
+        if (os.path.isdir("/tmp/etc/mysql")):
             print colored('#################################', 'blue')
             print colored('##### MySQL folders exists ######', 'blue')
             print colored('#################################', 'blue')
@@ -1883,7 +1883,7 @@ Migrate the data from a LAMP Server to a new one
         print colored('SYNC: Shibboleth Config Files', 'blue')
         print colored('=============================', 'blue')
 
-        if (os.path.isdir("/etc/shibboleth")):
+        if (os.path.isdir("/tmp/etc/shibboleth")):
             print colored('######################################', 'blue')
             print colored('##### Shibboleth folders exists ######', 'blue')
             print colored('######################################', 'blue')
