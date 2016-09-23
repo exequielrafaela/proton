@@ -1733,70 +1733,28 @@ Migrate the data from a LAMP Server to a new one
     with settings(warn_only=False):
         # Rsync web root
         # sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
-        rsync_project(local_dir='/tmp/var/www/', remote_dir='/var/www/', default_opts='-avzP --progress', use_sudo=True)
+        rsync_project(local_dir='/tmp/var/www/', remote_dir='/var/www/', default_opts='-avzP --progress')
 
         # Rsync the apache configuration files
         # sudo('rsync -avzP --progress /etc/httpd/ apache@172.17.2.30:/etc/httpd.old/')
-        rsync_project(local_dir='/tmp/etc/httpd/', remote_dir='/etc/httpd/', default_opts='-avzP --progress',
-                      use_sudo=True)
+        rsync_project(local_dir='/tmp/etc/httpd/', remote_dir='/etc/httpd/', default_opts='-avzP --progress')
 
         # Rsync php configuration
         # comparar memory limit => llevarlo a 512mb o 1gb
         # sudo('scp /etc/php.ini root@172.17.2.30:/etc/php.ini.old/')
         upload_project(local_dir='/tmp/etc/php.ini', remote_dir='/etc/php.ini', use_sudo=True)
         # sudo('rsync -avzP --progress /etc/php.d/ 172.17.2.30:/etc/php.d.old/')
-        rsync_project(local_dir='/tmp/etc/php.d/', remote_dir='/etc/php.d/', default_opts='-avzP --progress',
-                      use_sudo=True)
+        rsync_project(local_dir='/tmp/etc/php.d/', remote_dir='/etc/php.d/', default_opts='-avzP --progress')
         # sudo('rsync -avzP --progress /usr/include/php/ 172.17.2.30:/usr/include/php.old/')
-        rsync_project(local_dir='/tmp/usr/include/php/', ramote_dir='/usr/include/php/',
-                      default_opts='-avzP --progress',
-                      use_sudo=True)
+        rsync_project(local_dir='/tmp/usr/include/php/', ramote_dir='/usr/include/php/',default_opts='-avzP --progress')
 
         # Rsync mysql config files
         # sudo('rsync -avzP --progress /etc/mysql/ 172.17.2.30:/etc/mysql.old/')
-        rsync_project(local_dir='/tmp/etc/mysql/', ramote_dir='/etc/mysql/', default_opts='-avzP --progress',
-                      use_sudo=True)
+        rsync_project(local_dir='/tmp/etc/mysql/', ramote_dir='/etc/mysql/', default_opts='-avzP --progress')
 
         # Rsync shibboleth config files
         # sudo('rsync -avzP --progress /etc/shibboleth/ 172.17.2.30:/etc/shibboleth.old/')
-        rsync_project(local_dir='/tmp/etc/shibboleth/', ramote_dir='/etc/shibboleth/', default_opts='-avzP --progress',
-                      use_sudo=True)
-
-def rsync_data_to_server():
-    """
-Migrate the data from a LAMP Server to a new one
-    """
-    with settings(warn_only=False):
-        # Rsync web root
-        # sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
-        rsync_project(local_dir='/tmp/var/www/', remote_dir='/var/www/', default_opts='-avzP --progress', use_sudo=True)
-
-        # Rsync the apache configuration files
-        # sudo('rsync -avzP --progress /etc/httpd/ apache@172.17.2.30:/etc/httpd.old/')
-        rsync_project(local_dir='/tmp/etc/httpd/', remote_dir='/etc/httpd/', default_opts='-avzP --progress',
-                      use_sudo=True)
-
-        # Rsync php configuration
-        # comparar memory limit => llevarlo a 512mb o 1gb
-        # sudo('scp /etc/php.ini root@172.17.2.30:/etc/php.ini.old/')
-        upload_project(local_dir='/tmp/etc/php.ini', remote_dir='/etc/php.ini', use_sudo=True)
-        # sudo('rsync -avzP --progress /etc/php.d/ 172.17.2.30:/etc/php.d.old/')
-        rsync_project(local_dir='/tmp/etc/php.d/', remote_dir='/etc/php.d/', default_opts='-avzP --progress',
-                      use_sudo=True)
-        # sudo('rsync -avzP --progress /usr/include/php/ 172.17.2.30:/usr/include/php.old/')
-        rsync_project(local_dir='/tmp/usr/include/php/', ramote_dir='/usr/include/php/',
-                      default_opts='-avzP --progress',
-                      use_sudo=True)
-
-        # Rsync mysql config files
-        # sudo('rsync -avzP --progress /etc/mysql/ 172.17.2.30:/etc/mysql.old/')
-        rsync_project(local_dir='/tmp/etc/mysql/', ramote_dir='/etc/mysql/', default_opts='-avzP --progress',
-                      use_sudo=True)
-
-        # Rsync shibboleth config files
-        # sudo('rsync -avzP --progress /etc/shibboleth/ 172.17.2.30:/etc/shibboleth.old/')
-        rsync_project(local_dir='/tmp/etc/shibboleth/', ramote_dir='/etc/shibboleth/', default_opts='-avzP --progress',
-                      use_sudo=True)
+        rsync_project(local_dir='/tmp/etc/shibboleth/', ramote_dir='/etc/shibboleth/', default_opts='-avzP --progress')
 
 
 """
