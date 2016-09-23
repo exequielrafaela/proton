@@ -1823,7 +1823,7 @@ Migrate the data from a LAMP Server to a new one
                 rsync_project(local_dir='/tmp/etc/php.d', remote_dir='/etc/php.d/', default_opts='-avzP --progress',
                               upload=False)
                 # sudo('rsync -avzP --progress /usr/include/php/ 172.17.2.30:/usr/include/php.old/')
-                rsync_project(local_dir='/tmp//usr/include/php/', remote_dir='/usr/include/php/',
+                rsync_project(local_dir='/tmp/usr/include/php/', remote_dir='/usr/include/php/',
                               default_opts='-avzP --progress',upload=False)
             except SystemExit:
                 print colored('##########################################', 'red')
