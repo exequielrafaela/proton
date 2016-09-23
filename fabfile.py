@@ -1739,12 +1739,25 @@ Migrate the data from a LAMP Server to a new one
             print colored('################################', 'blue')
             print colored('##### /tmp/var/www exists ######', 'blue')
             print colored('################################', 'blue')
+            try:
+                print colored('#########################', 'blue')
+                print colored('####### RSYNCKING #######', 'blue')
+                print colored('#########################', 'blue')
+                # Rsync web root
+                # sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
+                # local: rsync  -avzP --progress  --rsh='ssh  -p 22  ' /tmp/ vagrant@172.28.128.4:/var/www
+                rsync_project(local_dir='/tmp/var/www/', remote_dir='/var/www/', default_opts='-avzPO --progress',
+                              upload=False)
+            except SystemExit:
+                print colored('##############################################', 'red')
+                print colored('##### FAIL to RSYNC Apache Document Root #####', 'red')
+                print colored('##############################################', 'red')
         else:
             sudo('mkdir -p /tmp/var/www')
             try:
-                print colored('########################', 'blue')
+                print colored('#########################', 'blue')
                 print colored('####### RSYNCKING #######', 'blue')
-                print colored('########################', 'blue')
+                print colored('#########################', 'blue')
                 # Rsync web root
                 # sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
                 # local: rsync  -avzP --progress  --rsh='ssh  -p 22  ' /tmp/ vagrant@172.28.128.4:/var/www
