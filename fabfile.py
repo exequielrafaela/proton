@@ -1430,8 +1430,9 @@ MySQLdump backup
 def mysql_grant_remote_cx(mysql_pass,remote_ip,mysql_ip="127.0.0.1"):
     """
 MySQLdump backup
-    :param host_ip: MySQL Server IP Address
-    :param dst_dir: mysqldump destination directory
+    :param mysql_pass: MySQL Server root password
+    :param remote_ip: Remote host IP address to allow remote connections from
+    :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
         try:
