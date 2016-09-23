@@ -1806,7 +1806,7 @@ Migrate the data from a LAMP Server to a new one
         print colored('SYNC: PHP Config Files', 'blue')
         print colored('======================', 'blue')
 
-        if (os.path.isdir("/tmp/etc/php.d") and os.path.isdir("/usr/include/php")):
+        if (os.path.isdir("/tmp/etc/php.d") and os.path.isdir("/tmp/usr/include/php")):
             print colored('###############################', 'blue')
             print colored('##### PHP folders exists ######', 'blue')
             print colored('###############################', 'blue')
