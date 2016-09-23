@@ -1377,7 +1377,7 @@ MySQLdump backup
 
 def mysql_create_db(db_name, mysql_ip="127.0.0.1"):
     """
-MySQLdump backup
+Create a MySQL Database with the given db_name
     :param db_name: Database name to be created
     :param mysql_ip: MySQL Server IP Address
     """
@@ -1391,10 +1391,11 @@ MySQLdump backup
             print colored('===================', 'red')
 
 
-def mysql_create_local_user(db_user, db_user_pass="db_user", mysql_ip="127.0.0.1"):
+def mysql_create_local_user(db_user, db_user_pass="password", mysql_ip="127.0.0.1"):
     """
-MySQLdump backup
+Create a localhost MySQL user
     :param db_user: Username to be created
+    :param db_user_pass: Password for the new username
     :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
@@ -1410,11 +1411,17 @@ MySQLdump backup
 
 def mysql_grant_user_db(db_name, db_user, db_user_pass="db_user", mysql_ip="127.0.0.1"):
     """
-MySQLdump backup
-    :param db_name: Database name to be created
-    :param db_user: Database Username to grant access to
+Given the username, grant MySQL permissions for a certain DB to this username
+    :param db_name: Database name to grant permissions in
+    :param db_user: Database Username to grant access to the before passsed DB
     :param db_user_pass: Database Username password
     :param mysql_ip: MySQL Server IP Address
+
+localhost] sudo: mysql -h 172.28.128.4 -u root -p -e "GRANT ALL PRIVILEGES ON wordpress.*
+TO wordpressuer@localhost IDENTIFIED BY 'password';"
+[localhost] out: Enter password:
+[localhost] out: ERROR 1044 (42000) at line 1: Access denied for user 'root'@'172.28.128.3'
+to database 'wordpress'
     """
     with settings(warn_only=False):
         try:
@@ -1449,7 +1456,9 @@ Grant MySQL remote conection from a certain host
 def mysql_backup(mysql_ip="127.0.0.1", dst_dir="/tmp/"):
     """
 MySQLdump backup
-    :param host_ip: MySQL Server IP Address
+fab -R devtest mysql_backup:172.28.128.4,/tmp/
+NOTE: Consider that the role after -R hast to be the remote MySQL Server.
+    :param mysql_ip: MySQL Server IP Address
     :param dst_dir: mysqldump destination directory
     """
     with settings(warn_only=False):
