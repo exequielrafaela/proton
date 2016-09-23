@@ -1420,6 +1420,7 @@ MySQLdump backup
         # check that the backup was created with a grep.
         file_get(dst_dir + 'backup-' + date + '.sql', dst_dir + 'backup-' + date + '.sql')
 
+
 def mysql_restore(mysqldump_fpath, host_ip="127.0.0.1"):
     """
 MySQLdump restore
@@ -1432,17 +1433,14 @@ MySQLdump restore
         sudo('mysql -h ' + host_ip + ' -u root -p -e "show databases;"')
 
 
-def rsync(remote_dir='/srv/myproject/'):
+def rsync(local_dir,remote_dir):
     """
 Python fabric rsync
+    :param local_dir:
     :param remote_dir:
     """
     with settings(warn_only=False):
-        rsync_project(
-            remote_dir="/srv/myproject/",
-            local_dir="./",
-            exclude=("*_local.py", "*.pyc",),
-        )
+        rsync_project(remote_dir,local_dir)
 
 
 def disk_usage(tree_dir='/'):
@@ -1666,8 +1664,9 @@ Migrate the data from a LAMP Server to a new one
     """
     with settings(warn_only=False):
         # Rsync web root
-        sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
+        rsync_project('/var/www/', '/var/www/', extra_opts='-avzP --progress')
 
+        sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
         # Rsync the apache configuration files
         sudo('rsync -avzP --progress /etc/httpd/ apache@172.17.2.30:/etc/httpd.old/')
 
