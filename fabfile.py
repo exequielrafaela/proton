@@ -1408,7 +1408,7 @@ MySQLdump backup
             print colored('===================', 'red')
 
 
-def mysql_create_local_user(db_name, db_user, db_user_pass="db_user", mysql_ip="127.0.0.1"):
+def mysql_grant_user_db(db_name, db_user, db_user_pass="db_user", mysql_ip="127.0.0.1"):
     """
 MySQLdump backup
     :param db_name: Database name to be created
@@ -1429,7 +1429,7 @@ MySQLdump backup
 
 def mysql_grant_remote_cx(mysql_pass,remote_ip,mysql_ip="127.0.0.1"):
     """
-MySQLdump backup
+Grant MySQL remote conection from a certain host
     :param mysql_pass: MySQL Server root password
     :param remote_ip: Remote host IP address to allow remote connections from
     :param mysql_ip: MySQL Server IP Address
