@@ -1839,7 +1839,8 @@ Migrate the data from a LAMP Server to a new one
                 # Rsync php configuration
                 # comparar memory limit => llevarlo a 512mb o 1gb
                 # sudo('scp /etc/php.ini root@172.17.2.30:/etc/php.ini.old/')
-                upload_project(local_dir='/tmp/etc/', remote_dir='/etc/php.ini', use_sudo=True)
+                #upload_project(local_dir='/tmp/etc/', remote_dir='/etc/php.ini', use_sudo=True)
+                get('/etc/php.ini', '/etc/')
                 # sudo('rsync -avzP --progress /etc/php.d/ 172.17.2.30:/etc/php.d.old/')
                 rsync_project(local_dir='/tmp/etc/php.d', remote_dir='/etc/php.d/', default_opts='-avzP --progress',
                               upload=False)
