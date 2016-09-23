@@ -1830,8 +1830,8 @@ Migrate the data from a LAMP Server to a new one
                 print colored('##### FAIL to RSYNC PHP Config Files #####', 'red')
                 print colored('##########################################', 'red')
         else:
-            local('mkdir -p /etc/php.d')
-            local('mkdir -p /usr/include/php')
+            local('mkdir -p /tmp/etc/php.d')
+            local('mkdir -p /tmp/usr/include/php')
             try:
                 print colored('#########################', 'blue')
                 print colored('####### RSYNCKING #######', 'blue')
