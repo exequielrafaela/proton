@@ -1733,7 +1733,8 @@ Migrate the data from a LAMP Server to a new one
     with settings(warn_only=False):
         # Rsync web root
         # sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
-        rsync_project(local_dir='/tmp/', remote_dir='/var/www', default_opts='-avzP --progress')
+        # local: rsync  -avzP --progress  --rsh='ssh  -p 22  ' /tmp/ vagrant@172.28.128.4:/var/www
+        rsync_project(local_dir='/tmp/', remote_dir='/var/www', default_opts='-avzPO --progress')
 
         # Rsync the apache configuration files
         # sudo('rsync -avzP --progress /etc/httpd/ apache@172.17.2.30:/etc/httpd.old/')
