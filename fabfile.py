@@ -1818,7 +1818,7 @@ Migrate the data from a LAMP Server to a new one
                 # comparar memory limit => llevarlo a 512mb o 1gb
                 # sudo('scp /etc/php.ini root@172.17.2.30:/etc/php.ini.old/')
                 #upload_project(local_dir='/tmp/etc/', remote_dir='/etc/php.ini', use_sudo=True)
-                get('/etc/php.ini', '/etc/')
+                get('/etc/php.ini', '/tmp/etc/')
                 # sudo('rsync -avzP --progress /etc/php.d/ 172.17.2.30:/etc/php.d.old/')
                 rsync_project(local_dir='/tmp/etc/php.d', remote_dir='/etc/php.d/', default_opts='-avzP --progress',
                               upload=False)
@@ -1840,7 +1840,7 @@ Migrate the data from a LAMP Server to a new one
                 # comparar memory limit => llevarlo a 512mb o 1gb
                 # sudo('scp /etc/php.ini root@172.17.2.30:/etc/php.ini.old/')
                 #upload_project(local_dir='/tmp/etc/', remote_dir='/etc/php.ini', use_sudo=True)
-                get('/etc/php.ini', '/etc/')
+                get('/etc/php.ini', '/tmp/etc/')
                 # sudo('rsync -avzP --progress /etc/php.d/ 172.17.2.30:/etc/php.d.old/')
                 rsync_project(local_dir='/tmp/etc/php.d', remote_dir='/etc/php.d/', default_opts='-avzP --progress',
                               upload=False)
