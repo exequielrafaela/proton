@@ -1735,7 +1735,7 @@ Migrate the data from a LAMP Server to a new one
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('===========================', 'blue')
 
-        if (os.path.isdir("/var/www")):
+        if (os.path.isdir("/tmp/var/www")):
             print colored('################################', 'blue')
             print colored('##### /tmp/var/www exists ######', 'blue')
             print colored('################################', 'blue')
