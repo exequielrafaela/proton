@@ -1317,7 +1317,7 @@ Modifiy iptables rules
             #        iptables -A INPUT
 
 
-def musql_install_client_centos7():
+def mysql_install_client_centos7():
     """
 Install the mysql client in a Centos7 based OS
     """
