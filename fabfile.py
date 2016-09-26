@@ -1734,6 +1734,7 @@ def rsync_data_from_server(data_dir="/tmp/"):
     """
 Migrate the data from a LAMP Server to a new one mainly using rsync
 fab -R devtest rsync_data_from_server()
+    :param data_dir: Directory where the rsync data it's going to be stored
     """
     with settings(warn_only=False):
         print colored('===========================', 'blue')
@@ -1938,6 +1939,7 @@ def rsync_data_to_server(data_dir="/tmp/"):
     """
 Migrate the data from a Jumphost Server to a new LAMP Server mainly using rsync
 fab -R devtest rsync_data_to_server()
+    :param data_dir: Directory where the rsync data it's going to be stored
     """
     with settings(warn_only=False):
         print colored('===========================', 'blue')
