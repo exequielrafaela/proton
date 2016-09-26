@@ -1752,8 +1752,8 @@ fab -R devtest rsync_data_from_server()
                 # Rsync web root
                 # sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
                 # local: rsync  -avzP --progress  --rsh='ssh  -p 22  ' /tmp/ vagrant@172.28.128.4:/var/www
-                rsync_project(local_dir=data_dir + 'var/www/', remote_dir='/var/www/', default_opts='-avzPO --progress',
-                              upload=False)
+                rsync_project(local_dir=data_dir + 'var/www/', remote_dir='/var/www/',
+                              default_opts='-avzPO --progress --rsync-path="sudo rsync"', upload=False)
             except SystemExit:
                 print colored('##############################################', 'red')
                 print colored('##### FAIL to RSYNC Apache Document Root #####', 'red')
