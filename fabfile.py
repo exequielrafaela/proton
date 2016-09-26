@@ -1728,7 +1728,8 @@ Python fabric rsync
 
 def rsync_data_from_server():
     """
-Migrate the data from a LAMP Server to a new one
+Migrate the data from a LAMP Server to a new one mainly using rsync
+fab -R devtest rsync_data_from_server()
     """
     with settings(warn_only=False):
         print colored('===========================', 'blue')
@@ -1746,7 +1747,8 @@ Migrate the data from a LAMP Server to a new one
                 # Rsync web root
                 # sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
                 # local: rsync  -avzP --progress  --rsh='ssh  -p 22  ' /tmp/ vagrant@172.28.128.4:/var/www
-                rsync_project(local_dir='/tmp/var/www/', remote_dir='/var/www/', default_opts='-avzPO --progress')
+                rsync_project(local_dir='/tmp/var/www/', remote_dir='/var/www/', default_opts='-avzPO --progress',
+                              upload=False)
             except SystemExit:
                 print colored('##############################################', 'red')
                 print colored('##### FAIL to RSYNC Apache Document Root #####', 'red')
@@ -1852,6 +1854,7 @@ Migrate the data from a LAMP Server to a new one
                 print colored('##### FAIL to RSYNC PHP Config Files #####', 'red')
                 print colored('##########################################', 'red')
 
+        """
         print colored('========================', 'blue')
         print colored('SYNC: MySQL Config Files', 'blue')
         print colored('========================', 'blue')
@@ -1886,6 +1889,7 @@ Migrate the data from a LAMP Server to a new one
                 print colored('############################################', 'red')
                 print colored('##### FAIL to RSYNC MySQL Config Files #####', 'red')
                 print colored('############################################', 'red')
+        """
 
         print colored('=============================', 'blue')
         print colored('SYNC: Shibboleth Config Files', 'blue')
@@ -1922,6 +1926,198 @@ Migrate the data from a LAMP Server to a new one
                 print colored('##### FAIL to RSYNC Shibboleth Config Files #####', 'red')
                 print colored('#################################################', 'red')
 
+
+def rsync_data_to_server():
+    """
+Migrate the data from a Jumphost Server to a new LAMP Server mainly using rsync
+fab -R devtest rsync_data_to_server()
+    """
+    with settings(warn_only=False):
+        print colored('===========================', 'blue')
+        print colored('SYNC: Apache Document Root', 'blue')
+        print colored('===========================', 'blue')
+
+        if (os.path.isdir("/tmp/var/www")):
+            print colored('################################', 'blue')
+            print colored('##### /tmp/var/www exists ######', 'blue')
+            print colored('################################', 'blue')
+            try:
+                print colored('#########################', 'blue')
+                print colored('####### RSYNCKING #######', 'blue')
+                print colored('#########################', 'blue')
+                # Rsync web root
+                # sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
+                # local: rsync  -avzP --progress  --rsh='ssh  -p 22  ' /tmp/ vagrant@172.28.128.4:/var/www
+                rsync_project(local_dir='/tmp/var/www/', remote_dir='/var/www/', default_opts='-avzPO --progress')
+            except SystemExit:
+                print colored('##############################################', 'red')
+                print colored('##### FAIL to RSYNC Apache Document Root #####', 'red')
+                print colored('##############################################', 'red')
+        else:
+            local('mkdir -p /tmp/var/www')
+            try:
+                print colored('#########################', 'blue')
+                print colored('####### RSYNCKING #######', 'blue')
+                print colored('#########################', 'blue')
+                # Rsync web root
+                # sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
+                # local: rsync  -avzP --progress  --rsh='ssh  -p 22  ' /tmp/ vagrant@172.28.128.4:/var/www
+                rsync_project(local_dir='/tmp/var/www/', remote_dir='/var/www/', default_opts='-avzPO --progress')
+            except SystemExit:
+                print colored('##############################################', 'red')
+                print colored('##### FAIL to RSYNC Apache Document Root #####', 'red')
+                print colored('##############################################', 'red')
+
+        print colored('=========================', 'blue')
+        print colored('SYNC: Apache Config Files', 'blue')
+        print colored('=========================', 'blue')
+
+        if (os.path.isdir("/tmp/etc/httpd")):
+            print colored('##################################', 'blue')
+            print colored('##### /tmp/etc/httpd exists ######', 'blue')
+            print colored('##################################', 'blue')
+            try:
+                print colored('#########################', 'blue')
+                print colored('####### RSYNCKING #######', 'blue')
+                print colored('#########################', 'blue')
+                # Rsync the apache configuration files
+                # sudo('rsync -avzP --progress /etc/httpd/ apache@172.17.2.30:/etc/httpd.old/')
+                rsync_project(local_dir='/tmp/etc/httpd/', remote_dir='/etc/httpd/', default_opts='-avzP --progress')
+            except SystemExit:
+                print colored('#############################################', 'red')
+                print colored('##### FAIL to RSYNC Apache Config Files #####', 'red')
+                print colored('#############################################', 'red')
+        else:
+            local('mkdir -p /tmp/etc/httpd')
+            try:
+                print colored('#########################', 'blue')
+                print colored('####### RSYNCKING #######', 'blue')
+                print colored('#########################', 'blue')
+                # Rsync the apache configuration files
+                # sudo('rsync -avzP --progress /etc/httpd/ apache@172.17.2.30:/etc/httpd.old/')
+                rsync_project(local_dir='/tmp/etc/httpd/', remote_dir='/etc/httpd/', default_opts='-avzP --progress')
+            except SystemExit:
+                print colored('#############################################', 'red')
+                print colored('##### FAIL to RSYNC Apache Config files #####', 'red')
+                print colored('#############################################', 'red')
+
+        print colored('======================', 'blue')
+        print colored('SYNC: PHP Config Files', 'blue')
+        print colored('======================', 'blue')
+
+        if (os.path.isdir("/tmp/etc/php.d") and os.path.isdir("/tmp/usr/include/php")):
+            print colored('###############################', 'blue')
+            print colored('##### PHP folders exists ######', 'blue')
+            print colored('###############################', 'blue')
+            try:
+                print colored('#########################', 'blue')
+                print colored('####### RSYNCKING #######', 'blue')
+                print colored('#########################', 'blue')
+                # Rsync php configuration
+                # comparar memory limit => llevarlo a 512mb o 1gb
+                # sudo('scp /etc/php.ini root@172.17.2.30:/etc/php.ini.old/')
+                #upload_project(local_dir='/tmp/etc/', remote_dir='/etc/php.ini', use_sudo=True)
+                get('/etc/php.ini', '/tmp/etc/')
+                # sudo('rsync -avzP --progress /etc/php.d/ 172.17.2.30:/etc/php.d.old/')
+                rsync_project(local_dir='/tmp/etc/php.d', remote_dir='/etc/php.d/', default_opts='-avzP --progress')
+                # sudo('rsync -avzP --progress /usr/include/php/ 172.17.2.30:/usr/include/php.old/')
+                rsync_project(local_dir='/tmp/usr/include/php/', remote_dir='/usr/include/php/',
+                              default_opts='-avzP --progress')
+            except SystemExit:
+                print colored('##########################################', 'red')
+                print colored('##### FAIL to RSYNC PHP Config Files #####', 'red')
+                print colored('##########################################', 'red')
+        else:
+            local('mkdir -p /tmp/etc/php.d')
+            local('mkdir -p /tmp/usr/include/php')
+            try:
+                print colored('#########################', 'blue')
+                print colored('####### RSYNCKING #######', 'blue')
+                print colored('#########################', 'blue')
+                # Rsync php configuration
+                # comparar memory limit => llevarlo a 512mb o 1gb
+                # sudo('scp /etc/php.ini root@172.17.2.30:/etc/php.ini.old/')
+                #upload_project(local_dir='/tmp/etc/', remote_dir='/etc/php.ini', use_sudo=True)
+                get('/etc/php.ini', '/tmp/etc/')
+                # sudo('rsync -avzP --progress /etc/php.d/ 172.17.2.30:/etc/php.d.old/')
+                rsync_project(local_dir='/tmp/etc/php.d', remote_dir='/etc/php.d/', default_opts='-avzP --progress')
+                # sudo('rsync -avzP --progress /usr/include/php/ 172.17.2.30:/usr/include/php.old/')
+                rsync_project(local_dir='/tmp//usr/include/php/', remote_dir='/usr/include/php/',
+                              default_opts='-avzP --progress')
+            except SystemExit:
+                print colored('##########################################', 'red')
+                print colored('##### FAIL to RSYNC PHP Config Files #####', 'red')
+                print colored('##########################################', 'red')
+
+        """
+        print colored('========================', 'blue')
+        print colored('SYNC: MySQL Config Files', 'blue')
+        print colored('========================', 'blue')
+
+        if (os.path.isdir("/tmp/etc/mysql")):
+            print colored('#################################', 'blue')
+            print colored('##### MySQL folders exists ######', 'blue')
+            print colored('#################################', 'blue')
+            try:
+                print colored('#########################', 'blue')
+                print colored('####### RSYNCKING #######', 'blue')
+                print colored('#########################', 'blue')
+                # Rsync mysql config files
+                # sudo('rsync -avzP --progress /etc/mysql/ 172.17.2.30:/etc/mysql.old/')
+                rsync_project(local_dir='/tmp/etc/mysql/', remote_dir='/etc/mysql/', default_opts='-avzP --progress')
+            except SystemExit:
+                print colored('############################################', 'red')
+                print colored('##### FAIL to RSYNC MySQL Config Files #####', 'red')
+                print colored('############################################', 'red')
+        else:
+            local('mkdir -p /tmp/etc/mysql')
+            try:
+                print colored('#########################', 'blue')
+                print colored('####### RSYNCKING #######', 'blue')
+                print colored('#########################', 'blue')
+                # Rsync mysql config files
+                # sudo('rsync -avzP --progress /etc/mysql/ 172.17.2.30:/etc/mysql.old/')
+                rsync_project(local_dir='/tmp/etc/mysql/', remote_dir='/etc/mysql/', default_opts='-avzP --progress')
+            except SystemExit:
+                print colored('############################################', 'red')
+                print colored('##### FAIL to RSYNC MySQL Config Files #####', 'red')
+                print colored('############################################', 'red')
+        """
+
+        print colored('=============================', 'blue')
+        print colored('SYNC: Shibboleth Config Files', 'blue')
+        print colored('=============================', 'blue')
+
+        if (os.path.isdir("/tmp/etc/shibboleth")):
+            print colored('######################################', 'blue')
+            print colored('##### Shibboleth folders exists ######', 'blue')
+            print colored('######################################', 'blue')
+            try:
+                print colored('#########################', 'blue')
+                print colored('####### RSYNCKING #######', 'blue')
+                print colored('#########################', 'blue')
+                # Rsync shibboleth config files
+                # sudo('rsync -avzP --progress /etc/shibboleth/ 172.17.2.30:/etc/shibboleth.old/')
+                rsync_project(local_dir='/tmp/etc/shibboleth/', remote_dir='/etc/shibboleth/',
+                              default_opts='-avzP --progress')
+            except SystemExit:
+                print colored('#################################################', 'red')
+                print colored('##### FAIL to RSYNC Shibboleth Config Files #####', 'red')
+                print colored('#################################################', 'red')
+        else:
+            local('mkdir -p /tmp/etc/shibboleth')
+            try:
+                print colored('#########################', 'blue')
+                print colored('####### RSYNCKING #######', 'blue')
+                print colored('#########################', 'blue')
+                # Rsync shibboleth config files
+                # sudo('rsync -avzP --progress /etc/shibboleth/ 172.17.2.30:/etc/shibboleth.old/')
+                rsync_project(local_dir='/tmp/etc/shibboleth/', remote_dir='/etc/shibboleth/',
+                              default_opts='-avzP --progress')
+            except SystemExit:
+                print colored('#################################################', 'red')
+                print colored('##### FAIL to RSYNC Shibboleth Config Files #####', 'red')
+                print colored('#################################################', 'red')
 
 """
 def db_backup():
