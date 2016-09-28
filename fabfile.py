@@ -1428,16 +1428,17 @@ Grant MySQL remote conection from a certain host
             print colored('===================', 'red')
 
 
-def mysql_backup(mysql_ip="127.0.0.1", dst_dir="/tmp/"):
+def mysql_backup(mysql_user, mysql_ip="127.0.0.1", dst_dir="/tmp/"):
     """
 MySQLdump backup
 fab -R devtest mysql_backup:172.28.128.4,/tmp/
 NOTE: Consider that the role after -R hast to be the remote MySQL Server.
+    :param mysql_user: MySQL Server Admin User
     :param mysql_ip: MySQL Server IP Address
     :param dst_dir: mysqldump destination directory
     """
     with settings(warn_only=False):
-        sudo('mysql -h ' + mysql_ip + ' -u root -p -e "show databases;"')
+        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
         # +--------------------+
         # | Database           |
         # +--------------------+
@@ -1452,8 +1453,8 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         date = str(time.strftime("%x"))
         date = date.replace("/", "-")
 
-        sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction -u root -p --all-databases >'
-             ' ' + dst_dir + 'backup-' + date + '.sql')
+        sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction -u '
+             + mysql_user + ' -p --all-databases > ' + dst_dir + 'backup-' + date + '.sql')
         # check that the backup was created with a grep.
         file_get(dst_dir + 'backup-' + date + '.sql', dst_dir + 'backup-' + date + '.sql')
 
@@ -2111,7 +2112,7 @@ fab -R devtest rsync_data_from_server()
             print colored('################################', 'blue')
             try:
                 print colored('#########################', 'blue')
-                print colored('####### RSYNCKING #######', 'blue')
+                print colored('####### GETING ' + migrate_dir + ' #######', 'blue')
                 print colored('#########################', 'blue')
                 date = strftime("%Y-%m-%d-%H:%M:%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
@@ -2126,7 +2127,7 @@ fab -R devtest rsync_data_from_server()
             local('mkdir -p ' + data_dir)
             try:
                 print colored('#########################', 'blue')
-                print colored('####### RSYNCKING #######', 'blue')
+                print colored('####### GETING ' + migrate_dir + ' #######', 'blue')
                 print colored('#########################', 'blue')
                 date = strftime("%Y-%m-%d-%H:%M:%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
@@ -2134,9 +2135,9 @@ fab -R devtest rsync_data_from_server()
                 get('/tmp/' + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
 
             except SystemExit:
-                print colored('##############################################', 'red')
-                print colored('##### FAIL to RSYNC Apache Document Root #####', 'red')
-                print colored('##############################################', 'red')
+                print colored('#############################################', 'red')
+                print colored('##### FAIL to RSYNC ' + migrate_dir + ' #####', 'red')
+                print colored('#############################################', 'red')
         """
         print colored('=========================', 'blue')
         print colored('SYNC: Apache Config Files', 'blue')
@@ -2296,6 +2297,13 @@ fab -R devtest rsync_data_from_server()
                 print colored('##### FAIL to RSYNC Shibboleth Config Files #####', 'red')
                 print colored('#################################################', 'red')
         """
+
+def download_LAMP_from_server():
+    with settings(warn_only=False):
+        download_data_from_server('/tmp/', '/var/www/')
+        download_data_from_server('/tmp/', '/etc/httpd/')
+        download_data_from_server('/tmp/', '/var/www/')
+        download_data_from_server('/tmp/', '/var/www/')
 
 """
 def iptables(action, ip_addr):
