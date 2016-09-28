@@ -2190,7 +2190,7 @@ Download LAMP data using download_data_from_server task
         download_data_from_server('/tmp/', '/etc/shibboleth/')
 
 
-def rysnc_data_to_server_v2(data_dir, migrate_dir):
+def rysnc_data_to_server_v2(local_file_dir, local_file_path , local_rsync_dir, remote_dir):
     """
 Get data from a remote host passing the local data_dir and the
 remote migrate_dir to be actually migrated
@@ -2199,49 +2199,39 @@ fab -R devtest rsync_data_from_server()
     :param migrate_dir: Directory to get from the remote server
     """
     with settings(warn_only=False):
+        print colored('==============', 'blue')
+        print colored('RSYNCING START', 'blue')
+        print colored('==============', 'blue')
 
-        data_dir = data_dir + env.host
-        print data_dir
-
-        migrate_dir_dash = migrate_dir.replace("/", "-")
-        if migrate_dir_dash.startswith('-') and migrate_dir_dash.endswith('-'):
-            migrate_dir_dash = migrate_dir_dash[1:-1]
-
-        print colored('=======================', 'blue')
-        print colored('Getting: ' + migrate_dir, 'blue')
-        print colored('=======================', 'blue')
-
-        if os.path.isdir(data_dir):
-            print colored('####################################', 'blue')
-            print colored('##### ' + data_dir + ' exists ######', 'blue')
-            print colored('####################################', 'blue')
+        if os.path.isfile(local_file_path):
+            print colored('###########################################', 'blue')
+            print colored('##### ' + local_file_path + ' exists ######', 'blue')
+            print colored('###########################################', 'blue')
             try:
-                print colored('##########################################', 'blue')
-                print colored('####### GETING ' + migrate_dir + ' #######', 'blue')
-                print colored('##########################################', 'blue')
-                sudo('tar xzvf /tmp/' + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
-                get('/tmp/' + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
-
+                print colored('###############################################', 'blue')
+                print colored('####### RSYNCING' + local_file_path + ' #######', 'blue')
+                print colored('###############################################', 'blue')
+                sudo('tar xzvf '+ local_file_path)
+                if os.path.isdir(local_rsync_dir) and exists(remote_dir):
+                    rsync_project(local_dir=local_file_dir +  local_rsync_dir, remote_dir=remote_dir,
+                                  default_opts='-avzP --progress')
+                else:
+                    try:
+                        sudo('mkdir -p ' + remote_dir)
+                        rsync_project(local_dir=local_file_dir + local_rsync_dir, remote_dir=remote_dir,
+                                      default_opts='-avzP --progress')
+                    except SystemExit:
+                        print colored('#################################################################', 'red')
+                        print colored('##### Check that all the DIRS passed as args are consistent #####', 'red')
+                        print colored('#################################################################', 'red')
             except SystemExit:
-                print colored('##########################################', 'red')
-                print colored('##### FAIL to GET' + migrate_dir + ' #####', 'red')
-                print colored('##########################################', 'red')
+                print colored('###############################', 'red')
+                print colored('##### FAIL to RSYNC Files #####', 'red')
+                print colored('###############################', 'red')
         else:
-            local('mkdir -p ' + data_dir)
-            try:
-                print colored('#########################', 'blue')
-                print colored('####### GETING ' + migrate_dir + ' #######', 'blue')
-                print colored('#########################', 'blue')
-                date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
-                # tar -czvf /path-to/other/directory/file.tar.gz file
-                sudo('tar czvf /tmp/' + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
-                get('/tmp/' + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
-
-            except SystemExit:
-                print colored('#############################################', 'red')
-                print colored('##### FAIL to RSYNC ' + migrate_dir + ' #####', 'red')
-                print colored('#############################################', 'red')
-
+            print colored('##########################################################', 'red')
+            print colored('##### Check that files ' + local_file_path + 'exists #####', 'red')
+            print colored('##########################################################', 'red')
 
 """
 def iptables(action, ip_addr):
