@@ -402,11 +402,11 @@ Remember that this task it's intended to be run with role "local"
             user_exists = user_struct.pw_gecos.split(",")[0]
             print colored(user_exists, 'green')
             if user_exists == "root":
-                print colored('#######################################################', 'blue')
-                print colored('ROOT user CANT be changed', 'blue')
-                print colored('#######################################################', 'blue')
+                print colored('#################################################################', 'yellow')
+                print colored('CAREFULL: ROOT ssh keys will be generated if they does not exists', 'yellow')
+                print colored('#################################################################', 'yellow')
                 if os.path.exists('/' + usernameg + '/.ssh/id_rsa'):
-                    print colored(str(os.path.exists('/home/' + usernameg + '/.ssh/id_rsa')), 'blue')
+                    print colored(str(os.path.exists('/' + usernameg + '/.ssh/id_rsa')), 'blue')
                     print colored('###########################################', 'blue')
                     print colored('username: ' + usernameg + ' KEYS already EXISTS', 'blue')
                     print colored('###########################################', 'blue')
@@ -414,27 +414,13 @@ Remember that this task it's intended to be run with role "local"
                     print colored('###########################################', 'blue')
                     print colored('username: ' + usernameg + ' Creating KEYS', 'blue')
                     print colored('###########################################', 'blue')
-                    sudo("ssh-keygen -t rsa -f /home/" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
+                    sudo("ssh-keygen -t rsa -f /" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
                     # http://unix.stackexchange.com/questions/36540/why-am-i-still-getting-a-password-prompt-with-ssh
                     # -with-public-key-authentication
                     # sudo('chmod 700 /home/' + usernameg)
-                    sudo('chmod 755 /home/' + usernameg)
-                    sudo('chmod 755 /home/' + usernameg + '/.ssh')
-                    sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
-                    sudo('gpasswd -a ' + usernameg + ' wheel')
-
-                print colored('User ' + usernameg + ' does not exist', 'red')
-                print colored('#######################################################', 'blue')
-                print colored('Consider that we generate user: username pass: username', 'blue')
-                print colored('#######################################################', 'blue')
-
-                sudo('useradd ' + usernameg + ' -m -d /home/' + usernameg)
-                #sudo('echo "' + usernameg + ':' + usernameg + '" | chpasswd')
-                sudo("ssh-keygen -t rsa -f /home/" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
-                sudo('chmod 755 /home/' + usernameg)
-                sudo('chmod 755 /home/' + usernameg + '/.ssh')
-                sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
-                sudo('gpasswd -a ' + usernameg + ' wheel')
+                    sudo('chmod 755 /' + usernameg)
+                    sudo('chmod 755 /' + usernameg + '/.ssh')
+                    sudo('chmod 600 /' + usernameg + '/.ssh/id_rsa')
 
             elif os.path.exists('/home/' + usernameg + '/.ssh/id_rsa'):
                 print colored(str(os.path.exists('/home/' + usernameg + '/.ssh/id_rsa')), 'blue')
@@ -454,18 +440,15 @@ Remember that this task it's intended to be run with role "local"
                 sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
                 sudo('gpasswd -a ' + usernameg + ' wheel')
         except KeyError:
-            if user_exists != "root":
+            if user_exists == "" and usernameg != "root":
                 print colored('User ' + usernameg + ' does not exist', 'red')
                 print colored('#######################################################', 'blue')
                 print colored('Consider that we generate user: username pass: username', 'blue')
                 print colored('#######################################################', 'blue')
 
                 sudo('useradd ' + usernameg + ' -m -d /home/' + usernameg)
-                #sudo('echo "' + usernameg + ':' + usernameg + '" | chpasswd')
+                sudo('echo "' + usernameg + ':' + usernameg + '" | chpasswd')
                 sudo("ssh-keygen -t rsa -f /home/" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
-                # http://unix.stackexchange.com/questions/36540/why-am-i-still-getting-a-password-prompt-with-ssh
-                # -with-public-key-authentication
-                # sudo('chmod 700 /home/' + usernameg)
                 sudo('chmod 755 /home/' + usernameg)
                 sudo('chmod 755 /home/' + usernameg + '/.ssh')
                 sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
