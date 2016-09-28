@@ -2098,6 +2098,8 @@ fab -R devtest rsync_data_from_server()
         print data_dir
 
         migrate_dir_dash = migrate_dir.replace("/", "-")
+        if migrate_dir_dash.startswith('-') and migrate_dir_dash.endswith('-'):
+            migrate_dir_dash = migrate_dir_dash[1:-1]
 
         print colored('===========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
@@ -2114,7 +2116,7 @@ fab -R devtest rsync_data_from_server()
                 date = strftime("%Y-%m-%d-%H:%M:%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
                 sudo('tar czvf /tmp/var-www.' + date + '.tar.gz ' + migrate_dir)
-                get('/tmp/'+migrate_dir_dash+'.' + date + '.tar.gz', data_dir, use_sudo=True)
+                get('/tmp/' + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
 
             except SystemExit:
                 print colored('##############################################', 'red')
@@ -2129,7 +2131,7 @@ fab -R devtest rsync_data_from_server()
                 date = strftime("%Y-%m-%d-%H:%M:%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
                 sudo('tar czvf /tmp/var-www.' + date + '.tar.gz ' + migrate_dir)
-                get('/tmp/'+migrate_dir_dash+'.' + date + '.tar.gz', data_dir, use_sudo=True)
+                get('/tmp/' + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
 
             except SystemExit:
                 print colored('##############################################', 'red')
