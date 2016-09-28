@@ -2198,6 +2198,10 @@ fab -R devtest rsync_data_to_server_v2()
     :param local_file_path: Absolute path of the .tar.gz containing the data to be rsynced w/ the remote host
     :param local_rsync_dir: Directory where the rsync data it's going to be stored
     :param remote_dir: Remote directory where the rsync data it's going to be stored
+
+eg: fab -R devtest rsync_data_to_server_v2:/tmp/172.28.128.4/,/tmp/172.28.128.4/var-www.2016-09-28-19-11-18.tar.gz,
+/tmp/172.28.128.4/var/www/,/tmp/
+
     """
     with settings(warn_only=False):
         print colored('==============', 'blue')
@@ -2214,12 +2218,12 @@ fab -R devtest rsync_data_to_server_v2()
                 print colored('###############################################', 'blue')
                 local('tar xzvf '+ local_file_path)
                 if os.path.isdir(local_rsync_dir) and exists(remote_dir):
-                    rsync_project(local_dir=local_file_dir +  local_rsync_dir, remote_dir=remote_dir,
+                    rsync_project(local_dir= local_rsync_dir, remote_dir=remote_dir,
                                   default_opts='-avzP --progress')
                 else:
                     try:
                         sudo('mkdir -p ' + remote_dir)
-                        rsync_project(local_dir=local_file_dir + local_rsync_dir, remote_dir=remote_dir,
+                        rsync_project(local_dir= local_rsync_dir, remote_dir=remote_dir,
                                       default_opts='-avzP --progress')
                     except SystemExit:
                         print colored('#################################################################', 'red')
