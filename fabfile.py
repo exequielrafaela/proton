@@ -1462,7 +1462,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
             file_get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
         else:
             print colored('===================================================', 'red')
-            print colored('Checl ' + local_dir + ' & ' + remote_dir + ' exists', 'red')
+            print colored('Check that DIRs: ' + local_dir + ' & ' + remote_dir + ' do exist', 'red')
             print colored('===================================================', 'red')
 
 def mysql_restore(mysqldump_fpath, mysql_ip="127.0.0.1"):
