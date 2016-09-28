@@ -2132,7 +2132,7 @@ fab -R devtest rsync_data_from_server()
                 print colored('##############################################', 'red')
                 print colored('##### FAIL to RSYNC Apache Document Root #####', 'red')
                 print colored('##############################################', 'red')
-
+        """
         print colored('=========================', 'blue')
         print colored('SYNC: Apache Config Files', 'blue')
         print colored('=========================', 'blue')
@@ -2220,7 +2220,7 @@ fab -R devtest rsync_data_from_server()
                 print colored('##### FAIL to RSYNC PHP Config Files #####', 'red')
                 print colored('##########################################', 'red')
 
-        """
+
         print colored('========================', 'blue')
         print colored('SYNC: MySQL Config Files', 'blue')
         print colored('========================', 'blue')
@@ -2255,7 +2255,6 @@ fab -R devtest rsync_data_from_server()
                 print colored('############################################', 'red')
                 print colored('##### FAIL to RSYNC MySQL Config Files #####', 'red')
                 print colored('############################################', 'red')
-        """
 
         print colored('=============================', 'blue')
         print colored('SYNC: Shibboleth Config Files', 'blue')
@@ -2291,7 +2290,7 @@ fab -R devtest rsync_data_from_server()
                 print colored('#################################################', 'red')
                 print colored('##### FAIL to RSYNC Shibboleth Config Files #####', 'red')
                 print colored('#################################################', 'red')
-
+        """
 
 """
 def iptables(action, ip_addr):
