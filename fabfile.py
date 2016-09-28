@@ -751,15 +751,19 @@ Installing NFS Server on a Centos7 host
         # sudo firewall-cmd --reload
 
 
-def cachefs_install(nfs_dir, nfs_server_ip, cachetag="mycache", cachedir="/var/cache/fscache", selinux='False'):
+def cachefs_install(nfs_dir, nfs_server_ip, cachedir="/var/cache/fscache", selinux='False'):
     """
 cachefilesd (NFS Cache) installation function
 fab -R dev cachefs_install:nfsshare,\"172.28.128.3\",mycache-test,/var/cache/fscache-test/
     :param nfs_dir: NFS Server directory
     :param nfs_server_ip: NFS Server IP Address
-    :param cachetag: Tag to identify the NFS cache in case we have many caches
     :param cachedir: NFS Cache directory
     :param selinux: "False" or "True"
+
+NOTE:
+Pending to check code to support "cachetag" argument:
+cachetag: Tag to identify the NFS cache in case we have many caches
+def cachefs_install(nfs_dir, nfs_server_ip, cachetag="mycache", cachedir="/var/cache/fscache", selinux='False'):
     """
     with settings(warn_only=False):
         # INSTALL FS-CACHE PACKAGE #
@@ -769,7 +773,10 @@ fab -R dev cachefs_install:nfsshare,\"172.28.128.3\",mycache-test,/var/cache/fsc
         print colored('=====================================================', 'blue')
         print colored('RELOCATING THE CACHE WITH SELINUX ENFORCEMENT ENABLED', 'blue')
         print colored('=====================================================', 'blue')
+        # consider that we are not using this variable for the moment this the code
+        # that calls it, it's commented.
         selinux = bool(strtobool(selinux))
+        print selinux
         # setenforce enforcing
         # setenforce permissive
         # sestatus
@@ -823,7 +830,7 @@ fab -R dev cachefs_install:nfsshare,\"172.28.128.3\",mycache-test,/var/cache/fsc
                     print colored('#######################################', 'red', attrs=['bold'])
 
                     # Default policy interface for the CacheFiles userspace management daemon
-                    ##/usr/share/selinux/devel/include/contrib/cachefilesd.if
+                    # #/usr/share/selinux/devel/include/contrib/cachefilesd.if
                     sudo('yum install -y checkpolicy selinux-policy*')
                     print colored(sudo('sestatus'), 'cyan', attrs=['bold'])
 
@@ -873,17 +880,17 @@ fab -R dev cachefs_install:nfsshare,\"172.28.128.3\",mycache-test,/var/cache/fsc
                         sudo('restorecon '+cachedir)
                         sudo('ls -dZ '+cachedir)
 
-                    #Modify /etc/cachefilesd.conf to point to the correct directory and then
-                    #start the cachefilesd service. In our case in /conf/cachefield.conf
-                    #config file
+                    # Modify /etc/cachefilesd.conf to point to the correct directory and then
+                    # start the cachefilesd service. In our case in /conf/cachefield.conf
+                    # config file
                     file_send_mod('/vagrant/scripts/conf/cachefs/cachefilesd.conf', '/etc/cachefilesd.conf', '664')
 
                     #The auxiliary policy can be later removed by:""
                     #semodule -r '+cachetag+'.pp
 
-                    #If the policy is updated, then the version number in policy_module() in
-                    #'+cachetag+'.te should be increased and the module upgraded:
-                	#semodule -u '+cachetag+'.pp
+                    # If the policy is updated, then the version number in policy_module() in
+                    # '+cachetag+'.te should be increased and the module upgraded:
+                    # semodule -u '+cachetag+'.pp
                 """
                 else:
                     print colored('#############################################################################',
@@ -1280,42 +1287,6 @@ Instaling maltrail IDS as Server or Sensor
             print colored('===========================', 'red')
             print colored('Problem installing MALTRAIL', 'red')
             print colored('===========================', 'red')
-
-
-def iptables(action, ip_addr):
-    """
-Modifiy iptables rules
-    :param action:
-    :param ip_addr:
-    """
-    with settings(warn_only=False):
-        try:
-            print colored('===========================', 'red')
-            print colored('IPTABLES START', 'red')
-            print colored('===========================', 'red')
-        except SystemExit:
-            print colored('===========================', 'red')
-            print colored('IPTABLES PROBLEM', 'red')
-            print colored('===========================', 'red')
-
-            # 62.210.148.246
-            # 46.4.116.197
-            # 51.254.97.23
-            # 171.113.86.129
-
-            # iptables -A INPUT -s <ip> -j DROP
-            # iptables -A INPUT -s 62.210.148.246 -j DROP
-            # iptables -A INPUT -s 46.4.116.197 -j DROP
-            # iptables -A INPUT -s 51.254.97.23 -j DROP
-            # iptables -A INPUT -s 171.113.86.129 -j DROP
-
-            # iptables -A INPUT -s 62.24.252.133 -j DROP
-            # iptables -A INPUT -s 195.154.187.115 -j DROP
-            # iptables -A INPUT -s 176.9.131.69 -j DROP
-            # iptables -A INPUT -s 46.165.197.141 -j DROP
-
-            # for ip in list:
-            #        iptables -A INPUT
 
 
 def mysql_install_client_centos7():
@@ -1769,7 +1740,7 @@ fab -R devtest rsync_data_from_server()
                 # Rsync web root
                 # sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
                 # local: rsync  -avzP --progress  --rsh='ssh  -p 22  ' /tmp/ vagrant@172.28.128.4:/var/www
-                rsync_project(local_dir=data_dir + 'var/www/', remote_dir='/var/www/', default_opts='-avzPO --progress',
+                rsync_project(local_dir=data_dir + 'var/www/', remote_dir='/var/www/', default_opts='-avzP --progress',
                               upload=False)
             except SystemExit:
                 print colored('##############################################', 'red')
@@ -1964,7 +1935,7 @@ fab -R devtest rsync_data_to_server()
                 else:
                     sudo('mkdir -p ' + data_dir + 'var/www/')
                     rsync_project(local_dir=data_dir + 'var/www/', remote_dir=data_dir + 'var/www/',
-                                  default_opts='-avzPO --progress')
+                                  default_opts='-avzP --progress')
             except SystemExit:
                 print colored('##############################################', 'red')
                 print colored('##### FAIL to RSYNC Apache Document Root #####', 'red')
@@ -2139,17 +2110,17 @@ fab -R devtest rsync_data_from_server()
                 # Rsync web root
                 # rsync_project(local_dir=data_dir + 'var/www/', remote_dir='/var/www/',
                 #              default_opts='-avzP --progress', upload=False)
-                date = strftime("%Y-%m-%d", gmtime())
+                date = strftime("%Y-%m-%d-%H:%M:%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
-                sudo('tar czvf /tmp/var-www.' + date +'.tar.gz' + ' /var/www')
-                file_get('/tmp/var-www.' + date +'.tar.gz', data_dir + date + ' /var/www')
+                sudo('tar czvf /tmp/var-www.' + date + '.tar.gz' + ' /var/www')
+                file_get('/tmp/var-www.' + date + '.tar.gz', data_dir + date)
 
             except SystemExit:
                 print colored('##############################################', 'red')
                 print colored('##### FAIL to RSYNC Apache Document Root #####', 'red')
                 print colored('##############################################', 'red')
         else:
-            local('mkdir -p ' + data_dir + 'var/www')
+            local('mkdir -p ' + data_dir)
             try:
                 print colored('#########################', 'blue')
                 print colored('####### RSYNCKING #######', 'blue')
@@ -2157,7 +2128,7 @@ fab -R devtest rsync_data_from_server()
                 # Rsync web root
                 # sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
                 # local: rsync  -avzP --progress  --rsh='ssh  -p 22  ' /tmp/ vagrant@172.28.128.4:/var/www
-                rsync_project(local_dir=data_dir + 'var/www/', remote_dir='/var/www/', default_opts='-avzPO --progress',
+                rsync_project(local_dir=data_dir + 'var/www/', remote_dir='/var/www/', default_opts='-avzP --progress',
                               upload=False)
             except SystemExit:
                 print colored('##############################################', 'red')
@@ -2292,7 +2263,7 @@ fab -R devtest rsync_data_from_server()
         print colored('SYNC: Shibboleth Config Files', 'blue')
         print colored('=============================', 'blue')
 
-        if (os.path.isdir(data_dir + "etc/shibboleth")):
+        if os.path.isdir(data_dir + "etc/shibboleth"):
             print colored('######################################', 'blue')
             print colored('##### Shibboleth folders exists ######', 'blue')
             print colored('######################################', 'blue')
@@ -2322,6 +2293,39 @@ fab -R devtest rsync_data_from_server()
                 print colored('#################################################', 'red')
                 print colored('##### FAIL to RSYNC Shibboleth Config Files #####', 'red')
                 print colored('#################################################', 'red')
+
+
+"""
+def iptables(action, ip_addr):
+    with settings(warn_only=False):
+        try:
+            print colored('===========================', 'red')
+            print colored('IPTABLES START', 'red')
+            print colored('===========================', 'red')
+        except SystemExit:
+            print colored('===========================', 'red')
+            print colored('IPTABLES PROBLEM', 'red')
+            print colored('===========================', 'red')
+
+            # 62.210.148.246
+            # 46.4.116.197
+            # 51.254.97.23
+            # 171.113.86.129
+
+            # iptables -A INPUT -s <ip> -j DROP
+            # iptables -A INPUT -s 62.210.148.246 -j DROP
+            # iptables -A INPUT -s 46.4.116.197 -j DROP
+            # iptables -A INPUT -s 51.254.97.23 -j DROP
+            # iptables -A INPUT -s 171.113.86.129 -j DROP
+
+            # iptables -A INPUT -s 62.24.252.133 -j DROP
+            # iptables -A INPUT -s 195.154.187.115 -j DROP
+            # iptables -A INPUT -s 176.9.131.69 -j DROP
+            # iptables -A INPUT -s 46.165.197.141 -j DROP
+
+            # for ip in list:
+            #        iptables -A INPUT
+"""
 
 """
 def db_backup():
