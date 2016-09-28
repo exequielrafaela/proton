@@ -2142,7 +2142,7 @@ fab -R devtest rsync_data_from_server()
                 date = strftime("%Y-%m-%d", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
                 sudo('tar czvf /tmp/var-www.' + date +'.tar.gz' + ' /var/www')
-                file_get('/tmp/var-www.' + date, data_dir + date +'.tar.gz' + '/var/www')
+                file_get('/tmp/var-www.' + date, data_dir + date +'.tar.gz' + ' /var/www')
 
             except SystemExit:
                 print colored('##############################################', 'red')
