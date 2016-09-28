@@ -2219,12 +2219,12 @@ eg: fab -R devtest rsync_data_to_server_v2:/tmp/172.28.128.4/,/tmp/172.28.128.4/
                 local('tar xzvf '+ local_file_path)
                 if os.path.isdir(local_rsync_dir) and exists(remote_dir):
                     rsync_project(local_dir= local_rsync_dir, remote_dir=remote_dir,
-                                  default_opts='-avzP --progress --rsync-path="sudo rsync"')
+                                  default_opts='-avzP --progress')
                 else:
                     try:
                         sudo('mkdir -p ' + remote_dir)
                         rsync_project(local_dir= local_rsync_dir, remote_dir=remote_dir,
-                                      default_opts='-avzP --progress --rsync-path="sudo rsync"')
+                                      default_opts='-avzP --progress')
                     except SystemExit:
                         print colored('#################################################################', 'red')
                         print colored('##### Check that all the DIRS passed as args are consistent #####', 'red')
