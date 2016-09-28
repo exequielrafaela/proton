@@ -2102,13 +2102,14 @@ fab -R devtest rsync_data_to_server()
             print colored('############################################################', 'red')
 
 
-def download_data_from_server(data_dir, migrate_dir):
+def download_data_from_server(data_dir, migrate_dir, tmp_migrate_dir="/tmp/"):
     """
 Get data from a remote host passing the local data_dir and the
 remote migrate_dir to be actually migrated
 fab -R devtest rsync_data_from_server()
     :param data_dir: Directory where the data it's going to be stored
     :param migrate_dir: Directory to get from the remote server
+    :param tmp_migrate_dir: Directory to host the compress files to get from the remote server
     """
     with settings(warn_only=False):
 
@@ -2133,8 +2134,8 @@ fab -R devtest rsync_data_from_server()
                 print colored('##########################################', 'blue')
                 date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
-                sudo('tar czvf /tmp/' + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
-                get('/tmp/' + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
+                sudo('tar czvf '+ tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
+                get(tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
 
             except SystemExit:
                 print colored('##########################################', 'red')
@@ -2148,8 +2149,8 @@ fab -R devtest rsync_data_from_server()
                 print colored('#########################', 'blue')
                 date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
-                sudo('tar czvf /tmp/' + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
-                get('/tmp/' + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
+                sudo('tar czvf '+ tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
+                get(tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
 
             except SystemExit:
                 print colored('#############################################', 'red')
@@ -2187,6 +2188,59 @@ Download LAMP data using download_data_from_server task
         print colored('SYNC: Shibboleth Config Files', 'blue')
         print colored('=============================', 'blue')
         download_data_from_server('/tmp/', '/etc/shibboleth/')
+
+
+def rysnc_data_to_server_v2(data_dir, migrate_dir):
+    """
+Get data from a remote host passing the local data_dir and the
+remote migrate_dir to be actually migrated
+fab -R devtest rsync_data_from_server()
+    :param data_dir: Directory where the data it's going to be stored
+    :param migrate_dir: Directory to get from the remote server
+    """
+    with settings(warn_only=False):
+
+        data_dir = data_dir + env.host
+        print data_dir
+
+        migrate_dir_dash = migrate_dir.replace("/", "-")
+        if migrate_dir_dash.startswith('-') and migrate_dir_dash.endswith('-'):
+            migrate_dir_dash = migrate_dir_dash[1:-1]
+
+        print colored('=======================', 'blue')
+        print colored('Getting: ' + migrate_dir, 'blue')
+        print colored('=======================', 'blue')
+
+        if os.path.isdir(data_dir):
+            print colored('####################################', 'blue')
+            print colored('##### ' + data_dir + ' exists ######', 'blue')
+            print colored('####################################', 'blue')
+            try:
+                print colored('##########################################', 'blue')
+                print colored('####### GETING ' + migrate_dir + ' #######', 'blue')
+                print colored('##########################################', 'blue')
+                sudo('tar xzvf /tmp/' + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
+                get('/tmp/' + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
+
+            except SystemExit:
+                print colored('##########################################', 'red')
+                print colored('##### FAIL to GET' + migrate_dir + ' #####', 'red')
+                print colored('##########################################', 'red')
+        else:
+            local('mkdir -p ' + data_dir)
+            try:
+                print colored('#########################', 'blue')
+                print colored('####### GETING ' + migrate_dir + ' #######', 'blue')
+                print colored('#########################', 'blue')
+                date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+                # tar -czvf /path-to/other/directory/file.tar.gz file
+                sudo('tar czvf /tmp/' + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
+                get('/tmp/' + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
+
+            except SystemExit:
+                print colored('#############################################', 'red')
+                print colored('##### FAIL to RSYNC ' + migrate_dir + ' #####', 'red')
+                print colored('#############################################', 'red')
 
 
 """
