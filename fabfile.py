@@ -2104,7 +2104,8 @@ fab -R devtest rsync_data_to_server()
 
 def download_data_from_server(data_dir, migrate_dir):
     """
-Migrate the data from a LAMP Server to a new one mainly using rsync
+Get data from a remote host passing the local data_dir and the
+remote migrate_dir to be actually migrated
 fab -R devtest rsync_data_from_server()
     :param data_dir: Directory where the data it's going to be stored
     :param migrate_dir: Directory to get from the remote server
@@ -2158,7 +2159,8 @@ fab -R devtest rsync_data_from_server()
 
 def download_lamp_from_server(data_dir):
     """
-Download lamp data using download_data_from_server task
+Download LAMP data using download_data_from_server task
+    :param data_dir: Directory where the data it's going to be stored
     """
     with settings(warn_only=False):
 
