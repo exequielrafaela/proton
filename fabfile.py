@@ -389,7 +389,8 @@ Change RedHat/Centos based OS user password
 
 def key_gen(usernameg):
     """
-Generate an SSH key for a certain
+Generate an SSH key for a certain user
+Remember that this task it's intended to be run with role "local"
     :param usernameg: "username" to change password
     """
     with settings(warn_only=False):
@@ -404,6 +405,36 @@ Generate an SSH key for a certain
                 print colored('#######################################################', 'blue')
                 print colored('ROOT user CANT be changed', 'blue')
                 print colored('#######################################################', 'blue')
+                if os.path.exists('/' + usernameg + '/.ssh/id_rsa'):
+                    print colored(str(os.path.exists('/home/' + usernameg + '/.ssh/id_rsa')), 'blue')
+                    print colored('###########################################', 'blue')
+                    print colored('username: ' + usernameg + ' KEYS already EXISTS', 'blue')
+                    print colored('###########################################', 'blue')
+                else:
+                    print colored('###########################################', 'blue')
+                    print colored('username: ' + usernameg + ' Creating KEYS', 'blue')
+                    print colored('###########################################', 'blue')
+                    sudo("ssh-keygen -t rsa -f /home/" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
+                    # http://unix.stackexchange.com/questions/36540/why-am-i-still-getting-a-password-prompt-with-ssh
+                    # -with-public-key-authentication
+                    # sudo('chmod 700 /home/' + usernameg)
+                    sudo('chmod 755 /home/' + usernameg)
+                    sudo('chmod 755 /home/' + usernameg + '/.ssh')
+                    sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
+                    sudo('gpasswd -a ' + usernameg + ' wheel')
+
+                print colored('User ' + usernameg + ' does not exist', 'red')
+                print colored('#######################################################', 'blue')
+                print colored('Consider that we generate user: username pass: username', 'blue')
+                print colored('#######################################################', 'blue')
+
+                sudo('useradd ' + usernameg + ' -m -d /home/' + usernameg)
+                #sudo('echo "' + usernameg + ':' + usernameg + '" | chpasswd')
+                sudo("ssh-keygen -t rsa -f /home/" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
+                sudo('chmod 755 /home/' + usernameg)
+                sudo('chmod 755 /home/' + usernameg + '/.ssh')
+                sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
+                sudo('gpasswd -a ' + usernameg + ' wheel')
 
             elif os.path.exists('/home/' + usernameg + '/.ssh/id_rsa'):
                 print colored(str(os.path.exists('/home/' + usernameg + '/.ssh/id_rsa')), 'blue')
@@ -423,21 +454,22 @@ Generate an SSH key for a certain
                 sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
                 sudo('gpasswd -a ' + usernameg + ' wheel')
         except KeyError:
-            print colored('User ' + usernameg + ' does not exist', 'red')
-            print colored('#######################################################', 'blue')
-            print colored('Consider that we generate user: username pass: username', 'blue')
-            print colored('#######################################################', 'blue')
+            if user_exists != "root":
+                print colored('User ' + usernameg + ' does not exist', 'red')
+                print colored('#######################################################', 'blue')
+                print colored('Consider that we generate user: username pass: username', 'blue')
+                print colored('#######################################################', 'blue')
 
-            sudo('useradd ' + usernameg + ' -m -d /home/' + usernameg)
-            sudo('echo "' + usernameg + ':' + usernameg + '" | chpasswd')
-            sudo("ssh-keygen -t rsa -f /home/" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
-            # http://unix.stackexchange.com/questions/36540/why-am-i-still-getting-a-password-prompt-with-ssh
-            # -with-public-key-authentication
-            # sudo('chmod 700 /home/' + usernameg)
-            sudo('chmod 755 /home/' + usernameg)
-            sudo('chmod 755 /home/' + usernameg + '/.ssh')
-            sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
-            sudo('gpasswd -a ' + usernameg + ' wheel')
+                sudo('useradd ' + usernameg + ' -m -d /home/' + usernameg)
+                #sudo('echo "' + usernameg + ':' + usernameg + '" | chpasswd')
+                sudo("ssh-keygen -t rsa -f /home/" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
+                # http://unix.stackexchange.com/questions/36540/why-am-i-still-getting-a-password-prompt-with-ssh
+                # -with-public-key-authentication
+                # sudo('chmod 700 /home/' + usernameg)
+                sudo('chmod 755 /home/' + usernameg)
+                sudo('chmod 755 /home/' + usernameg + '/.ssh')
+                sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
+                sudo('gpasswd -a ' + usernameg + ' wheel')
 
 
 def key_read_file(key_file):
