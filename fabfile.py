@@ -2223,7 +2223,6 @@ eg: fab -R devtest rsync_data_to_server_v2:/tmp/172.28.128.4/,/tmp/172.28.128.4/
                 else:
                     try:
                         sudo('mkdir -p ' + remote_dir)
-                        local('sudo tar xzvf '+ local_file_path)
                         rsync_project(local_dir= local_rsync_dir, remote_dir=remote_dir,
                                       default_opts='-avzP --progress')
                     except SystemExit:
