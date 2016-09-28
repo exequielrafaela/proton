@@ -1331,15 +1331,24 @@ Install the mysql client in a Centos7 based OS
             print colored('#################################################', 'red')
 
 
-def mysql_sh_db_user(mysql_ip="127.0.0.1"):
+def mysql_sh_db_user(mysql_user, mysql_ip="127.0.0.1"):
     """
 MySQLdump backup
+In case you have remote permissions with the mysql_user passed as argument
+it's possible to run this fabric task with the "local" role.
+fab -R local mysql_sh_db_user:root,192.168.0.1
+
+If not yo can just pass de Servers fabric Role and the default mysql_ip
+set as "127.0.0.1" (localhost) will be ok
+fab -R devtest mysql_sh_db_user:root,127.0.0.1
+
+    :param mysql_user: MySQL Server Admin user
     :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
         try:
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "show databases;"')
+            sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "SELECT User, Host, Password FROM mysql.user;"')
+            sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
         except SystemExit:
             print colored('===================', 'red')
             print colored('MySQL query problem', 'red')
@@ -1454,8 +1463,6 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         # date = str(time.strftime("%x %X"))
         # date = date.replace("/", "-")
         date = strftime("%Y-%m-%d-%H:%M:%S", gmtime())
-
-
 
         if os.path.isdir(local_dir) and exists(remote_dir):
             sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction -u '
