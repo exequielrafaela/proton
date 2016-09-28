@@ -2133,7 +2133,7 @@ fab -R devtest rsync_data_from_server()
                 print colored('##########################################', 'blue')
                 date = strftime("%Y-%m-%d-%H:%M:%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
-                sudo('tar czvf /tmp/var-www.' + date + '.tar.gz ' + migrate_dir)
+                sudo('tar czvf /tmp/' + migrate_dir_dash + '.' + date + '.tar.gz' + migrate_dir)
                 get('/tmp/' + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
 
             except SystemExit:
@@ -2148,7 +2148,7 @@ fab -R devtest rsync_data_from_server()
                 print colored('#########################', 'blue')
                 date = strftime("%Y-%m-%d-%H:%M:%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
-                sudo('tar czvf /tmp/var-www.' + date + '.tar.gz ' + migrate_dir)
+                sudo('tar czvf /tmp/' + migrate_dir_dash + '.' + date + '.tar.gz' + migrate_dir)
                 get('/tmp/' + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
 
             except SystemExit:
