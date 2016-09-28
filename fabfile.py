@@ -2093,15 +2093,15 @@ fab -R devtest rsync_data_from_server()
     """
     with settings(warn_only=False):
 
-        #data_dir = data_dir + env.host + '/'
+        data_dir = data_dir + env.host + '/'
 
         print colored('===========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('===========================', 'blue')
 
-        if os.path.isdir(data_dir + '/' 'var/www'):
+        if os.path.isdir(data_dir):
             print colored('################################', 'blue')
-            print colored('##### ' + data_dir + 'var/www exists ######', 'blue')
+            print colored('##### ' + data_dir + ' exists ######', 'blue')
             print colored('################################', 'blue')
             try:
                 print colored('#########################', 'blue')
