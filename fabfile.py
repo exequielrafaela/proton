@@ -2155,6 +2155,7 @@ fab -R devtest rsync_data_from_server()
                 print colored('##### FAIL to RSYNC ' + migrate_dir + ' #####', 'red')
                 print colored('#############################################', 'red')
 
+
 def download_lamp_from_server(data_dir):
     """
 Download lamp data using download_data_from_server task
