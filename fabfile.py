@@ -2216,13 +2216,14 @@ eg: fab -R devtest rsync_data_to_server_v2:/tmp/172.28.128.4/,/tmp/172.28.128.4/
                 print colored('###############################################', 'blue')
                 print colored('####### RSYNCING' + local_file_path + ' #######', 'blue')
                 print colored('###############################################', 'blue')
-                local('sudo tar xzvf '+ local_file_path)
+                local('tar xzvf '+ local_file_path)
                 if os.path.isdir(local_rsync_dir) and exists(remote_dir):
                     rsync_project(local_dir= local_rsync_dir, remote_dir=remote_dir,
                                   default_opts='-avzP --progress')
                 else:
                     try:
                         sudo('mkdir -p ' + remote_dir)
+                        local('sudo tar xzvf '+ local_file_path)
                         rsync_project(local_dir= local_rsync_dir, remote_dir=remote_dir,
                                       default_opts='-avzP --progress')
                     except SystemExit:
