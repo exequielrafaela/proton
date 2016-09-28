@@ -1454,11 +1454,16 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         date = str(time.strftime("%x"))
         date = date.replace("/", "-")
 
-        sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction -u '
-             + mysql_user + ' -p --all-databases > ' + remote_dir + 'backup-' + date + '.sql')
-        # check that the backup was created with a grep.
-        file_get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
 
+        if os.path.isdir(local_dir) and exists(remote_dir):
+            sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction -u '
+                 + mysql_user + ' -p --all-databases > ' + remote_dir + 'backup-' + date + '.sql')
+            # check that the backup was created with a grep.
+            file_get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
+        else:
+            print colored('===================================================', 'red')
+            print colored('Checl ' + local_dir + ' & ' + remote_dir + ' exists', 'red')
+            print colored('===================================================', 'red')
 
 def mysql_restore(mysqldump_fpath, mysql_ip="127.0.0.1"):
     """
