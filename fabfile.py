@@ -2107,13 +2107,10 @@ fab -R devtest rsync_data_from_server()
                 print colored('#########################', 'blue')
                 print colored('####### RSYNCKING #######', 'blue')
                 print colored('#########################', 'blue')
-                # Rsync web root
-                # rsync_project(local_dir=data_dir + 'var/www/', remote_dir='/var/www/',
-                #              default_opts='-avzP --progress', upload=False)
                 date = strftime("%Y-%m-%d-%H:%M:%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
                 sudo('tar czvf /tmp/var-www.' + date + '.tar.gz' + ' /var/www')
-                file_get('/tmp/var-www.' + date + '.tar.gz', data_dir + date)
+                file_get('/tmp/var-www.' + date + '.tar.gz', data_dir)
 
             except SystemExit:
                 print colored('##############################################', 'red')
@@ -2125,11 +2122,11 @@ fab -R devtest rsync_data_from_server()
                 print colored('#########################', 'blue')
                 print colored('####### RSYNCKING #######', 'blue')
                 print colored('#########################', 'blue')
-                # Rsync web root
-                # sudo('rsync -avzP --progress /var/www/ apache@172.17.2.30:/var/www/')
-                # local: rsync  -avzP --progress  --rsh='ssh  -p 22  ' /tmp/ vagrant@172.28.128.4:/var/www
-                rsync_project(local_dir=data_dir + 'var/www/', remote_dir='/var/www/', default_opts='-avzP --progress',
-                              upload=False)
+                date = strftime("%Y-%m-%d-%H:%M:%S", gmtime())
+                # tar -czvf /path-to/other/directory/file.tar.gz file
+                sudo('tar czvf /tmp/var-www.' + date + '.tar.gz' + ' /var/www')
+                file_get('/tmp/var-www.' + date + '.tar.gz', data_dir)
+
             except SystemExit:
                 print colored('##############################################', 'red')
                 print colored('##### FAIL to RSYNC Apache Document Root #####', 'red')
