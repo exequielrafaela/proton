@@ -2190,13 +2190,14 @@ Download LAMP data using download_data_from_server task
         download_data_from_server('/tmp/', '/etc/shibboleth/')
 
 
-def rysnc_data_to_server_v2(local_file_dir, local_file_path , local_rsync_dir, remote_dir):
+def rsync_data_to_server_v2(local_file_dir, local_file_path , local_rsync_dir, remote_dir):
     """
-Get data from a remote host passing the local data_dir and the
-remote migrate_dir to be actually migrated
-fab -R devtest rsync_data_from_server()
-    :param data_dir: Directory where the data it's going to be stored
-    :param migrate_dir: Directory to get from the remote server
+Migrate the data from a Jumphost Server to a new Server mainly using rsync
+fab -R devtest rsync_data_to_server_v2()
+    :param local_file_dir: Directory where the .tar.gz containing the data to be rsynced w/ the remote host
+    :param local_file_path: Absolute path of the .tar.gz containing the data to be rsynced w/ the remote host
+    :param local_rsync_dir: Directory where the rsync data it's going to be stored
+    :param remote_dir: Remote directory where the rsync data it's going to be stored
     """
     with settings(warn_only=False):
         print colored('==============', 'blue')
