@@ -2141,7 +2141,7 @@ fab -R devtest rsync_data_from_server()
                 #              default_opts='-avzP --progress', upload=False)
                 date = strftime("%Y-%m-%d", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
-                sudo('tar -cvfz /tmp/var-www.' + date + ' /var/www')
+                sudo('tar -cvfz /tmp/var-www.' + date +'.tar.gz' + ' /var/www')
                 file_get('/tmp/var-www.' + date, data_dir + date + '/var/www')
 
             except SystemExit:
