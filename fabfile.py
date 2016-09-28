@@ -2093,7 +2093,7 @@ fab -R devtest rsync_data_from_server()
     """
     with settings(warn_only=False):
 
-        data_dir = data_dir + env.host + '/'
+        #data_dir = data_dir + env.host + '/'
 
         print colored('===========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
