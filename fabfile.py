@@ -547,6 +547,7 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
         if usernamea == "root":
             key_file = '/' + usernamea + '/.ssh/id_rsa.pub'
             key_text = key_read_file(key_file, usernamea)
+            key_text = key_text.rstrip()
             if exists('/' + usernamea + '/.ssh/authorized_keys', use_sudo=True):
                 local('sudo chmod 701 /' + usernamea)
                 local('sudo chmod 741 /' + usernamea + '/.ssh')
