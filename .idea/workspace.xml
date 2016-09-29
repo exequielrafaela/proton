@@ -25,8 +25,8 @@
       <file leaf-file-name="fabfile.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/fabfile.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="305">
-              <caret line="560" column="72" selection-start-line="560" selection-start-column="72" selection-end-line="560" selection-end-column="72" />
+            <state relative-caret-position="290">
+              <caret line="559" column="31" selection-start-line="559" selection-start-column="31" selection-end-line="559" selection-end-column="31" />
               <folding>
                 <element signature="e#1334#1402#0" expanded="true" />
                 <element signature="e#2658#3229#0" expanded="false" />
@@ -267,8 +267,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/fabfile.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="305">
-          <caret line="560" column="72" selection-start-line="560" selection-start-column="72" selection-end-line="560" selection-end-column="72" />
+        <state relative-caret-position="290">
+          <caret line="559" column="31" selection-start-line="559" selection-start-column="31" selection-end-line="559" selection-end-column="31" />
           <folding>
             <element signature="e#1334#1402#0" expanded="true" />
             <element signature="e#2658#3229#0" expanded="false" />
