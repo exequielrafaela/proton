@@ -25,8 +25,8 @@
       <file leaf-file-name="fabfile.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/fabfile.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1498">
-              <caret line="543" column="26" selection-start-line="543" selection-start-column="26" selection-end-line="543" selection-end-column="26" />
+            <state relative-caret-position="317">
+              <caret line="2323" column="37" selection-start-line="2323" selection-start-column="37" selection-end-line="2323" selection-end-column="37" />
               <folding>
                 <element signature="e#1334#1402#0" expanded="true" />
                 <element signature="e#2668#3239#0" expanded="false" />
@@ -74,10 +74,10 @@
                 <element signature="e#108423#119627#0" expanded="false" />
                 <element signature="e#119713#122747#0" expanded="false" />
                 <element signature="e#122795#124062#0" expanded="false" />
-                <element signature="e#129578#130743#1" expanded="false" />
-                <element signature="e#130745#140818#1" expanded="false" />
-                <element signature="e#140820#150303#1" expanded="false" />
-                <element signature="e#150305#155077#1" expanded="false" />
+                <element signature="e#129600#130765#1" expanded="false" />
+                <element signature="e#130767#140840#1" expanded="false" />
+                <element signature="e#140842#150325#1" expanded="false" />
+                <element signature="e#150327#155099#1" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -395,18 +395,18 @@
             <element signature="e#108423#119627#0" expanded="false" />
             <element signature="e#119713#122747#0" expanded="false" />
             <element signature="e#122795#124062#0" expanded="false" />
-            <element signature="e#129578#130743#1" expanded="false" />
-            <element signature="e#130745#140818#1" expanded="false" />
-            <element signature="e#140820#150303#1" expanded="false" />
-            <element signature="e#150305#155077#1" expanded="false" />
+            <element signature="e#129600#130765#1" expanded="false" />
+            <element signature="e#130767#140840#1" expanded="false" />
+            <element signature="e#140842#150325#1" expanded="false" />
+            <element signature="e#150327#155099#1" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/fabfile.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1498">
-          <caret line="543" column="26" selection-start-line="543" selection-start-column="26" selection-end-line="543" selection-end-column="26" />
+        <state relative-caret-position="317">
+          <caret line="2323" column="37" selection-start-line="2323" selection-start-column="37" selection-end-line="2323" selection-end-column="37" />
           <folding>
             <element signature="e#1334#1402#0" expanded="true" />
             <element signature="e#2668#3239#0" expanded="false" />
@@ -454,10 +454,10 @@
             <element signature="e#108423#119627#0" expanded="false" />
             <element signature="e#119713#122747#0" expanded="false" />
             <element signature="e#122795#124062#0" expanded="false" />
-            <element signature="e#129578#130743#1" expanded="false" />
-            <element signature="e#130745#140818#1" expanded="false" />
-            <element signature="e#140820#150303#1" expanded="false" />
-            <element signature="e#150305#155077#1" expanded="false" />
+            <element signature="e#129600#130765#1" expanded="false" />
+            <element signature="e#130767#140840#1" expanded="false" />
+            <element signature="e#140842#150325#1" expanded="false" />
+            <element signature="e#150327#155099#1" expanded="false" />
           </folding>
         </state>
       </provider>

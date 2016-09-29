@@ -2321,7 +2321,7 @@ It's a must to have in every server the rsync package already installed!
         print colored('======================', 'blue')
         print colored('SYNC: PHP Config Files', 'blue')
         print colored('======================', 'blue')
-        file_send_oldmod(data_dir, remote_dir)
+        file_send_oldmod(data_dir + 'php.ini', remote_dir + '/etc/')
         rsync_data_to_server_v2(data_dir, data_dir + 'etc-php.d.2016-09-29-14-54-19.tar.gz',
                                 data_dir + 'etc/php.d/', remote_dir + '/etc/php.d/')
         rsync_data_to_server_v2(data_dir, data_dir + 'usr-include-php.2016-09-29-14-54-20.tar.gz',
