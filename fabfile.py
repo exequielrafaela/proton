@@ -555,9 +555,8 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
                 print colored('##### authorized_keys file exists #######', 'blue')
                 print colored('#########################################', 'blue')
                 key_clean = ""
-                sed('/' + usernamea + '/.ssh/authorized_keys', key_text, key_clean, use_sudo=True, backup='.bak',
-                    flags='',
-                    shell=False)
+                sed('/' + usernamea + '/.ssh/authorized_keys', key_text, key_clean,
+                    limit='', use_sudo=True, shell=False)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /' + usernamea + '/.ssh/')
                 local('sudo chmod 700 /' + usernamea)
                 local('sudo chmod 700 /' + usernamea + '/.ssh')
@@ -586,8 +585,7 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
                 print colored('#########################################', 'blue')
                 key_clean = ''
                 sed('/home/' + usernamea + '/.ssh/authorized_keys', key_text, key_clean, limit='', use_sudo=True,
-                    backup='.bak', flags='',
-                    shell=False)
+                    backup='.bak', flags='', shell=False)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
             else:
                 print colored('#######################################################################################',
