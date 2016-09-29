@@ -469,10 +469,10 @@ In the localhost read and return as a string the public ssh key file given as pa
         if username == "root":
             if not key_file.endswith('pub'):
                 raise RuntimeWarning('Trying to push non-public part of key pair')
+            local('sudo chmod 701 /' + username)
+            local('sudo chmod 741 /' + username + '/.ssh')
+            local('sudo chmod 604 /' + username + '/.ssh/id_rsa.pub')
             with open(key_file) as pyfile:
-                local('sudo chmod 701 /' + username)
-                local('sudo chmod 741 /' + username + '/.ssh')
-                local('sudo chmod 604 /' + username + '/.ssh/id_rsa.pub')
                 return pyfile.read()
                 local('sudo chmod 700 /' + username)
                 local('sudo chmod 700 /' + username + '/.ssh')
