@@ -562,9 +562,10 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
                 print colored('##### authorized_keys file exists #######', 'blue')
                 print colored('#########################################', 'blue')
                 key_text = key_text.replace("/", "\/")
-                sudo('sed -i -e \'s/' + key_text + '//g\' /' + usernamea + '/.ssh/authorized_keys')
-                # sed('/' + usernamea + '/.ssh/authorized_keys', key_text, key_clean,
-                #    limit='', use_sudo=True, backup='.bak', flags='', shell=False)
+                key_clean = ""
+                #sudo('sed -i -e \'s/' + key_text + '//g\' /' + usernamea + '/.ssh/authorized_keys')
+                sed('/' + usernamea + '/.ssh/authorized_keys', key_text, key_clean,
+                    limit='', use_sudo=True, backup='.bak', flags='', shell=False)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /' + usernamea + '/.ssh/')
                 local('sudo chmod 700 /' + usernamea)
                 local('sudo chmod 700 /' + usernamea + '/.ssh')
@@ -2289,25 +2290,31 @@ Download LAMP data using download_data_from_server task
 
 def upload_lamp_from_server(data_dir, remote_dir):
     """
-Download LAMP data using download_data_from_server task
-    :param data_dir: Directory where the data it's going to be stored
-    :param remote_dir: Remote dir to store the lamp data and conf
-IMPORTANT:
+Upload LAMP stack data using rsync_data_to_server_v2 task
+    :param data_dir: Directory where the data it's locally stored
+    :param remote_dir: Remote dir to store the LAMP stack data and conf
+
+IMPORTANT 1:
+Remeber to genereta a key pair for root, if the key does not exists this task won't work
+since it's a MANDATORY PREREQUISITE for it. Then, before executing it, you should use:
+"fab -R local key_gen:root"
+"fab -R devtest key_append:root"
+
+IMPORTANT 2:
 To mantain the files permissions you must run this taks with sudo:
 eg:sudo fab -R devtest upload_lamp_from_server:/tmp/172.28.128.4/,/tmp/
 
-NOTE:
-Remeber to genereta a key pair for root, if this does not exist since it's a
-mandatory prerequisite for this taks => fan -R local key_gen:root
+IMPORTANT 3:
+It's a must to have in every server the rsync package already installed!
     """
     with settings(warn_only=False):
-        key_append("root")
+
 
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('==========================', 'blue')
         rsync_data_to_server_v2(data_dir, data_dir + 'var-www.2016-09-29-14-54-15.tar.gz',
-                                data_dir + 'var/www/', remote_dir)
+                                data_dir + 'var/www/', remote_dir + '/var/www/')
 
         print colored('=========================', 'blue')
         print colored('SYNC: Apache Config Files', 'blue')
