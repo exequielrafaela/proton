@@ -556,9 +556,15 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
                 print colored('#########################################', 'blue')
                 key_text = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzLU6xQ6EEiEq5qfdgGBpqPq/0o5QWY8SWiNAVJfFMiwacWGVfqSOgMO4Iv9NbZbQTwwa/KfT7XH9Dxuw60oAJdZwh+VrK97rSIJRXrh3jbeNsOrlnOKBtWymUoe6QxWUV6Ave3PcdZkoiumTj7iFtjzkw4j3+nI9LGADhx3UKSwoUiXDicFDDThj1hXJu+Z2ioMmqq/cIOVDDMmwRXSQ4p73abMbyTr27Hh2vARNbATzjeScgt7uXp/q6HMDg+LyMif5SOT43o0utZoKK4drKTB3ipfbEOuNorIMO8+BYiw/jOxPA8sHW+lNPyoPhIpdAzte8n1zppqJjRpKsxUlJ root@server'
                 key_clean = ""
+                sudo('sudo chmod 701 /' + usernamea)
+                sudo('sudo chmod 741 /' + usernamea + '/.ssh')
+                sudo('sudo chmod 604 /' + usernamea + '/.ssh/id_rsa.pub')
                 sed('/' + usernamea + '/.ssh/authorized_keys', key_text, key_clean,
                     limit='', use_sudo=True, backup='.bak', flags='', shell=False)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /' + usernamea + '/.ssh/')
+                sudo('sudo chmod 700 /' + usernamea)
+                sudo('sudo chmod 700 /' + usernamea + '/.ssh')
+                sudo('sudo chmod 600 /' + usernamea + '/.ssh/id_rsa.pub')
                 local('sudo chmod 700 /' + usernamea)
                 local('sudo chmod 700 /' + usernamea + '/.ssh')
                 local('sudo chmod 600 /' + usernamea + '/.ssh/id_rsa.pub')
