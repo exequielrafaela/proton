@@ -456,18 +456,32 @@ Remember that this task it's intended to be run with role "local"
                 sudo('gpasswd -a ' + usernameg + ' wheel')
 
 
-def key_read_file(key_file):
+def key_read_file(key_file, username):
     """
 In the localhost read and return as a string the public ssh key file given as parameter
+
     :param key_file: absolute path of the public ssh key
-    :return:
+    :param username: username that owns the ssh key
+    :return: The public key string
     """
     with settings(warn_only=False):
         key_file = os.path.expanduser(key_file)
-        if not key_file.endswith('pub'):
-            raise RuntimeWarning('Trying to push non-public part of key pair')
-        with open(key_file) as pyfile:
-            return pyfile.read()
+        if username == "root":
+            if not key_file.endswith('pub'):
+                raise RuntimeWarning('Trying to push non-public part of key pair')
+            with open(key_file) as pyfile:
+                local('sudo chmod 701 /' + username)
+                local('sudo chmod 741 /' + username + '/.ssh')
+                local('sudo chmod 604 /' + username + '/.ssh/id_rsa.pub')
+                return pyfile.read()
+                local('sudo chmod 700 /' + username)
+                local('sudo chmod 700 /' + username + '/.ssh')
+                local('sudo chmod 600 /' + username + '/.ssh/id_rsa.pub')
+        else:
+            if not key_file.endswith('pub'):
+                raise RuntimeWarning('Trying to push non-public part of key pair')
+            with open(key_file) as pyfile:
+                return pyfile.read()
 
 
 def key_append(usernamea):
@@ -478,7 +492,7 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
     with settings(warn_only=False):
         if usernamea == "root":
             key_file = '/' + usernamea + '/.ssh/id_rsa.pub'
-            key_text = key_read_file(key_file)
+            key_text = key_read_file(key_file, usernamea)
             if exists('/' + usernamea + '/.ssh/authorized_keys', use_sudo=True):
                 local('sudo chmod 701 /' + usernamea)
                 local('sudo chmod 741 /' + usernamea + '/.ssh')
@@ -506,7 +520,7 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
             local('sudo chmod 701 /home/' + usernamea)
             local('sudo chmod 741 /home/' + usernamea + '/.ssh')
             local('sudo chmod 604 /home/' + usernamea + '/.ssh/id_rsa.pub')
-            key_text = key_read_file(key_file)
+            key_text = key_read_file(key_file, usernamea)
             local('sudo chmod 700 /home/' + usernamea)
             local('sudo chmod 700 /home/' + usernamea + '/.ssh')
             local('sudo chmod 600 /home/' + usernamea + '/.ssh/id_rsa.pub')
@@ -532,7 +546,7 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
     with settings(warn_only=False):
         if usernamea == "root":
             key_file = '/' + usernamea + '/.ssh/id_rsa.pub'
-            key_text = key_read_file(key_file)
+            key_text = key_read_file(key_file, usernamea)
             if exists('/' + usernamea + '/.ssh/authorized_keys', use_sudo=True):
                 local('sudo chmod 701 /' + usernamea)
                 local('sudo chmod 741 /' + usernamea + '/.ssh')
@@ -540,23 +554,28 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
                 print colored('#########################################', 'blue')
                 print colored('##### authorized_keys file exists #######', 'blue')
                 print colored('#########################################', 'blue')
-                sed('/' + usernamea + '/.ssh/authorized_keys', key_text, '', limit='', use_sudo=True, backup='.bak', flags='',
-                        shell=False)
+                sed('/' + usernamea + '/.ssh/authorized_keys', key_text, '', limit='', use_sudo=True, backup='.bak',
+                    flags='',
+                    shell=False)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /' + usernamea + '/.ssh/')
                 local('sudo chmod 700 /' + usernamea)
                 local('sudo chmod 700 /' + usernamea + '/.ssh')
                 local('sudo chmod 600 /' + usernamea + '/.ssh/id_rsa.pub')
             else:
-                print colored('#######################################################################################', 'yellow')
-                print colored('##### '+usernamea+' authorized_keys server:' + env.host + ' file does NOT exists ######', 'yellow')
-                print colored('#######################################################################################', 'yellow')
+                print colored('#######################################################################################',
+                              'yellow')
+                print colored(
+                    '##### ' + usernamea + ' authorized_keys server:' + env.host + ' file does NOT exists ######',
+                    'yellow')
+                print colored('#######################################################################################',
+                              'yellow')
 
         else:
             key_file = '/home/' + usernamea + '/.ssh/id_rsa.pub'
             local('sudo chmod 701 /home/' + usernamea)
             local('sudo chmod 741 /home/' + usernamea + '/.ssh')
             local('sudo chmod 604 /home/' + usernamea + '/.ssh/id_rsa.pub')
-            key_text = key_read_file(key_file)
+            key_text = key_read_file(key_file, usernamea)
             local('sudo chmod 700 /home/' + usernamea)
             local('sudo chmod 700 /home/' + usernamea + '/.ssh')
             local('sudo chmod 600 /home/' + usernamea + '/.ssh/id_rsa.pub')
@@ -564,13 +583,18 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
                 print colored('#########################################', 'blue')
                 print colored('##### authorized_keys file exists #######', 'blue')
                 print colored('#########################################', 'blue')
-                sed('/home/' + usernamea + '/.ssh/authorized_keys', key_text, '', limit='', use_sudo=True, backup='.bak', flags='',
-                        shell=False)
+                sed('/home/' + usernamea + '/.ssh/authorized_keys', key_text, '', limit='', use_sudo=True,
+                    backup='.bak', flags='',
+                    shell=False)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
             else:
-                print colored('#######################################################################################', 'yellow')
-                print colored('##### '+usernamea+' authorized_keys server:' + env.host + ' file does NOT exists ######', 'yellow')
-                print colored('#######################################################################################', 'yellow')
+                print colored('#######################################################################################',
+                              'yellow')
+                print colored(
+                    '##### ' + usernamea + ' authorized_keys server:' + env.host + ' file does NOT exists ######',
+                    'yellow')
+                print colored('#######################################################################################',
+                              'yellow')
 
 
 def key_test(usernamet):
@@ -2201,7 +2225,7 @@ fab -R devtest rsync_data_from_server()
                 # tar -czvf /path-to/other/directory/file.tar.gz file
                 sudo('tar czvf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
                 get(tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
-                sudo('rm -rf '+ tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ')
+                sudo('rm -rf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ')
 
             except SystemExit:
                 print colored('##########################################', 'red')
@@ -2255,11 +2279,11 @@ Download LAMP data using download_data_from_server task
         download_data_from_server('/tmp/', '/etc/shibboleth/')
 
 
-def upload_lamp_from_server(data_dir,remote_dir):
+def upload_lamp_from_server(data_dir, remote_dir):
     """
 Download LAMP data using download_data_from_server task
     :param data_dir: Directory where the data it's going to be stored
-
+    :param remote_dir: Remote dir to store the lamp data and conf
 IMPORTANT:
 To mantain the files permissions you must run this taks with sudo:
 eg:sudo fab -R devtest upload_lamp_from_server:/tmp/172.28.128.4/,/tmp/
@@ -2269,23 +2293,22 @@ Remeber to genereta a key pair for root, if this does not exist since it's a
 mandatory prerequisite for this taks => fan -R local key_gen:root
     """
     with settings(warn_only=False):
-
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('==========================', 'blue')
-        rsync_data_to_server_v2(data_dir,data_dir+'var-www.2016-09-29-14-54-15.tar.gz',
-                                data_dir+'var/www/', remote_dir)
+        rsync_data_to_server_v2(data_dir, data_dir + 'var-www.2016-09-29-14-54-15.tar.gz',
+                                data_dir + 'var/www/', remote_dir)
 
         print colored('=========================', 'blue')
         print colored('SYNC: Apache Config Files', 'blue')
         print colored('=========================', 'blue')
-        rsync_data_to_server_v2(data_dir, data_dir+'etc-httpd.2016-09-29-14-54-19.tar.gz',
-                                data_dir+'etc/httpd/', remote_dir)
+        rsync_data_to_server_v2(data_dir, data_dir + 'etc-httpd.2016-09-29-14-54-19.tar.gz',
+                                data_dir + 'etc/httpd/', remote_dir)
 
         print colored('======================', 'blue')
         print colored('SYNC: PHP Config Files', 'blue')
         print colored('======================', 'blue')
-        file_send_oldmod(data_dir , remote_dir)
+        file_send_oldmod(data_dir, remote_dir)
         rsync_data_to_server_v2(data_dir, data_dir + 'etc-php.d.2016-09-29-14-54-19.tar.gz',
                                 data_dir + 'etc/php.d/', remote_dir)
         rsync_data_to_server_v2(data_dir, data_dir + 'usr-include-php.2016-09-29-14-54-20.tar.gz',
