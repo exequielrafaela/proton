@@ -341,8 +341,8 @@ Add a user in RedHat/Centos based OS
 
         try:
             # if(user_exists != ""):
-            user_exists = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamec)
-            if user_exists != "":
+            user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamec)
+            if user_true != "":
                 print colored('##############################', 'green')
                 print colored('"' + usernamec + '" already exists', 'green')
                 print colored('##############################', 'green')
@@ -393,6 +393,7 @@ Generate an SSH key for a certain user
 Remember that this task it's intended to be run with role "local"
     :param usernameg: "username" to change password
     """
+    global user_exists
     with settings(warn_only=False):
         # usernameg = prompt("Which USERNAME you like to GEN KEYS?")
         # user_exists = sudo('cut -d: -f1 /etc/passwd | grep '+usernameg)
@@ -2149,8 +2150,9 @@ fab -R devtest rsync_data_from_server()
                 print colored('##########################################', 'blue')
                 date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
-                sudo('tar czvf '+ tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
+                sudo('tar czvf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
                 get(tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
+                sudo('rm -rf '+ tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ')
 
             except SystemExit:
                 print colored('##########################################', 'red')
@@ -2164,7 +2166,7 @@ fab -R devtest rsync_data_from_server()
                 print colored('#########################', 'blue')
                 date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
-                sudo('tar czvf '+ tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
+                sudo('tar czvf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
                 get(tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
 
             except SystemExit:
@@ -2179,7 +2181,6 @@ Download LAMP data using download_data_from_server task
     :param data_dir: Directory where the data it's going to be stored
     """
     with settings(warn_only=False):
-
         data_dir = data_dir + env.host
 
         print colored('==========================', 'blue')
@@ -2205,7 +2206,7 @@ Download LAMP data using download_data_from_server task
         download_data_from_server('/tmp/', '/etc/shibboleth/')
 
 
-def rsync_data_to_server_v2(local_file_dir, local_file_path , local_rsync_dir, remote_dir):
+def rsync_data_to_server_v2(local_file_dir, local_file_path, local_rsync_dir, remote_dir):
     """
 Migrate the data from a Jumphost Server to a new Server mainly using rsync
 fab -R devtest rsync_data_to_server_v2()
@@ -2233,12 +2234,12 @@ eg: fab -R devtest rsync_data_to_server_v2:/tmp/172.28.128.4/,/tmp/172.28.128.4/
                 print colored('###############################################', 'blue')
                 local('sudo tar xzvf ' + local_file_path + ' -C ' + local_file_dir)
                 if os.path.isdir(local_rsync_dir) and exists(remote_dir):
-                    rsync_project(local_dir= local_rsync_dir, remote_dir=remote_dir,
+                    rsync_project(local_dir=local_rsync_dir, remote_dir=remote_dir,
                                   default_opts='-avzP --progress')
                 else:
                     try:
                         sudo('mkdir -p ' + remote_dir)
-                        rsync_project(local_dir= local_rsync_dir, remote_dir=remote_dir,
+                        rsync_project(local_dir=local_rsync_dir, remote_dir=remote_dir,
                                       default_opts='-avzP --progress')
                     except SystemExit:
                         print colored('#################################################################', 'red')
@@ -2252,6 +2253,7 @@ eg: fab -R devtest rsync_data_to_server_v2:/tmp/172.28.128.4/,/tmp/172.28.128.4/
             print colored('##########################################################', 'red')
             print colored('##### Check that files ' + local_file_path + 'exists #####', 'red')
             print colored('##########################################################', 'red')
+
 
 """
 def iptables(action, ip_addr):
