@@ -371,8 +371,8 @@ Change RedHat/Centos based OS user password
     with settings(warn_only=False):
         try:
             # if(user_exists != ""):
-            user_exists = sudo('cut -d: -f1 /etc/passwd | grep ' + usernameu)
-            if user_exists != "":
+            user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usernameu)
+            if user_true != "":
                 print colored('#######################################', 'green')
                 print colored('"' + usernameu + '" PASSWORD will be changed', 'green')
                 print colored('#######################################', 'green')
@@ -522,6 +522,55 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
                 append('/home/' + usernamea + '/.ssh/authorized_keys', key_text, use_sudo=True)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
                 # put('/home/'+usernamea+'/.ssh/authorized_keys', '/home/'+usernamea+'/.ssh/')
+
+
+def key_remove(usernamea):
+    """
+Append the public key string in the /home/usernamea/.ssh/authorized_keys of the host
+    :param usernamea: "username" to append the key to.
+    """
+    with settings(warn_only=False):
+        if usernamea == "root":
+            key_file = '/' + usernamea + '/.ssh/id_rsa.pub'
+            key_text = key_read_file(key_file)
+            if exists('/' + usernamea + '/.ssh/authorized_keys', use_sudo=True):
+                local('sudo chmod 701 /home/' + usernamea)
+                local('sudo chmod 741 /home/' + usernamea + '/.ssh')
+                local('sudo chmod 604 /home/' + usernamea + '/.ssh/id_rsa.pub')
+                print colored('#########################################', 'blue')
+                print colored('##### authorized_keys file exists #######', 'blue')
+                print colored('#########################################', 'blue')
+                sed('/' + usernamea + '/.ssh/authorized_keys', key_text, '', limit='', use_sudo=True, backup='.bak', flags='',
+                        shell=False)
+                sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
+                local('sudo chmod 700 /home/' + usernamea)
+                local('sudo chmod 700 /home/' + usernamea + '/.ssh')
+                local('sudo chmod 600 /home/' + usernamea + '/.ssh/id_rsa.pub')
+            else:
+                print colored('#######################################################################################', 'yellow')
+                print colored('##### '+usernamea+' authorized_keys server:' + env.host + ' file does NOT exists ######', 'yellow')
+                print colored('#######################################################################################', 'yellow')
+
+        else:
+            key_file = '/home/' + usernamea + '/.ssh/id_rsa.pub'
+            local('sudo chmod 701 /home/' + usernamea)
+            local('sudo chmod 741 /home/' + usernamea + '/.ssh')
+            local('sudo chmod 604 /home/' + usernamea + '/.ssh/id_rsa.pub')
+            key_text = key_read_file(key_file)
+            local('sudo chmod 700 /home/' + usernamea)
+            local('sudo chmod 700 /home/' + usernamea + '/.ssh')
+            local('sudo chmod 600 /home/' + usernamea + '/.ssh/id_rsa.pub')
+            if exists('/home/' + usernamea + '/.ssh/authorized_keys', use_sudo=True):
+                print colored('#########################################', 'blue')
+                print colored('##### authorized_keys file exists #######', 'blue')
+                print colored('#########################################', 'blue')
+                sed('/home/' + usernamea + '/.ssh/authorized_keys', key_text, '', limit='', use_sudo=True, backup='.bak', flags='',
+                        shell=False)
+                sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
+            else:
+                print colored('#######################################################################################', 'yellow')
+                print colored('##### '+usernamea+' authorized_keys server:' + env.host + ' file does NOT exists ######', 'yellow')
+                print colored('#######################################################################################', 'yellow')
 
 
 def key_test(usernamet):
@@ -2204,6 +2253,49 @@ Download LAMP data using download_data_from_server task
         print colored('SYNC: Shibboleth Config Files', 'blue')
         print colored('=============================', 'blue')
         download_data_from_server('/tmp/', '/etc/shibboleth/')
+
+
+def upload_lamp_from_server(data_dir,remote_dir):
+    """
+Download LAMP data using download_data_from_server task
+    :param data_dir: Directory where the data it's going to be stored
+
+IMPORTANT:
+To mantain the files permissions you must run this taks with sudo:
+eg:sudo fab -R devtest upload_lamp_from_server:/tmp/172.28.128.4/,/tmp/
+
+NOTE:
+Remeber to genereta a key pair for root, if this does not exist since it's a
+mandatory prerequisite for this taks => fan -R local key_gen:root
+    """
+    with settings(warn_only=False):
+
+        print colored('==========================', 'blue')
+        print colored('SYNC: Apache Document Root', 'blue')
+        print colored('==========================', 'blue')
+        rsync_data_to_server_v2(data_dir,data_dir+'var-www.2016-09-29-14-54-15.tar.gz',
+                                data_dir+'var/www/', remote_dir)
+
+        print colored('=========================', 'blue')
+        print colored('SYNC: Apache Config Files', 'blue')
+        print colored('=========================', 'blue')
+        rsync_data_to_server_v2(data_dir, data_dir+'etc-httpd.2016-09-29-14-54-19.tar.gz',
+                                data_dir+'etc/httpd/', remote_dir)
+
+        print colored('======================', 'blue')
+        print colored('SYNC: PHP Config Files', 'blue')
+        print colored('======================', 'blue')
+        file_send_oldmod(data_dir , remote_dir)
+        rsync_data_to_server_v2(data_dir, data_dir + 'etc-php.d.2016-09-29-14-54-19.tar.gz',
+                                data_dir + 'etc/php.d/', remote_dir)
+        rsync_data_to_server_v2(data_dir, data_dir + 'usr-include-php.2016-09-29-14-54-20.tar.gz',
+                                data_dir + 'usr/include/php/', remote_dir)
+
+        print colored('=============================', 'blue')
+        print colored('SYNC: Shibboleth Config Files', 'blue')
+        print colored('=============================', 'blue')
+        rsync_data_to_server_v2(data_dir, data_dir + 'etc-shibboleth.2016-09-29-14-54-20.tar.gz',
+                                data_dir + 'etc/shibboleth/', remote_dir)
 
 
 def rsync_data_to_server_v2(local_file_dir, local_file_path, local_rsync_dir, remote_dir):
