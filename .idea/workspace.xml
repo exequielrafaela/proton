@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a993ae91-7269-4555-bac9-8b6b472734eb" name="Default" comment="" />
+    <list default="true" id="a993ae91-7269-4555-bac9-8b6b472734eb" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fabfile.py" afterPath="$PROJECT_DIR$/fabfile.py" />
+    </list>
     <ignored path="proton.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -23,8 +25,8 @@
       <file leaf-file-name="fabfile.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/fabfile.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="2337" column="90" selection-start-line="2337" selection-start-column="90" selection-end-line="2337" selection-end-column="90" />
+            <state relative-caret-position="502">
+              <caret line="2317" column="90" selection-start-line="2317" selection-start-column="90" selection-end-line="2317" selection-end-column="90" />
               <folding>
                 <element signature="e#1334#1402#0" expanded="true" />
                 <element signature="e#2668#3239#0" expanded="false" />
@@ -72,8 +74,6 @@
                 <element signature="e#108423#119627#0" expanded="false" />
                 <element signature="e#119713#122747#0" expanded="false" />
                 <element signature="e#122795#124062#0" expanded="false" />
-                <element signature="e#124120#126586#0" expanded="false" />
-                <element signature="e#124865#126586#0" expanded="false" />
                 <element signature="e#126684#129856#0" expanded="false" />
                 <element signature="e#127393#129856#0" expanded="false" />
                 <element signature="e#129859#131024#1" expanded="false" />
@@ -397,8 +397,6 @@
             <element signature="e#108423#119627#0" expanded="false" />
             <element signature="e#119713#122747#0" expanded="false" />
             <element signature="e#122795#124062#0" expanded="false" />
-            <element signature="e#124120#126586#0" expanded="false" />
-            <element signature="e#124865#126586#0" expanded="false" />
             <element signature="e#126684#129856#0" expanded="false" />
             <element signature="e#127393#129856#0" expanded="false" />
             <element signature="e#129859#131024#1" expanded="false" />
@@ -411,8 +409,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/fabfile.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="2337" column="90" selection-start-line="2337" selection-start-column="90" selection-end-line="2337" selection-end-column="90" />
+        <state relative-caret-position="502">
+          <caret line="2317" column="90" selection-start-line="2317" selection-start-column="90" selection-end-line="2317" selection-end-column="90" />
           <folding>
             <element signature="e#1334#1402#0" expanded="true" />
             <element signature="e#2668#3239#0" expanded="false" />
@@ -460,8 +458,6 @@
             <element signature="e#108423#119627#0" expanded="false" />
             <element signature="e#119713#122747#0" expanded="false" />
             <element signature="e#122795#124062#0" expanded="false" />
-            <element signature="e#124120#126586#0" expanded="false" />
-            <element signature="e#124865#126586#0" expanded="false" />
             <element signature="e#126684#129856#0" expanded="false" />
             <element signature="e#127393#129856#0" expanded="false" />
             <element signature="e#129859#131024#1" expanded="false" />

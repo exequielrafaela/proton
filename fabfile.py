@@ -2315,7 +2315,7 @@ It's a must to have in every server the rsync package already installed!
         print colored('=========================', 'blue')
         print colored('SYNC: Apache Config Files', 'blue')
         print colored('=========================', 'blue')
-        rsync_data_to_server_v2(data_dir, data_dir + 'etc-httpd.2016-09-29-14-54-19.tar.gz',
+        rsync_data_to_server_v2(data_dir, data_dir + 'etc-httpd.2016-09-29-20-46-11.tar.gz',
                                 data_dir + 'etc/httpd/', remote_dir + '/etc/httpd/')
 
         print colored('======================', 'blue')
