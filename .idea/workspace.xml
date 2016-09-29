@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a993ae91-7269-4555-bac9-8b6b472734eb" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fabfile.py" afterPath="$PROJECT_DIR$/fabfile.py" />
-    </list>
+    <list default="true" id="a993ae91-7269-4555-bac9-8b6b472734eb" name="Default" comment="" />
     <ignored path="proton.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -25,8 +23,8 @@
       <file leaf-file-name="fabfile.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/fabfile.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="502">
-              <caret line="2317" column="90" selection-start-line="2317" selection-start-column="90" selection-end-line="2317" selection-end-column="90" />
+            <state relative-caret-position="112">
+              <caret line="2291" column="0" selection-start-line="2291" selection-start-column="0" selection-end-line="2291" selection-end-column="0" />
               <folding>
                 <element signature="e#1334#1402#0" expanded="true" />
                 <element signature="e#2668#3239#0" expanded="false" />
@@ -409,8 +407,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/fabfile.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="502">
-          <caret line="2317" column="90" selection-start-line="2317" selection-start-column="90" selection-end-line="2317" selection-end-column="90" />
+        <state relative-caret-position="112">
+          <caret line="2291" column="0" selection-start-line="2291" selection-start-column="0" selection-end-line="2291" selection-end-column="0" />
           <folding>
             <element signature="e#1334#1402#0" expanded="true" />
             <element signature="e#2668#3239#0" expanded="false" />
