@@ -556,7 +556,7 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
                 print colored('#########################################', 'blue')
                 key_clean = ""
                 sed('/' + usernamea + '/.ssh/authorized_keys', key_text, key_clean,
-                    limit='', use_sudo=True,  flags='-i -e', shell=False)
+                    limit='', use_sudo=True, backup=False, flags='', shell=False)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /' + usernamea + '/.ssh/')
                 local('sudo chmod 700 /' + usernamea)
                 local('sudo chmod 700 /' + usernamea + '/.ssh')
