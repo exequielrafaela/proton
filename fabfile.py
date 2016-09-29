@@ -587,9 +587,7 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
                 print colored('##### authorized_keys file exists #######', 'blue')
                 print colored('#########################################', 'blue')
                 key_text = key_text.rstrip()
-                key_clean = ""
-                sed('/home/' + usernamea + '/.ssh/authorized_keys', key_text, key_clean,
-                    limit='', use_sudo=True, backup='.bak', flags='', shell=False)
+                sudo('sed -i -e \'s/' + key_text + '//g\' /home/' + usernamea + '/.ssh/authorized_keys')
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
             else:
                 print colored('#######################################################################################',
