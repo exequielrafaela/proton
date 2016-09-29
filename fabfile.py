@@ -480,9 +480,9 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
             key_file = '/' + usernamea + '/.ssh/id_rsa.pub'
             key_text = key_read_file(key_file)
             if exists('/' + usernamea + '/.ssh/authorized_keys', use_sudo=True):
-                local('sudo chmod 701 /home/' + usernamea)
-                local('sudo chmod 741 /home/' + usernamea + '/.ssh')
-                local('sudo chmod 604 /home/' + usernamea + '/.ssh/id_rsa.pub')
+                local('sudo chmod 701 /' + usernamea)
+                local('sudo chmod 741 /' + usernamea + '/.ssh')
+                local('sudo chmod 604 /' + usernamea + '/.ssh/id_rsa.pub')
                 print colored('#########################################', 'blue')
                 print colored('##### authorized_keys file exists #######', 'blue')
                 print colored('#########################################', 'blue')
