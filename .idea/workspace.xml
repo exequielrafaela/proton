@@ -25,8 +25,8 @@
       <file leaf-file-name="fabfile.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/fabfile.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="414">
-              <caret line="2373" column="64" selection-start-line="2373" selection-start-column="64" selection-end-line="2373" selection-end-column="64" />
+            <state relative-caret-position="368">
+              <caret line="2365" column="83" selection-start-line="2365" selection-start-column="83" selection-end-line="2365" selection-end-column="83" />
               <folding>
                 <element signature="e#1334#1402#0" expanded="true" />
                 <element signature="e#2668#3239#0" expanded="false" />
@@ -74,10 +74,10 @@
                 <element signature="e#108423#119627#0" expanded="false" />
                 <element signature="e#119713#122747#0" expanded="false" />
                 <element signature="e#122795#124062#0" expanded="false" />
-                <element signature="e#129735#130900#1" expanded="false" />
-                <element signature="e#130902#140975#1" expanded="false" />
-                <element signature="e#140977#150460#1" expanded="false" />
-                <element signature="e#150462#155234#1" expanded="false" />
+                <element signature="e#129859#131024#1" expanded="false" />
+                <element signature="e#131026#141099#1" expanded="false" />
+                <element signature="e#141101#150584#1" expanded="false" />
+                <element signature="e#150586#155358#1" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -312,7 +312,7 @@
       <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32933334" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32933334" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32933334" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
@@ -395,18 +395,18 @@
             <element signature="e#108423#119627#0" expanded="false" />
             <element signature="e#119713#122747#0" expanded="false" />
             <element signature="e#122795#124062#0" expanded="false" />
-            <element signature="e#129735#130900#1" expanded="false" />
-            <element signature="e#130902#140975#1" expanded="false" />
-            <element signature="e#140977#150460#1" expanded="false" />
-            <element signature="e#150462#155234#1" expanded="false" />
+            <element signature="e#129859#131024#1" expanded="false" />
+            <element signature="e#131026#141099#1" expanded="false" />
+            <element signature="e#141101#150584#1" expanded="false" />
+            <element signature="e#150586#155358#1" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/fabfile.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="414">
-          <caret line="2373" column="64" selection-start-line="2373" selection-start-column="64" selection-end-line="2373" selection-end-column="64" />
+        <state relative-caret-position="368">
+          <caret line="2365" column="83" selection-start-line="2365" selection-start-column="83" selection-end-line="2365" selection-end-column="83" />
           <folding>
             <element signature="e#1334#1402#0" expanded="true" />
             <element signature="e#2668#3239#0" expanded="false" />
@@ -454,10 +454,10 @@
             <element signature="e#108423#119627#0" expanded="false" />
             <element signature="e#119713#122747#0" expanded="false" />
             <element signature="e#122795#124062#0" expanded="false" />
-            <element signature="e#129735#130900#1" expanded="false" />
-            <element signature="e#130902#140975#1" expanded="false" />
-            <element signature="e#140977#150460#1" expanded="false" />
-            <element signature="e#150462#155234#1" expanded="false" />
+            <element signature="e#129859#131024#1" expanded="false" />
+            <element signature="e#131026#141099#1" expanded="false" />
+            <element signature="e#141101#150584#1" expanded="false" />
+            <element signature="e#150586#155358#1" expanded="false" />
           </folding>
         </state>
       </provider>

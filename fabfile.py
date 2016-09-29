@@ -2365,13 +2365,14 @@ eg: fab -R devtest rsync_data_to_server_v2:/tmp/172.28.128.4/,/tmp/172.28.128.4/
                 if os.path.isdir(local_rsync_dir) and exists(remote_dir):
                     rsync_project(local_dir=local_rsync_dir, remote_dir=remote_dir,
                                   default_opts='-avzP --progress')
-                    local('sudo rm -rf ' + local_rsync_dir[:-1])
+                    local('sudo find ' + local_file_dir + '* -type d | sudo xargs rm -rf --')
                 else:
                     try:
                         sudo('mkdir -p ' + remote_dir)
                         rsync_project(local_dir=local_rsync_dir, remote_dir=remote_dir,
                                       default_opts='-avzP --progress')
-                        local('sudo rm -rf ' + local_rsync_dir[:-1])
+                        local('sudo find '+local_file_dir+'* -type d | sudo xargs rm -rf --')
+                        #local('sudo rm -rf ' + local_rsync_dir[:-1])
 
                     except SystemExit:
                         print colored('#################################################################', 'red')
