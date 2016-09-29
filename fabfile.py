@@ -488,18 +488,18 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
                 print colored('#########################################', 'blue')
                 append('/' + usernamea + '/.ssh/authorized_keys', key_text, use_sudo=True)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
-                local('sudo chmod 700 /home/' + usernamea)
-                local('sudo chmod 700 /home/' + usernamea + '/.ssh')
-                local('sudo chmod 600 /home/' + usernamea + '/.ssh/id_rsa.pub')
+                local('sudo chmod 700 /' + usernamea)
+                local('sudo chmod 700 /' + usernamea + '/.ssh')
+                local('sudo chmod 600 /' + usernamea + '/.ssh/id_rsa.pub')
             else:
                 sudo('mkdir -p /' + usernamea + '/.ssh/')
                 sudo('touch /' + usernamea + '/.ssh/authorized_keys')
                 append('/' + usernamea + '/.ssh/authorized_keys', key_text, use_sudo=True)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
                 # put('/home/'+usernamea+'/.ssh/authorized_keys', '/home/'+usernamea+'/.ssh/')
-                local('sudo chmod 700 /home/' + usernamea)
-                local('sudo chmod 700 /home/' + usernamea + '/.ssh')
-                local('sudo chmod 600 /home/' + usernamea + '/.ssh/id_rsa.pub')
+                local('sudo chmod 700 /' + usernamea)
+                local('sudo chmod 700 /' + usernamea + '/.ssh')
+                local('sudo chmod 600 /' + usernamea + '/.ssh/id_rsa.pub')
 
         else:
             key_file = '/home/' + usernamea + '/.ssh/id_rsa.pub'
@@ -534,18 +534,18 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
             key_file = '/' + usernamea + '/.ssh/id_rsa.pub'
             key_text = key_read_file(key_file)
             if exists('/' + usernamea + '/.ssh/authorized_keys', use_sudo=True):
-                local('sudo chmod 701 /home/' + usernamea)
-                local('sudo chmod 741 /home/' + usernamea + '/.ssh')
-                local('sudo chmod 604 /home/' + usernamea + '/.ssh/id_rsa.pub')
+                local('sudo chmod 701 /' + usernamea)
+                local('sudo chmod 741 /' + usernamea + '/.ssh')
+                local('sudo chmod 604 /' + usernamea + '/.ssh/id_rsa.pub')
                 print colored('#########################################', 'blue')
                 print colored('##### authorized_keys file exists #######', 'blue')
                 print colored('#########################################', 'blue')
                 sed('/' + usernamea + '/.ssh/authorized_keys', key_text, '', limit='', use_sudo=True, backup='.bak', flags='',
                         shell=False)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
-                local('sudo chmod 700 /home/' + usernamea)
-                local('sudo chmod 700 /home/' + usernamea + '/.ssh')
-                local('sudo chmod 600 /home/' + usernamea + '/.ssh/id_rsa.pub')
+                local('sudo chmod 700 /' + usernamea)
+                local('sudo chmod 700 /' + usernamea + '/.ssh')
+                local('sudo chmod 600 /' + usernamea + '/.ssh/id_rsa.pub')
             else:
                 print colored('#######################################################################################', 'yellow')
                 print colored('##### '+usernamea+' authorized_keys server:' + env.host + ' file does NOT exists ######', 'yellow')
