@@ -480,9 +480,6 @@ In the localhost read and return as a string the public ssh key file given as pa
             local('sudo chmod 604 /' + username + '/.ssh/id_rsa.pub')
             with open(key_file) as pyfile:
                 return pyfile.read()
-                local('sudo chmod 700 /' + username)
-                local('sudo chmod 700 /' + username + '/.ssh')
-                local('sudo chmod 600 /' + username + '/.ssh/id_rsa.pub')
         else:
             if not key_file.endswith('pub'):
                 raise RuntimeWarning('Trying to push non-public part of key pair')
@@ -562,10 +559,9 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
                 print colored('##### authorized_keys file exists #######', 'blue')
                 print colored('#########################################', 'blue')
                 key_text = key_text.replace("/", "\/")
-                key_clean = ""
-                #sudo('sed -i -e \'s/' + key_text + '//g\' /' + usernamea + '/.ssh/authorized_keys')
-                sed('/' + usernamea + '/.ssh/authorized_keys', key_text, key_clean,
-                    limit='', use_sudo=True, backup='.bak', flags='', shell=False)
+                sudo('sed -i -e \'s/' + key_text + '//g\' /' + usernamea + '/.ssh/authorized_keys')
+                # sed('/' + usernamea + '/.ssh/authorized_keys', key_text, key_clean,
+                #    limit='', use_sudo=True, backup='.bak', flags='', shell=False)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /' + usernamea + '/.ssh/')
                 local('sudo chmod 700 /' + usernamea)
                 local('sudo chmod 700 /' + usernamea + '/.ssh')
@@ -2320,22 +2316,22 @@ It's a must to have in every server the rsync package already installed!
         print colored('SYNC: Apache Config Files', 'blue')
         print colored('=========================', 'blue')
         rsync_data_to_server_v2(data_dir, data_dir + 'etc-httpd.2016-09-29-14-54-19.tar.gz',
-                                data_dir + 'etc/httpd/', remote_dir)
+                                data_dir + 'etc/httpd/', remote_dir + '/etc/httpd/')
 
         print colored('======================', 'blue')
         print colored('SYNC: PHP Config Files', 'blue')
         print colored('======================', 'blue')
         file_send_oldmod(data_dir, remote_dir)
         rsync_data_to_server_v2(data_dir, data_dir + 'etc-php.d.2016-09-29-14-54-19.tar.gz',
-                                data_dir + 'etc/php.d/', remote_dir)
+                                data_dir + 'etc/php.d/', remote_dir + '/etc/php.d/')
         rsync_data_to_server_v2(data_dir, data_dir + 'usr-include-php.2016-09-29-14-54-20.tar.gz',
-                                data_dir + 'usr/include/php/', remote_dir)
+                                data_dir + 'usr/include/php/', remote_dir + '/usr/include/php/')
 
         print colored('=============================', 'blue')
         print colored('SYNC: Shibboleth Config Files', 'blue')
         print colored('=============================', 'blue')
         rsync_data_to_server_v2(data_dir, data_dir + 'etc-shibboleth.2016-09-29-14-54-20.tar.gz',
-                                data_dir + 'etc/shibboleth/', remote_dir)
+                                data_dir + 'etc/shibboleth/', remote_dir + '/etc/shibboleth/')
         key_remove("root")
 
 
