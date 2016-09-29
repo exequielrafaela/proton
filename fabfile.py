@@ -394,11 +394,12 @@ Generate an SSH key for a certain user
 Remember that this task it's intended to be run with role "local"
     :param usernameg: "username" to change password
     """
-    global user_exists
+    # global user_exists
     with settings(warn_only=False):
         # usernameg = prompt("Which USERNAME you like to GEN KEYS?")
         # user_exists = sudo('cut -d: -f1 /etc/passwd | grep '+usernameg)
         # user_exists = sudo('cat /etc/passwd | grep ' + usernameg)
+        # user_exists = ""
         try:
             user_struct = pwd.getpwnam(usernameg)
             user_exists = user_struct.pw_gecos.split(",")[0]
@@ -442,19 +443,23 @@ Remember that this task it's intended to be run with role "local"
                 sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
                 sudo('gpasswd -a ' + usernameg + ' wheel')
         except KeyError:
-            if user_exists == "" and usernameg != "root":
-                print colored('User ' + usernameg + ' does not exist', 'red')
-                print colored('#######################################################', 'blue')
-                print colored('Consider that we generate user: username pass: username', 'blue')
-                print colored('#######################################################', 'blue')
+            print colored('####################################', 'blue')
+            print colored('User ' + usernameg + 'does not exists', 'blue')
+            print colored('####################################', 'blue')
 
-                sudo('useradd ' + usernameg + ' -m -d /home/' + usernameg)
-                sudo('echo "' + usernameg + ':' + usernameg + '" | chpasswd')
-                sudo("ssh-keygen -t rsa -f /home/" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
-                sudo('chmod 755 /home/' + usernameg)
-                sudo('chmod 755 /home/' + usernameg + '/.ssh')
-                sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
-                sudo('gpasswd -a ' + usernameg + ' wheel')
+            # if user_exists == "" and usernameg != "root":
+            #     print colored('User ' + usernameg + ' does not exist', 'red')
+            #     print colored('#######################################################', 'blue')
+            #     print colored('Consider that we generate user: username pass: username', 'blue')
+            #     print colored('#######################################################', 'blue')
+            #
+            #     sudo('useradd ' + usernameg + ' -m -d /home/' + usernameg)
+            #     sudo('echo "' + usernameg + ':' + usernameg + '" | chpasswd')
+            #     sudo("ssh-keygen -t rsa -f /home/" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
+            #     sudo('chmod 755 /home/' + usernameg)
+            #     sudo('chmod 755 /home/' + usernameg + '/.ssh')
+            #     sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
+            #     sudo('gpasswd -a ' + usernameg + ' wheel')
 
 
 def key_read_file(key_file, username):
@@ -556,9 +561,9 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
                 print colored('#########################################', 'blue')
                 print colored('##### authorized_keys file exists #######', 'blue')
                 print colored('#########################################', 'blue')
-                key_text = key_text.replace("/","\/")
-                sudo('sed -i -e \'s/'+key_text+'//g\' /' + usernamea + '/.ssh/authorized_keys')
-                #sed('/' + usernamea + '/.ssh/authorized_keys', key_text, key_clean,
+                key_text = key_text.replace("/", "\/")
+                sudo('sed -i -e \'s/' + key_text + '//g\' /' + usernamea + '/.ssh/authorized_keys')
+                # sed('/' + usernamea + '/.ssh/authorized_keys', key_text, key_clean,
                 #    limit='', use_sudo=True, backup='.bak', flags='', shell=False)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /' + usernamea + '/.ssh/')
                 local('sudo chmod 700 /' + usernamea)
@@ -2296,6 +2301,8 @@ Remeber to genereta a key pair for root, if this does not exist since it's a
 mandatory prerequisite for this taks => fan -R local key_gen:root
     """
     with settings(warn_only=False):
+        key_append("root")
+
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('==========================', 'blue')
@@ -2322,6 +2329,7 @@ mandatory prerequisite for this taks => fan -R local key_gen:root
         print colored('=============================', 'blue')
         rsync_data_to_server_v2(data_dir, data_dir + 'etc-shibboleth.2016-09-29-14-54-20.tar.gz',
                                 data_dir + 'etc/shibboleth/', remote_dir)
+        key_remove("root")
 
 
 def rsync_data_to_server_v2(local_file_dir, local_file_path, local_rsync_dir, remote_dir):
