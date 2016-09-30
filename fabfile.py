@@ -1627,9 +1627,13 @@ LAMP Stack installation in Centos7 OS.
     """
     with settings(warn_only=False):
         sudo('yum update')
+        sudo('yum install epel-release')
         print colored('=================================', 'blue')
         print colored('INSTALLING : "APACHE2 WebqServer"', 'blue')
         print colored('=================================', 'blue')
+        # https://secure.kreationnext.com/support/the-perfect-server-centos-7-2-with-apache-postfix-dovecot-pure-ftpd-bind-and-ispconfig-3-1/
+        # MOD PYTHON COMPILE!!!
+        #
         try:
             sudo('yum install -y httpd-manual-2.2.3-91.el5.centos httpd-2.2.3-91.el5.centos')
             sudo('systemctl start httpd.service')
