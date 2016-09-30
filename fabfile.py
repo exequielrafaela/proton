@@ -2230,9 +2230,9 @@ fab -R devtest rsync_data_from_server()
                 # tar -czvf /path-to/other/directory/file.tar.gz file
                 # Consider tar | rsync // tar | scp // tar | netcat (insecure)
                 sudo('tar czvf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
-                local('sudo chmod 757 -R ' + data_dir)
+                #local('sudo chmod 757 -R ' + data_dir)
                 get(tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
-                local('sudo chmod 755 -R ' + data_dir)
+                #local('sudo chmod 755 -R ' + data_dir)
                 sudo('rm -rf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ')
 
             except SystemExit:
@@ -2240,7 +2240,7 @@ fab -R devtest rsync_data_from_server()
                 print colored('##### FAIL to GET' + migrate_dir + ' #####', 'red')
                 print colored('##########################################', 'red')
         else:
-            local('sudo mkdir -p ' + data_dir)
+            local('mkdir -p ' + data_dir)
             try:
                 print colored('#########################', 'blue')
                 print colored('####### GETING ' + migrate_dir + ' #######', 'blue')
@@ -2248,9 +2248,9 @@ fab -R devtest rsync_data_from_server()
                 date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
                 sudo('tar czvf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
-                local('sudo chmod 757 ' + data_dir )
+                #local('sudo chmod 757 ' + data_dir )
                 get(tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
-                local('sudo chmod 755 ' + data_dir)
+                #local('sudo chmod 755 ' + data_dir)
                 sudo('rm -rf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ')
 
             except SystemExit:
@@ -2279,9 +2279,9 @@ Download LAMP data using download_data_from_server task
         print colored('======================', 'blue')
         print colored('SYNC: PHP Config Files', 'blue')
         print colored('======================', 'blue')
-        local('sudo chmod 757 ' + data_dir + env.host)
+        #local('sudo chmod 757 ' + data_dir + env.host)
         get('/etc/php.ini', data_dir + env.host, use_sudo=True)
-        local('sudo chmod 755 ' + data_dir + env.host)
+        #local('sudo chmod 755 ' + data_dir + env.host)
         download_data_from_server(data_dir, '/etc/php.d/')
         download_data_from_server(data_dir, '/usr/include/php/')
 
