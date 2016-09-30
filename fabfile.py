@@ -2265,24 +2265,24 @@ Download LAMP data using download_data_from_server task
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('==========================', 'blue')
-        download_data_from_server('/tmp/', '/var/www/')
+        download_data_from_server(data_dir, '/var/www/')
 
         print colored('=========================', 'blue')
         print colored('SYNC: Apache Config Files', 'blue')
         print colored('=========================', 'blue')
-        download_data_from_server('/tmp/', '/etc/httpd/')
+        download_data_from_server(data_dir, '/etc/httpd/')
 
         print colored('======================', 'blue')
         print colored('SYNC: PHP Config Files', 'blue')
         print colored('======================', 'blue')
         get('/etc/php.ini', data_dir)
-        download_data_from_server('/tmp/', '/etc/php.d/')
-        download_data_from_server('/tmp/', '/usr/include/php/')
+        download_data_from_server(data_dir, '/etc/php.d/')
+        download_data_from_server(data_dir, '/usr/include/php/')
 
         print colored('=============================', 'blue')
         print colored('SYNC: Shibboleth Config Files', 'blue')
         print colored('=============================', 'blue')
-        download_data_from_server('/tmp/', '/etc/shibboleth/')
+        download_data_from_server(data_dir, '/etc/shibboleth/')
 
 
 def upload_lamp_from_server(data_dir, remote_dir):
@@ -2306,7 +2306,8 @@ It's a must to have in every server the rsync package already installed!
     """
     with settings(warn_only=False):
 
-        #key_gen("root")
+        key_gen("root")
+        #key_append("root")
 
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
