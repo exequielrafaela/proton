@@ -2260,7 +2260,6 @@ Download LAMP data using download_data_from_server task
     :param data_dir: Directory where the data it's going to be stored in the jumphost
     """
     with settings(warn_only=False):
-        data_dir = data_dir + env.host
 
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
