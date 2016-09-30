@@ -2324,22 +2324,22 @@ It's a must to have in every server the rsync package already installed!
         print colored('=========================', 'blue')
         print colored('SYNC: Apache Config Files', 'blue')
         print colored('=========================', 'blue')
-        rsync_data_to_server_v2(data_dir, data_dir + 'etc-httpd.2016-09-30-14-33-17.tar.gz',
+        rsync_data_to_server_v2(data_dir, data_dir + 'etc-httpd.2016-09-30-18-05-42.tar.gz',
                                 data_dir + 'etc/httpd/', remote_dir + '/etc/httpd/')
 
         print colored('======================', 'blue')
         print colored('SYNC: PHP Config Files', 'blue')
         print colored('======================', 'blue')
         file_send_oldmod(data_dir + 'php.ini', remote_dir + '/etc/')
-        rsync_data_to_server_v2(data_dir, data_dir + 'etc-php.d.2016-09-30-14-33-18.tar.gz',
+        rsync_data_to_server_v2(data_dir, data_dir + 'etc-php.d.2016-09-30-18-05-43.tar.gz',
                                 data_dir + 'etc/php.d/', remote_dir + '/etc/php.d/')
-        rsync_data_to_server_v2(data_dir, data_dir + 'usr-include-php.2016-09-30-14-33-18.tar.gz',
+        rsync_data_to_server_v2(data_dir, data_dir + 'usr-include-php.2016-09-30-18-05-43.tar.gz',
                                 data_dir + 'usr/include/php/', remote_dir + '/usr/include/php/')
 
         print colored('=============================', 'blue')
         print colored('SYNC: Shibboleth Config Files', 'blue')
         print colored('=============================', 'blue')
-        rsync_data_to_server_v2(data_dir, data_dir + 'etc-shibboleth.2016-09-30-14-33-19.tar.gz',
+        rsync_data_to_server_v2(data_dir, data_dir + 'etc-shibboleth.2016-09-30-18-05-44.tar.gz',
                                 data_dir + 'etc/shibboleth/', remote_dir + '/etc/shibboleth/')
         key_remove("root")
 
