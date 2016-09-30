@@ -2312,8 +2312,8 @@ It's a must to have in every server the rsync package already installed!
     """
     with settings(warn_only=False):
 
-        key_gen("root")
-        #key_append("root")
+        #key_gen("root")
+        key_append("root")
 
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
