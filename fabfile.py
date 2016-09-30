@@ -2228,6 +2228,7 @@ fab -R devtest rsync_data_from_server()
                 print colored('##########################################', 'blue')
                 date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
+                # Consider tar | rsync // tar | scp // tar | netcat (insecure)
                 sudo('tar czvf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
                 get(tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
                 sudo('rm -rf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ')
@@ -2256,7 +2257,7 @@ fab -R devtest rsync_data_from_server()
 def download_lamp_from_server(data_dir):
     """
 Download LAMP data using download_data_from_server task
-    :param data_dir: Directory where the data it's going to be stored
+    :param data_dir: Directory where the data it's going to be stored in the jumphost
     """
     with settings(warn_only=False):
         data_dir = data_dir + env.host
@@ -2305,32 +2306,33 @@ It's a must to have in every server the rsync package already installed!
     """
     with settings(warn_only=False):
 
+        #key_gen("root")
 
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('==========================', 'blue')
-        rsync_data_to_server_v2(data_dir, data_dir + 'var-www.2016-09-29-14-54-15.tar.gz',
+        rsync_data_to_server_v2(data_dir, data_dir + 'var-www.2016-09-30-14-31-39.tar.gz',
                                 data_dir + 'var/www/', remote_dir + '/var/www/')
 
         print colored('=========================', 'blue')
         print colored('SYNC: Apache Config Files', 'blue')
         print colored('=========================', 'blue')
-        rsync_data_to_server_v2(data_dir, data_dir + 'etc-httpd.2016-09-29-20-46-11.tar.gz',
+        rsync_data_to_server_v2(data_dir, data_dir + 'etc-httpd.2016-09-30-14-33-17.tar.gz',
                                 data_dir + 'etc/httpd/', remote_dir + '/etc/httpd/')
 
         print colored('======================', 'blue')
         print colored('SYNC: PHP Config Files', 'blue')
         print colored('======================', 'blue')
         file_send_oldmod(data_dir + 'php.ini', remote_dir + '/etc/')
-        rsync_data_to_server_v2(data_dir, data_dir + 'etc-php.d.2016-09-29-14-54-19.tar.gz',
+        rsync_data_to_server_v2(data_dir, data_dir + 'etc-php.d.2016-09-30-14-33-18.tar.gz',
                                 data_dir + 'etc/php.d/', remote_dir + '/etc/php.d/')
-        rsync_data_to_server_v2(data_dir, data_dir + 'usr-include-php.2016-09-29-14-54-20.tar.gz',
+        rsync_data_to_server_v2(data_dir, data_dir + 'usr-include-php.2016-09-30-14-33-18.tar.gz',
                                 data_dir + 'usr/include/php/', remote_dir + '/usr/include/php/')
 
         print colored('=============================', 'blue')
         print colored('SYNC: Shibboleth Config Files', 'blue')
         print colored('=============================', 'blue')
-        rsync_data_to_server_v2(data_dir, data_dir + 'etc-shibboleth.2016-09-29-14-54-20.tar.gz',
+        rsync_data_to_server_v2(data_dir, data_dir + 'etc-shibboleth.2016-09-30-14-33-19.tar.gz',
                                 data_dir + 'etc/shibboleth/', remote_dir + '/etc/shibboleth/')
         key_remove("root")
 
