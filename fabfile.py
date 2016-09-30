@@ -2264,7 +2264,7 @@ Download LAMP data using download_data_from_server task
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('==========================', 'blue')
-        download_data_from_server(data_dir, '/var/www/')
+        download_data_from_server('/tmp/', '/var/www/')
 
         print colored('=========================', 'blue')
         print colored('SYNC: Apache Config Files', 'blue')
