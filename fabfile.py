@@ -2279,7 +2279,9 @@ Download LAMP data using download_data_from_server task
         print colored('======================', 'blue')
         print colored('SYNC: PHP Config Files', 'blue')
         print colored('======================', 'blue')
+        local('sudo chmod 757 -R ' + data_dir)
         get('/etc/php.ini', data_dir + env.host, use_sudo=True)
+        local('sudo chmod 755 -R ' + data_dir)
         download_data_from_server(data_dir, '/etc/php.d/')
         download_data_from_server(data_dir, '/usr/include/php/')
 
