@@ -2313,34 +2313,34 @@ It's a must to have in every server the rsync package already installed!
     with settings(warn_only=False):
 
         #key_gen("root")
-        key_append("root")
+        #key_append("root")
 
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('==========================', 'blue')
-        rsync_data_to_server_v2(data_dir, data_dir + 'var-www.2016-09-30-18-05-32.tar.gz',
+        rsync_data_to_server_v2(data_dir, data_dir + 'var-www.2016-09-30-15-00-16.tar.gz',
                                 data_dir + 'var/www/', remote_dir + 'var/www/')
 
         print colored('=========================', 'blue')
         print colored('SYNC: Apache Config Files', 'blue')
         print colored('=========================', 'blue')
-        rsync_data_to_server_v2(data_dir, data_dir + 'etc-httpd.2016-09-30-18-05-42.tar.gz',
-                                data_dir + 'etc/httpd/', remote_dir + '/etc/httpd/')
+        rsync_data_to_server_v2(data_dir, data_dir + 'etc-httpd.2016-09-30-15-36-19.tar.gz',
+                                data_dir + 'etc/httpd/', remote_dir + 'etc/httpd/')
 
         print colored('======================', 'blue')
         print colored('SYNC: PHP Config Files', 'blue')
         print colored('======================', 'blue')
-        file_send_oldmod(data_dir + 'php.ini', remote_dir + '/etc/')
-        rsync_data_to_server_v2(data_dir, data_dir + 'etc-php.d.2016-09-30-18-05-43.tar.gz',
-                                data_dir + 'etc/php.d/', remote_dir + '/etc/php.d/')
-        rsync_data_to_server_v2(data_dir, data_dir + 'usr-include-php.2016-09-30-18-05-43.tar.gz',
-                                data_dir + 'usr/include/php/', remote_dir + '/usr/include/php/')
+        #file_send_oldmod(data_dir + 'php.ini', remote_dir + '/etc/')
+        rsync_data_to_server_v2(data_dir, data_dir + 'etc-php.d.2016-09-30-15-36-47.tar.gz',
+                                data_dir + 'etc/php.d/', remote_dir + 'etc/php.d/')
+        rsync_data_to_server_v2(data_dir, data_dir + 'usr-include-php.2016-09-30-15-36-48.tar.gz',
+                                data_dir + 'usr/include/php/', remote_dir + 'usr/include/php/')
 
         print colored('=============================', 'blue')
         print colored('SYNC: Shibboleth Config Files', 'blue')
         print colored('=============================', 'blue')
-        rsync_data_to_server_v2(data_dir, data_dir + 'etc-shibboleth.2016-09-30-18-05-44.tar.gz',
-                                data_dir + 'etc/shibboleth/', remote_dir + '/etc/shibboleth/')
+        rsync_data_to_server_v2(data_dir, data_dir + 'etc-shibboleth.2016-09-30-15-36-51.tar.gz',
+                                data_dir + 'etc/shibboleth/', remote_dir + 'etc/shibboleth/')
         key_remove("root")
 
 
