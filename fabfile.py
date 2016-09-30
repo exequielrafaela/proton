@@ -2319,7 +2319,7 @@ It's a must to have in every server the rsync package already installed!
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('==========================', 'blue')
         rsync_data_to_server_v2(data_dir, data_dir + 'var-www.2016-09-30-18-05-32.tar.gz',
-                                data_dir + 'var/www/', remote_dir + '/var/www/')
+                                data_dir + 'var/www/', remote_dir + 'var/www/')
 
         print colored('=========================', 'blue')
         print colored('SYNC: Apache Config Files', 'blue')
