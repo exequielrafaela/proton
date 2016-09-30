@@ -2238,7 +2238,7 @@ fab -R devtest rsync_data_from_server()
                 print colored('##### FAIL to GET' + migrate_dir + ' #####', 'red')
                 print colored('##########################################', 'red')
         else:
-            local('mkdir -p ' + data_dir)
+            local('sudo mkdir -p ' + data_dir)
             try:
                 print colored('#########################', 'blue')
                 print colored('####### GETING ' + migrate_dir + ' #######', 'blue')
@@ -2264,7 +2264,7 @@ Download LAMP data using download_data_from_server task
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('==========================', 'blue')
-        download_data_from_server('/tmp/', '/var/www/')
+        download_data_from_server(data_dir, '/var/www/')
 
         print colored('=========================', 'blue')
         print colored('SYNC: Apache Config Files', 'blue')
