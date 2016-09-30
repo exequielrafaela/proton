@@ -2238,7 +2238,7 @@ fab -R devtest rsync_data_from_server()
                 print colored('##### FAIL to GET' + migrate_dir + ' #####', 'red')
                 print colored('##########################################', 'red')
         else:
-            local('sudo mkdir -p ' + data_dir)
+            local('mkdir -p ' + data_dir)
             try:
                 print colored('#########################', 'blue')
                 print colored('####### GETING ' + migrate_dir + ' #######', 'blue')
