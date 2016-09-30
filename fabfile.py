@@ -2230,7 +2230,9 @@ fab -R devtest rsync_data_from_server()
                 # tar -czvf /path-to/other/directory/file.tar.gz file
                 # Consider tar | rsync // tar | scp // tar | netcat (insecure)
                 sudo('tar czvf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
+                local('sudo chmod 757 -R ' + data_dir)
                 get(tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
+                local('sudo chmod 755 -R ' + data_dir)
                 sudo('rm -rf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ')
 
             except SystemExit:
@@ -2246,7 +2248,10 @@ fab -R devtest rsync_data_from_server()
                 date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
                 sudo('tar czvf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
+                local('sudo chmod 757 -R ' + data_dir )
                 get(tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
+                local('sudo chmod 755 -R ' + data_dir)
+                sudo('rm -rf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ')
 
             except SystemExit:
                 print colored('#############################################', 'red')
