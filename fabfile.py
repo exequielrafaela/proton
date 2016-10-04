@@ -1562,7 +1562,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
             sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction -u '
                  + mysql_user + ' -p --all-databases > ' + remote_dir + 'backup-' + date + '.sql')
             # check that the backup was created with a grep.
-            get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "." + env.host + '.sql',
+            get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-" + env.host + '.sql',
                 use_sudo=True)
             sudo('rm -rf ' + remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
         else:
