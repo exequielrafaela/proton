@@ -1569,7 +1569,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
             print colored('===================================================', 'red')
 
 
-def mysql_restore(mysqldump_fpath, mysql_ip="127.0.0.1"):
+def mysql_restore(local_mysqldump_fpath, remote_mysqldump_fpath, mysql_user, mysql_ip="127.0.0.1"):
     """
 MySQLdump restore
 IMPORTANT: Since the restore it's supouse to be run from a Jumphost (bastion) Server
@@ -1580,9 +1580,10 @@ eg: fab -R local mysql_restore:/tmp/backup-09-26-16.sql.172.17.2.30,10.0.4.30
     """
     with settings(warn_only=False):
         # CONSIDERAR PRIMERO SCP luego restor (security)
-        sudo('mysql -h ' + mysql_ip + ' -u root -p -e "show databases;"')
-        sudo('mysql -h ' + mysql_ip + ' -u root -p < ' + mysqldump_fpath)
-        sudo('mysql -h ' + mysql_ip + ' -u root -p -e "show databases;"')
+        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
+        file_send_oldmod(local_mysqldump_fpath, remote_mysqldump_fpath)
+        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p < ' + remote_mysqldump_fpath)
+        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
 
 
 def disk_usage(tree_dir='/'):
@@ -1642,6 +1643,7 @@ LAMP Stack installation in Centos7 OS.
             sudo('yum install -y httpd')
             sudo('systemctl start httpd.service')
             sudo('systemctl enable httpd.service')
+            sudo('chkconfig httpd on')
 
         print colored('===========================', 'blue')
         print colored('INSTALLING : "MYSQL Server"', 'blue')
