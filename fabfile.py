@@ -143,7 +143,7 @@ Send a file to the host/s mirroring local permissions
     eg: fab -R dev file_send_oldmod:path/to/edited/ssh_config,/etc/ssh/ssh_config
     """
     with settings(warn_only=False):
-        put(localpath, remotepath, mirror_local_mode=True)
+        put(localpath, remotepath, mirror_local_mode=True, use_sudo=True)
 
 
 def file_get(remotepath, localpath):
@@ -1574,7 +1574,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
 def mysql_restore_upgrade(mysqldump_fname, local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
     """
 MySQLdump restore
-eg: fab -R devtest mysql_restore:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,/tmp/,root,127.0.0.1
+eg: fab -R devtest mysql_restore_upgrade:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,/tmp/,root,127.0.0.1
     :param mysqldump_fname: mysqldump file name to be restored
     :param local_dir: mysqldump jumphost/bastion destination directory
     :param remote_dir: mysqldump remote host destination directory
