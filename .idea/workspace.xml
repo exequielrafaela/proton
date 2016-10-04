@@ -21,12 +21,12 @@
     <favorites_list name="proton" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="fabfile.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/fabfile.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="540">
-              <caret line="1584" column="0" selection-start-line="1584" selection-start-column="0" selection-end-line="1584" selection-end-column="0" />
+            <state relative-caret-position="333">
+              <caret line="1589" column="80" selection-start-line="1589" selection-start-column="80" selection-end-line="1589" selection-end-column="80" />
               <folding>
                 <element signature="e#1334#1402#0" expanded="true" />
                 <element signature="e#2668#3239#0" expanded="false" />
@@ -64,58 +64,14 @@
                 <element signature="e#77496#78366#0" expanded="false" />
                 <element signature="e#78462#79726#0" expanded="false" />
                 <element signature="e#79805#80823#0" expanded="false" />
-                <element signature="e#84011#86122#0" expanded="false" />
-                <element signature="e#86157#92966#0" expanded="false" />
-                <element signature="e#93004#96461#0" expanded="false" />
-                <element signature="e#96537#96797#0" expanded="false" />
-                <element signature="e#96850#109327#0" expanded="false" />
-                <element signature="e#109378#120582#0" expanded="false" />
-                <element signature="e#120668#124095#0" expanded="false" />
-                <element signature="e#124143#125530#0" expanded="false" />
-                <element signature="e#125588#128103#0" expanded="false" />
-                <element signature="e#128201#131373#0" expanded="false" />
-                <element signature="e#128910#131373#0" expanded="false" />
-                <element signature="e#131376#132541#1" expanded="false" />
-                <element signature="e#132543#142616#1" expanded="false" />
-                <element signature="e#142618#152101#1" expanded="false" />
-                <element signature="e#152103#156875#1" expanded="false" />
+                <element signature="e#80905#82736#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="connect-stg.conf" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/conf/connect-stg/connect-stg.conf">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="connect-stg-my.cnf" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/conf/connect-stg/connect-stg-my.cnf">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="connect-prd.conf" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/conf/connect-prd/connect-prd.conf">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="connect-prd-my.cnf" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/conf/connect-prd/connect-prd-my.cnf">
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
               <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -167,6 +123,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
@@ -188,7 +145,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -349,20 +305,20 @@
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32933334" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32933334" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32933334" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32933334" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
@@ -385,6 +341,84 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/fabfile.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#1334#1402#0" expanded="true" />
+            <element signature="e#2668#3239#0" expanded="false" />
+            <element signature="e#3264#3407#0" expanded="false" />
+            <element signature="e#3432#3604#0" expanded="false" />
+            <element signature="e#3649#4063#0" expanded="false" />
+            <element signature="e#4119#4462#0" expanded="false" />
+            <element signature="e#4514#4834#0" expanded="false" />
+            <element signature="e#4878#5148#0" expanded="false" />
+            <element signature="e#5178#5397#0" expanded="false" />
+            <element signature="e#5425#5638#0" expanded="false" />
+            <element signature="e#5679#9253#0" expanded="false" />
+            <element signature="e#9294#15227#0" expanded="false" />
+            <element signature="e#15266#17069#0" expanded="false" />
+            <element signature="e#17111#18253#0" expanded="false" />
+            <element signature="e#18284#23011#0" expanded="false" />
+            <element signature="e#23057#24024#0" expanded="false" />
+            <element signature="e#24058#27421#0" expanded="false" />
+            <element signature="e#27455#31169#0" expanded="false" />
+            <element signature="e#31201#34466#0" expanded="false" />
+            <element signature="e#34500#35358#0" expanded="false" />
+            <element signature="e#35397#38001#0" expanded="false" />
+            <element signature="e#38062#41570#0" expanded="false" />
+            <element signature="e#41610#44079#0" expanded="false" />
+            <element signature="e#44179#55788#0" expanded="false" />
+            <element signature="e#55843#56622#0" expanded="false" />
+            <element signature="e#56662#58425#0" expanded="false" />
+            <element signature="e#58480#59267#0" expanded="false" />
+            <element signature="e#59306#61233#0" expanded="false" />
+            <element signature="e#61271#66255#0" expanded="false" />
+            <element signature="e#66282#73240#0" expanded="false" />
+            <element signature="e#73283#75791#0" expanded="false" />
+            <element signature="e#75854#76777#0" expanded="false" />
+            <element signature="e#76836#77404#0" expanded="false" />
+            <element signature="e#77496#78366#0" expanded="false" />
+            <element signature="e#78462#79726#0" expanded="false" />
+            <element signature="e#79805#80823#0" expanded="false" />
+            <element signature="e#80905#82736#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/conf/connect-stg/connect-stg.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/conf/connect-stg/connect-stg-my.cnf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/conf/connect-prd/connect-prd.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/conf/connect-prd/connect-prd-my.cnf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/fabfile.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="445">
@@ -426,21 +460,7 @@
             <element signature="e#77496#78366#0" expanded="false" />
             <element signature="e#78462#79726#0" expanded="false" />
             <element signature="e#79805#80823#0" expanded="false" />
-            <element signature="e#84011#86122#0" expanded="false" />
-            <element signature="e#86157#92966#0" expanded="false" />
-            <element signature="e#93004#96461#0" expanded="false" />
-            <element signature="e#96537#96797#0" expanded="false" />
-            <element signature="e#96850#109327#0" expanded="false" />
-            <element signature="e#109378#120582#0" expanded="false" />
-            <element signature="e#120668#124095#0" expanded="false" />
-            <element signature="e#124143#125530#0" expanded="false" />
-            <element signature="e#125588#128103#0" expanded="false" />
-            <element signature="e#128201#131373#0" expanded="false" />
-            <element signature="e#128910#131373#0" expanded="false" />
-            <element signature="e#131376#132541#1" expanded="false" />
-            <element signature="e#132543#142616#1" expanded="false" />
-            <element signature="e#142618#152101#1" expanded="false" />
-            <element signature="e#152103#156875#1" expanded="false" />
+            <element signature="e#80905#82736#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -518,21 +538,7 @@
             <element signature="e#77496#78366#0" expanded="false" />
             <element signature="e#78462#79726#0" expanded="false" />
             <element signature="e#79805#80823#0" expanded="false" />
-            <element signature="e#84011#86122#0" expanded="false" />
-            <element signature="e#86157#92966#0" expanded="false" />
-            <element signature="e#93004#96461#0" expanded="false" />
-            <element signature="e#96537#96797#0" expanded="false" />
-            <element signature="e#96850#109327#0" expanded="false" />
-            <element signature="e#109378#120582#0" expanded="false" />
-            <element signature="e#120668#124095#0" expanded="false" />
-            <element signature="e#124143#125530#0" expanded="false" />
-            <element signature="e#125588#128103#0" expanded="false" />
-            <element signature="e#128201#131373#0" expanded="false" />
-            <element signature="e#128910#131373#0" expanded="false" />
-            <element signature="e#131376#132541#1" expanded="false" />
-            <element signature="e#132543#142616#1" expanded="false" />
-            <element signature="e#142618#152101#1" expanded="false" />
-            <element signature="e#152103#156875#1" expanded="false" />
+            <element signature="e#80905#82736#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -578,21 +584,7 @@
             <element signature="e#77496#78366#0" expanded="false" />
             <element signature="e#78462#79726#0" expanded="false" />
             <element signature="e#79805#80823#0" expanded="false" />
-            <element signature="e#84011#86122#0" expanded="false" />
-            <element signature="e#86157#92966#0" expanded="false" />
-            <element signature="e#93004#96461#0" expanded="false" />
-            <element signature="e#96537#96797#0" expanded="false" />
-            <element signature="e#96850#109327#0" expanded="false" />
-            <element signature="e#109378#120582#0" expanded="false" />
-            <element signature="e#120668#124095#0" expanded="false" />
-            <element signature="e#124143#125530#0" expanded="false" />
-            <element signature="e#125588#128103#0" expanded="false" />
-            <element signature="e#128201#131373#0" expanded="false" />
-            <element signature="e#128910#131373#0" expanded="false" />
-            <element signature="e#131376#132541#1" expanded="false" />
-            <element signature="e#132543#142616#1" expanded="false" />
-            <element signature="e#142618#152101#1" expanded="false" />
-            <element signature="e#152103#156875#1" expanded="false" />
+            <element signature="e#80905#82736#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -638,21 +630,7 @@
             <element signature="e#77496#78366#0" expanded="false" />
             <element signature="e#78462#79726#0" expanded="false" />
             <element signature="e#79805#80823#0" expanded="false" />
-            <element signature="e#84011#86122#0" expanded="false" />
-            <element signature="e#86157#92966#0" expanded="false" />
-            <element signature="e#93004#96461#0" expanded="false" />
-            <element signature="e#96537#96797#0" expanded="false" />
-            <element signature="e#96850#109327#0" expanded="false" />
-            <element signature="e#109378#120582#0" expanded="false" />
-            <element signature="e#120668#124095#0" expanded="false" />
-            <element signature="e#124143#125530#0" expanded="false" />
-            <element signature="e#125588#128103#0" expanded="false" />
-            <element signature="e#128201#131373#0" expanded="false" />
-            <element signature="e#128910#131373#0" expanded="false" />
-            <element signature="e#131376#132541#1" expanded="false" />
-            <element signature="e#132543#142616#1" expanded="false" />
-            <element signature="e#142618#152101#1" expanded="false" />
-            <element signature="e#152103#156875#1" expanded="false" />
+            <element signature="e#80905#82736#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -698,21 +676,7 @@
             <element signature="e#77496#78366#0" expanded="false" />
             <element signature="e#78462#79726#0" expanded="false" />
             <element signature="e#79805#80823#0" expanded="false" />
-            <element signature="e#84011#86122#0" expanded="false" />
-            <element signature="e#86157#92966#0" expanded="false" />
-            <element signature="e#93004#96461#0" expanded="false" />
-            <element signature="e#96537#96797#0" expanded="false" />
-            <element signature="e#96850#109327#0" expanded="false" />
-            <element signature="e#109378#120582#0" expanded="false" />
-            <element signature="e#120668#124095#0" expanded="false" />
-            <element signature="e#124143#125530#0" expanded="false" />
-            <element signature="e#125588#128103#0" expanded="false" />
-            <element signature="e#128201#131373#0" expanded="false" />
-            <element signature="e#128910#131373#0" expanded="false" />
-            <element signature="e#131376#132541#1" expanded="false" />
-            <element signature="e#132543#142616#1" expanded="false" />
-            <element signature="e#142618#152101#1" expanded="false" />
-            <element signature="e#152103#156875#1" expanded="false" />
+            <element signature="e#80905#82736#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -726,22 +690,6 @@
       </provider>
     </entry>
     <entry file="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/conf/connect-prd/connect-prd.conf">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/conf/connect-prd/connect-prd-my.cnf">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/conf/connect-stg/connect-stg.conf">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -790,21 +738,7 @@
             <element signature="e#77496#78366#0" expanded="false" />
             <element signature="e#78462#79726#0" expanded="false" />
             <element signature="e#79805#80823#0" expanded="false" />
-            <element signature="e#84011#86122#0" expanded="false" />
-            <element signature="e#86157#92966#0" expanded="false" />
-            <element signature="e#93004#96461#0" expanded="false" />
-            <element signature="e#96537#96797#0" expanded="false" />
-            <element signature="e#96850#109327#0" expanded="false" />
-            <element signature="e#109378#120582#0" expanded="false" />
-            <element signature="e#120668#124095#0" expanded="false" />
-            <element signature="e#124143#125530#0" expanded="false" />
-            <element signature="e#125588#128103#0" expanded="false" />
-            <element signature="e#128201#131373#0" expanded="false" />
-            <element signature="e#128910#131373#0" expanded="false" />
-            <element signature="e#131376#132541#1" expanded="false" />
-            <element signature="e#132543#142616#1" expanded="false" />
-            <element signature="e#142618#152101#1" expanded="false" />
-            <element signature="e#152103#156875#1" expanded="false" />
+            <element signature="e#80905#82736#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -850,29 +784,39 @@
             <element signature="e#77496#78366#0" expanded="false" />
             <element signature="e#78462#79726#0" expanded="false" />
             <element signature="e#79805#80823#0" expanded="false" />
-            <element signature="e#84011#86122#0" expanded="false" />
-            <element signature="e#86157#92966#0" expanded="false" />
-            <element signature="e#93004#96461#0" expanded="false" />
-            <element signature="e#96537#96797#0" expanded="false" />
-            <element signature="e#96850#109327#0" expanded="false" />
-            <element signature="e#109378#120582#0" expanded="false" />
-            <element signature="e#120668#124095#0" expanded="false" />
-            <element signature="e#124143#125530#0" expanded="false" />
-            <element signature="e#125588#128103#0" expanded="false" />
-            <element signature="e#128201#131373#0" expanded="false" />
-            <element signature="e#128910#131373#0" expanded="false" />
-            <element signature="e#131376#132541#1" expanded="false" />
-            <element signature="e#132543#142616#1" expanded="false" />
-            <element signature="e#142618#152101#1" expanded="false" />
-            <element signature="e#152103#156875#1" expanded="false" />
+            <element signature="e#80905#82736#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/conf/connect-stg/connect-stg.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/conf/connect-prd/connect-prd-my.cnf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/fabfile.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="1584" column="0" selection-start-line="1584" selection-start-column="0" selection-end-line="1584" selection-end-column="0" />
+        <state relative-caret-position="333">
+          <caret line="1589" column="80" selection-start-line="1589" selection-start-column="80" selection-end-line="1589" selection-end-column="80" />
           <folding>
             <element signature="e#1334#1402#0" expanded="true" />
             <element signature="e#2668#3239#0" expanded="false" />
@@ -910,21 +854,7 @@
             <element signature="e#77496#78366#0" expanded="false" />
             <element signature="e#78462#79726#0" expanded="false" />
             <element signature="e#79805#80823#0" expanded="false" />
-            <element signature="e#84011#86122#0" expanded="false" />
-            <element signature="e#86157#92966#0" expanded="false" />
-            <element signature="e#93004#96461#0" expanded="false" />
-            <element signature="e#96537#96797#0" expanded="false" />
-            <element signature="e#96850#109327#0" expanded="false" />
-            <element signature="e#109378#120582#0" expanded="false" />
-            <element signature="e#120668#124095#0" expanded="false" />
-            <element signature="e#124143#125530#0" expanded="false" />
-            <element signature="e#125588#128103#0" expanded="false" />
-            <element signature="e#128201#131373#0" expanded="false" />
-            <element signature="e#128910#131373#0" expanded="false" />
-            <element signature="e#131376#132541#1" expanded="false" />
-            <element signature="e#132543#142616#1" expanded="false" />
-            <element signature="e#142618#152101#1" expanded="false" />
-            <element signature="e#152103#156875#1" expanded="false" />
+            <element signature="e#80905#82736#0" expanded="false" />
           </folding>
         </state>
       </provider>

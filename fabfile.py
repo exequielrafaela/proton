@@ -1571,7 +1571,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
             print colored('===================================================', 'red')
 
 
-def mysql_restore(mysqldump_fname, local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
+def mysql_restore_upgrade(mysqldump_fname, local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
     """
 MySQLdump restore
 eg: fab -R devtest mysql_restore:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,/tmp/,root,127.0.0.1
@@ -1582,12 +1582,12 @@ eg: fab -R devtest mysql_restore:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tm
     :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
-
         if os.path.isfile(local_dir + mysqldump_fname):
             sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
             if exists(remote_dir):
                 file_send_oldmod(local_dir + mysqldump_fname, remote_dir + mysqldump_fname)
                 sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p < ' + remote_dir + mysqldump_fname)
+                sudo('mysql_upgrade -h ' + mysql_ip + ' -u ' + mysql_user + ' -p')
                 sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
         else:
             print colored('===================================================', 'red')
