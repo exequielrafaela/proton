@@ -1534,7 +1534,7 @@ Grant MySQL remote conection from a certain host
 def mysql_backup(local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
     """
 MySQLdump backup
-fab -R devtest mysql_backup:172.28.128.4,/tmp/
+fab -R devtest mysql_backup:/tmp/,/tmp/,root,127.0.0.1
 NOTE: Consider that the role after -R hast to be the remote MySQL Server.
     :param local_dir: mysqldump jumphost/bastion destination directory
     :param remote_dir: mysqldump remote host destination directory
@@ -1562,7 +1562,8 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
             sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction -u '
                  + mysql_user + ' -p --all-databases > ' + remote_dir + 'backup-' + date + '.sql')
             # check that the backup was created with a grep.
-            file_get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
+            get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "." + env.host + '.sql',
+                use_sudo=True)
             sudo('rm -rf ' + remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
         else:
             print colored('===================================================', 'red')
@@ -1573,7 +1574,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
 def mysql_restore(mysqldump_fname, local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
     """
 MySQLdump restore
-eg: fab -R local mysql_restore:/tmp/backup-09-26-16.sql.172.17.2.30,10.0.4.30
+eg: fab -R
     :param mysqldump_fname: mysqldump file name to be restored
     :param local_dir: mysqldump jumphost/bastion destination directory
     :param remote_dir: mysqldump remote host destination directory
