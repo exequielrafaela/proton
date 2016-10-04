@@ -1574,7 +1574,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
 def mysql_restore(mysqldump_fname, local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
     """
 MySQLdump restore
-eg: fab -R
+eg: fab -R devtest mysql_restore:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,/tmp/,root,127.0.0.1
     :param mysqldump_fname: mysqldump file name to be restored
     :param local_dir: mysqldump jumphost/bastion destination directory
     :param remote_dir: mysqldump remote host destination directory
