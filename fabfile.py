@@ -1556,7 +1556,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
 
         # date = str(time.strftime("%x %X"))
         # date = date.replace("/", "-")
-        date = strftime("%Y-%m-%d-%H:%M:%S", gmtime())
+        date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
         if os.path.isdir(local_dir) and exists(remote_dir):
             sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction -u '
