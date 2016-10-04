@@ -1563,27 +1563,35 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
                  + mysql_user + ' -p --all-databases > ' + remote_dir + 'backup-' + date + '.sql')
             # check that the backup was created with a grep.
             file_get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
+            sudo('rm -rf ' + remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
         else:
             print colored('===================================================', 'red')
             print colored('Check that DIRs: ' + local_dir + ' & ' + remote_dir + ' do exist', 'red')
             print colored('===================================================', 'red')
 
 
-def mysql_restore(local_mysqldump_fpath, remote_mysqldump_fpath, mysql_user, mysql_ip="127.0.0.1"):
+def mysql_restore(mysqldump_fname, local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
     """
 MySQLdump restore
-IMPORTANT: Since the restore it's supouse to be run from a Jumphost (bastion) Server
-the role must be "local"
 eg: fab -R local mysql_restore:/tmp/backup-09-26-16.sql.172.17.2.30,10.0.4.30
-    :param mysqldump_fpath: mysqldump ".sql" file absolute path
+    :param mysqldump_fname: mysqldump file name to be restored
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param remote_dir: mysqldump remote host destination directory
+    :param mysql_user: MySQL Server Admin User
     :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
-        # CONSIDERAR PRIMERO SCP luego restor (security)
-        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
-        file_send_oldmod(local_mysqldump_fpath, remote_mysqldump_fpath)
-        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p < ' + remote_mysqldump_fpath)
-        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
+
+        if os.path.isfile(local_dir + mysqldump_fname):
+            sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
+            if exists(remote_dir):
+                file_send_oldmod(local_dir + mysqldump_fname, remote_dir + mysqldump_fname)
+                sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p < ' + remote_dir + mysqldump_fname)
+                sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
+        else:
+            print colored('===================================================', 'red')
+            print colored('Check that DIRs: ' + local_dir + mysqldump_fname + ' do exist', 'red')
+            print colored('===================================================', 'red')
 
 
 def disk_usage(tree_dir='/'):
