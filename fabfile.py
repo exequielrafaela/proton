@@ -1571,6 +1571,30 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
             print colored('===================================================', 'red')
 
 
+def mysql_restore_upgrade(mysqldump_fname, local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
+    """
+MySQLdump restore
+eg: fab -R devtest mysql_restore_upgrade:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,/tmp/,root,127.0.0.1
+    :param mysqldump_fname: mysqldump file name to be restored
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param remote_dir: mysqldump remote host destination directory
+    :param mysql_user: MySQL Server Admin User
+    :param mysql_ip: MySQL Server IP Address
+    """
+    with settings(warn_only=False):
+        if os.path.isfile(local_dir + mysqldump_fname):
+            sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
+            if exists(remote_dir):
+                file_send_oldmod(local_dir + mysqldump_fname, remote_dir + mysqldump_fname)
+                sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p < ' + remote_dir + mysqldump_fname)
+                sudo('mysql_upgrade -h ' + mysql_ip + ' -u ' + mysql_user + ' -p')
+                sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
+        else:
+            print colored('===================================================', 'red')
+            print colored('Check that DIRs: ' + local_dir + mysqldump_fname + ' do exist', 'red')
+            print colored('===================================================', 'red')
+
+
 def mysql_backup_db(local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
     """
 MySQLdump backup for a certain DB passed as argument
@@ -1618,7 +1642,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
             print colored('=========================================', 'red')
 
 
-def mysql_restore_upgrade(mysqldump_fname, local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
+def mysql_restore_db(mysqldump_fname, local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
     """
 MySQLdump restore
 eg: fab -R devtest mysql_restore_upgrade:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,/tmp/,root,127.0.0.1
@@ -1629,16 +1653,18 @@ eg: fab -R devtest mysql_restore_upgrade:backup-2016-10-04-16-13-10-172.28.128.4
     :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
-        if os.path.isfile(local_dir + mysqldump_fname):
-            sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
+        database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;" | grep ' + db_name)
+        if os.path.isfile(local_dir + mysqldump_fname) and database != "":
             if exists(remote_dir):
                 file_send_oldmod(local_dir + mysqldump_fname, remote_dir + mysqldump_fname)
                 sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p < ' + remote_dir + mysqldump_fname)
-                sudo('mysql_upgrade -h ' + mysql_ip + ' -u ' + mysql_user + ' -p')
                 sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
         else:
             print colored('===================================================', 'red')
             print colored('Check that DIRs: ' + local_dir + mysqldump_fname + ' do exist', 'red')
+            print colored('===================================================', 'red')
+            print colored('===================================================', 'red')
+            print colored('Database: ' + database + ' already exists', 'red')
             print colored('===================================================', 'red')
 
 
