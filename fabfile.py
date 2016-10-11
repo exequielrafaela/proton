@@ -1533,7 +1533,7 @@ Grant MySQL remote conection from a certain host
 
 def mysql_backup_all(local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
     """
-MySQLdump backup
+MySQLdump backup for all databases
 fab -R devtest mysql_backup:/tmp/,/tmp/,root,127.0.0.1
 NOTE: Consider that the role after -R hast to be the remote MySQL Server.
     :param local_dir: mysqldump jumphost/bastion destination directory
@@ -1573,7 +1573,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
 
 def mysql_backup_db(local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
     """
-MySQLdump backup
+MySQLdump backup for a certain DB passed as argument
 fab -R devtest mysql_backup:/tmp/,/tmp/,root,127.0.0.1
 NOTE: Consider that the role after -R hast to be the remote MySQL Server.
     :param local_dir: mysqldump jumphost/bastion destination directory
@@ -1600,7 +1600,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         # date = date.replace("/", "-")
         date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
-        if databse != "":
+        if database != "":
             if os.path.isdir(local_dir) and exists(remote_dir):
                 sudo('mysqldump -q -c --routines --triggers --single-transaction -h '+ mysql_ip +
                      ' -u ' +  + ' -p '+ db_name + ' > ' + remote_dir + 'backup-' + date + '.sql')
