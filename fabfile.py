@@ -2442,8 +2442,6 @@ Install php-5.3.29 in a CentOS7 Server
                 print colored('###########################################################', 'red')
                 print colored('###### PHP Sources will be downloaded and installed #######', 'red')
                 print colored('###########################################################', 'red')
-                run('wget -P /tmp/ https://packages.chef.io/stable/el/7/chefdk-0.17.17-1.el7.x86_64.rpm')
-                sudo('rpm -Uvh /tmp/chefdk-0.17.17-1.el7.x86_64.rpm')
                 sudo('wget "http://php.net/get/php-5.3.29.tar.gz/from/this/mirror"')
                 sudo('mv mirror php.tar.gz')
                 sudo('tar -xzf php.tar.gz')
