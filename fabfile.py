@@ -1603,7 +1603,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         if database != "":
             if os.path.isdir(local_dir) and exists(remote_dir):
                 sudo('mysqldump -q -c --routines --triggers --single-transaction -h '+ mysql_ip +
-                     ' -u ' +  + ' -p '+ db_name + ' > ' + remote_dir + 'backup-' + date + '.sql')
+                     ' -u ' + mysql_user + ' -p '+ db_name + ' > ' + remote_dir + 'backup-' + date + '.sql')
                 # check that the backup was created with a grep.
                 get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-" + env.host + '.sql',
                     use_sudo=True)
