@@ -1759,12 +1759,14 @@ Install custom list of packets
                  'http://download.opensuse.org/repositories/security://shibboleth/CentOS_7/security:shibboleth.repo')
             sudo('yum install -y shibboleth-2.5.6-3.1')
             sudo('systemctl start shibd.service')
+            sudo('chkconfig --levels 345 shibd on')
 
         except SystemExit:
             sudo('curl -o /etc/yum.repos.d/shibboleth.repo '
                  'http://download.opensuse.org/repositories/security://shibboleth/CentOS_7/security:shibboleth.repo')
             sudo('yum install -y shibboleth')
             sudo('systemctl start shibd.service')
+            sudo('chkconfig --levels 345 shibd on')
 
         print colored('===================', 'blue')
         print colored('INSTALLING : "CRON"', 'blue')
@@ -2411,6 +2413,44 @@ eg: fab -R devtest rsync_data_to_server_v2:/tmp/172.28.128.4/,/tmp/172.28.128.4/
             print colored('##### Check that files ' + local_file_path + 'exists #####', 'red')
             print colored('##########################################################', 'red')
 
+def php53_install_centos7():
+    """
+Install php-5.3.29 in a CentOS7 Server
+    """
+    with settings(warn_only=False):
+        with cd ('/usr/src'):
+            sudo('wget "http://php.net/get/php-5.3.29.tar.gz/from/this/mirror"')
+            sudo('mv mirror php.tar.gz')
+            sudo('tar -xzf php.tar.gz')
+            sudo('yum groupinstall \'Development Tools\'')
+            sudo('yum install -y libxml2-devel libXpm-devel gmp-devel libicu-devel t1lib-devel aspell-devel'
+                 ' openssl-devel openssl openssl-common bzip2-devel libcurl-devel libjpeg-devel libvpx-devel libpng-devel freetype-devel'
+                 ' readline-devel libtidy-devel libxslt-devel libmcrypt-devel pcre-devel curl-devel mysql-devel'
+                 ' ncurses-devel gettext-devel net-snmp-devel libevent-devel libtool-ltdl-devel libc-client-devel'
+                 ' postgresql-devel enchant-devel libpng-devel pam-devel libdb libdb-devel freetds-devel recode-devel'
+                 ' mod_ldap')
+
+            with cd ('php-5.3.29'):
+                sudo('./configure  --enable-cli --with-pgsql --with-curl --with-openssl --enable-pdo --with-gettext'
+                     ' --enable-mbstring --with-apxs2 --with-gd --with-zlib --with-ldap --with-pspell --with-mcrypt'
+                     ' --with-imap-ssl --with-tidy --with-enchant --enable-soap --with-mssql --with-mysql --with-mysqli'
+                     ' --enable-mbstring --enable-xml --enable-libxml --with-xmlrpc'
+                     ' --with-config-file-scan-dir=/etc/php.d/ --with-jpeg-dir=/lib64/ --with-libdir=lib64')
+                sudo('make')
+                sudo('make install')
+
+def php53_remove_centos7():
+    """
+Install php-5.3.29 in a CentOS7 Server
+    """
+    with settings(warn_only=False):
+        sudo('rm -rf /usr/local/bin/php')
+        sudo('rm -rf /usr/local/bin/phpize')
+        sudo('rm -rf /usr/local/bin/php-config')
+        sudo('rm -rf /usr/local/include/php')
+        sudo('rm -rf /usr/local/lib/php')
+        sudo('rm -rf /usr/local/man/man1/php*')
+        sudo('rm -rf /var/lib/php')
 
 """
 def iptables(action, ip_addr):
