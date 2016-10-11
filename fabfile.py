@@ -2424,7 +2424,7 @@ Install php-5.3.29 in a CentOS7 Server
              ' freetype-devel readline-devel libtidy-devel libxslt-devel libmcrypt-devel pcre-devel curl-devel'
              ' mysql-devel ncurses-devel gettext-devel net-snmp-devel libevent-devel libtool-ltdl-devel'
              ' libc-client-devel postgresql-devel enchant-devel libpng-devel pam-devel libdb libdb-devel'
-             ' freetds-devel recode-devel mod_ldap')
+             ' freetds-devel recode-devel mod_ldap httpd-devel')
         with cd ('/usr/src'):
             if exists('/usr/src/php-5.3.29', use_sudo=True):
                 print colored('###########################################', 'blue')
