@@ -1531,7 +1531,7 @@ Grant MySQL remote conection from a certain host
             print colored('===================', 'red')
 
 
-def mysql_backup(local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
+def mysql_backup_all(local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
     """
 MySQLdump backup
 fab -R devtest mysql_backup:/tmp/,/tmp/,root,127.0.0.1
@@ -1571,7 +1571,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
             print colored('===================================================', 'red')
 
 
-def mysql_db_backup(local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
+def mysql_backup_db(local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
     """
 MySQLdump backup
 fab -R devtest mysql_backup:/tmp/,/tmp/,root,127.0.0.1
@@ -1579,6 +1579,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
     :param local_dir: mysqldump jumphost/bastion destination directory
     :param remote_dir: mysqldump remote host destination directory
     :param mysql_user: MySQL Server Admin User
+    :param db_name: MySQL Server DB name to be backuped
     :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
@@ -1595,6 +1596,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         # +--------------------+
 
         # date = str(time.strftime("%x %X"))
+        # date = date.replace("/", "-")
         # date = date.replace("/", "-")
         date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
