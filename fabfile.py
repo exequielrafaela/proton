@@ -2418,26 +2418,45 @@ def php53_install_centos7():
 Install php-5.3.29 in a CentOS7 Server
     """
     with settings(warn_only=False):
+        sudo('yum groupinstall \'Development Tools\'')
+        sudo('yum install -y libxml2-devel libXpm-devel gmp-devel libicu-devel t1lib-devel aspell-devel'
+             ' openssl-devel openssl openssl-common bzip2-devel libcurl-devel libjpeg-devel libvpx-devel libpng-devel'
+             ' freetype-devel readline-devel libtidy-devel libxslt-devel libmcrypt-devel pcre-devel curl-devel'
+             ' mysql-devel ncurses-devel gettext-devel net-snmp-devel libevent-devel libtool-ltdl-devel'
+             ' libc-client-devel postgresql-devel enchant-devel libpng-devel pam-devel libdb libdb-devel'
+             ' freetds-devel recode-devel mod_ldap')
         with cd ('/usr/src'):
-            sudo('wget "http://php.net/get/php-5.3.29.tar.gz/from/this/mirror"')
-            sudo('mv mirror php.tar.gz')
-            sudo('tar -xzf php.tar.gz')
-            sudo('yum groupinstall \'Development Tools\'')
-            sudo('yum install -y libxml2-devel libXpm-devel gmp-devel libicu-devel t1lib-devel aspell-devel'
-                 ' openssl-devel openssl openssl-common bzip2-devel libcurl-devel libjpeg-devel libvpx-devel libpng-devel freetype-devel'
-                 ' readline-devel libtidy-devel libxslt-devel libmcrypt-devel pcre-devel curl-devel mysql-devel'
-                 ' ncurses-devel gettext-devel net-snmp-devel libevent-devel libtool-ltdl-devel libc-client-devel'
-                 ' postgresql-devel enchant-devel libpng-devel pam-devel libdb libdb-devel freetds-devel recode-devel'
-                 ' mod_ldap')
+            if exists('/usr/src/php-5.3.29', use_sudo=True):
+                print colored('###########################################', 'blue')
+                print colored('##### PHP Sources already downloaded ######', 'blue')
+                print colored('###########################################', 'blue')
+                with cd('php-5.3.29'):
+                    sudo('./configure  --enable-cli --with-pgsql --with-curl --with-openssl --enable-pdo --with-gettext'
+                         ' --enable-mbstring --with-apxs2 --with-gd --with-zlib --with-ldap --with-pspell --with-mcrypt'
+                         ' --with-imap-ssl --with-tidy --with-enchant --enable-soap --with-mssql --with-mysql --with-mysqli'
+                         ' --enable-mbstring --enable-xml --enable-libxml --with-xmlrpc'
+                         ' --with-config-file-scan-dir=/etc/php.d/ --with-jpeg-dir=/lib64/ --with-libdir=lib64')
+                    sudo('make')
+                    sudo('make install')
+            else:
+                print colored('###########################################################', 'red')
+                print colored('###### PHP Sources will be downloaded and installed #######', 'red')
+                print colored('###########################################################', 'red')
+                run('wget -P /tmp/ https://packages.chef.io/stable/el/7/chefdk-0.17.17-1.el7.x86_64.rpm')
+                sudo('rpm -Uvh /tmp/chefdk-0.17.17-1.el7.x86_64.rpm')
+                sudo('wget "http://php.net/get/php-5.3.29.tar.gz/from/this/mirror"')
+                sudo('mv mirror php.tar.gz')
+                sudo('tar -xzf php.tar.gz')
+                with cd('/usr/src/php-5.3.29'):
+                    sudo('./configure  --enable-cli --with-pgsql --with-curl --with-openssl --enable-pdo --with-gettext'
+                         ' --enable-mbstring --with-apxs2 --with-gd --with-zlib --with-ldap --with-pspell --with-mcrypt'
+                         ' --with-imap-ssl --with-tidy --with-enchant --enable-soap --with-mssql --with-mysql --with-mysqli'
+                         ' --enable-mbstring --enable-xml --enable-libxml --with-xmlrpc'
+                         ' --with-config-file-scan-dir=/etc/php.d/ --with-jpeg-dir=/lib64/ --with-libdir=lib64')
+                    sudo('make')
+                    sudo('make install')
 
-            with cd ('php-5.3.29'):
-                sudo('./configure  --enable-cli --with-pgsql --with-curl --with-openssl --enable-pdo --with-gettext'
-                     ' --enable-mbstring --with-apxs2 --with-gd --with-zlib --with-ldap --with-pspell --with-mcrypt'
-                     ' --with-imap-ssl --with-tidy --with-enchant --enable-soap --with-mssql --with-mysql --with-mysqli'
-                     ' --enable-mbstring --enable-xml --enable-libxml --with-xmlrpc'
-                     ' --with-config-file-scan-dir=/etc/php.d/ --with-jpeg-dir=/lib64/ --with-libdir=lib64')
-                sudo('make')
-                sudo('make install')
+
 
 def php53_remove_centos7():
     """
