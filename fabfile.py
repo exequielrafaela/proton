@@ -1571,6 +1571,51 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
             print colored('===================================================', 'red')
 
 
+def mysql_db_backup(local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
+    """
+MySQLdump backup
+fab -R devtest mysql_backup:/tmp/,/tmp/,root,127.0.0.1
+NOTE: Consider that the role after -R hast to be the remote MySQL Server.
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param remote_dir: mysqldump remote host destination directory
+    :param mysql_user: MySQL Server Admin User
+    :param mysql_ip: MySQL Server IP Address
+    """
+    with settings(warn_only=False):
+        database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;" | grep '+db_name)
+        # +--------------------+
+        # | Database           |
+        # +--------------------+
+        # | information_schema |
+        # | ggcc_prd           |
+        # | innodb             |
+        # | mysql              |
+        # | performance_schema |
+        # | tmp                |
+        # +--------------------+
+
+        # date = str(time.strftime("%x %X"))
+        # date = date.replace("/", "-")
+        date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
+        if databse != "":
+            if os.path.isdir(local_dir) and exists(remote_dir):
+                sudo('mysqldump -q -c --routines --triggers --single-transaction -h '+ mysql_ip +
+                     ' -u ' +  + ' -p '+ db_name + ' > ' + remote_dir + 'backup-' + date + '.sql')
+                # check that the backup was created with a grep.
+                get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-" + env.host + '.sql',
+                    use_sudo=True)
+                sudo('rm -rf ' + remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
+            else:
+                print colored('===================================================', 'red')
+                print colored('Check that DIRs: ' + local_dir + ' & ' + remote_dir + ' do exist', 'red')
+                print colored('===================================================', 'red')
+        else:
+            print colored('=========================================', 'red')
+            print colored('Database : ' + db_name + ' does not exist', 'red')
+            print colored('=========================================', 'red')
+
+
 def mysql_restore_upgrade(mysqldump_fname, local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
     """
 MySQLdump restore
@@ -2413,6 +2458,7 @@ eg: fab -R devtest rsync_data_to_server_v2:/tmp/172.28.128.4/,/tmp/172.28.128.4/
             print colored('##### Check that files ' + local_file_path + 'exists #####', 'red')
             print colored('##########################################################', 'red')
 
+
 def php53_install_centos7():
     """
 Install php-5.3.29 in a CentOS7 Server
@@ -2455,10 +2501,9 @@ Install php-5.3.29 in a CentOS7 Server
                     sudo('make install')
 
 
-
 def php53_remove_centos7():
     """
-Install php-5.3.29 in a CentOS7 Server
+Remove php-5.3.29 in a CentOS7 Server
     """
     with settings(warn_only=False):
         sudo('rm -rf /usr/local/bin/php')
@@ -2611,11 +2656,14 @@ def db_backup():
 
         DATE=`date +%Y-%m-%d`
         mysqldump -q -c --routines --triggers --single-transaction -h ggcc-prd.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p ggcc_prd > /ops/backups/ggcc_prd-$DATE.sql
+        mysqldump -q -c --routines --triggers --single-transaction -h ggcc-prd.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p ggcc_prd > /ops/backups/ggcc_prd-$DATE.sql
+
         #check that the backup was created with a grep.
 
         #mysql --defaults-file=scripts/conf/connect-stg/connect-stg-my.cnf -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -e "CREATE DATABASE grey_stg_v2"
         #mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "DROP DATABASE grey_stg_v2"
         mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "CREATE DATABASE ggcc_stg_v3"
+        mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "CREATE DATABASE ggcc_stg_v4"
         mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "show databases;"
         Enter password:
         +--------------------+
@@ -2633,6 +2681,9 @@ def db_backup():
 
         DATE=`date +%Y-%m-%d`
         mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p ggcc_stg_v3 < /ops/backups/ggcc_prd-$DATE.sql
+        mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p ggcc_stg_v4 < /ops/backups/ggcc-prd-$DATE.sql
+
+        mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "use ggcc_stg_v4; show tables;"
 
         THEN IN STG
         If User not created:
@@ -2645,6 +2696,7 @@ def db_backup():
 
         #To grant permisions for a certain user for a specific DB (for Connect)
         mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "grant all on ggcc_stg_v3.* to 'ggcc_stg_user'@'%';"
+        mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "grant all on ggcc_stg_v4.* to 'ggcc_stg_user'@'%';"
 
         #Remove the dump
 
