@@ -109,15 +109,16 @@ def load_configuration(conf_file, section, option):
     """
     Load configurations from file artemisa.conf
     """
+    global temp_parser
     with settings(warn_only=False):
         config_parser = ConfigParser.ConfigParser()
         try:
-            Temp = config_parser.read(conf_file)
-            print Temp
+            temp_parser = config_parser.read(conf_file)
+            print temp_parser
         except SystemExit:
             logging.critical("The configuration file artemisa.conf cannot be read.")
 
-        if Temp == []:
+        if temp_parser == []:
             logging.critical("The configuration file artemisa.conf cannot be read.")
             sys.exit(1)
         else:
@@ -127,7 +128,7 @@ def load_configuration(conf_file, section, option):
                     sys.exit(1)
 
                 # Gets the parameters of mysql
-                #self.mysql_section = Temp.GetConfigSection(config.CONFIG_SQL_DIR, "mysql")
+                #self.mysql_section = temp.GetConfigSection(config.CONFIG_SQL_DIR, "mysql")
                 #for options in option_list:
                 option_value = config_parser.get(section, option)
                 print "Section: " + section + " => " + option + " :" + option_value
@@ -1675,7 +1676,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
     """
     with settings(warn_only=False):
         password = password_base64_decode(password_enc)
-        database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "show databases;" | grep ' + db_name)
+        database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;" | grep ' + db_name)
         # +--------------------+
         # | Database           |
         # +--------------------+
@@ -1695,7 +1696,59 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         if database != "":
             if os.path.isdir(local_dir) and exists(remote_dir):
                 sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
-                     ' -u ' + mysql_user + ' -p' + password + db_name + ' > ' + remote_dir + 'backup-' + date + '.sql')
+                     ' -u ' + mysql_user + ' -p ' + db_name + ' > ' + remote_dir + 'backup-' + date + '.sql')
+                # check that the backup was created with a grep.
+                get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-" + env.host + '.sql',
+                    use_sudo=True)
+                sudo('rm -rf ' + remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
+            else:
+                print colored('===================================================', 'red')
+                print colored('Check that DIRs: ' + local_dir + ' & ' + remote_dir + ' do exist', 'red')
+                print colored('===================================================', 'red')
+        else:
+            print colored('=========================================', 'red')
+            print colored('Database : ' + db_name + ' does not exist', 'red')
+            print colored('=========================================', 'red')
+
+
+def mysql_backup_db_from_conf(local_dir, remote_dir, db_name, mysql_ip="127.0.0.1"):
+    """
+MySQLdump backup for a certain DB passed as argument
+fab -R devtest mysql_backup:/tmp/,/tmp/,root,127.0.0.1
+NOTE: Consider that the role after -R hast to be the remote MySQL Server.
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param remote_dir: mysqldump remote host destination directory
+    :param mysql_user: MySQL Server Admin User
+    :param db_name: MySQL Server DB name to be backuped
+    :param mysql_ip: MySQL Server IP Address
+    """
+    with settings(warn_only=False):
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "username")
+        mysql_password_enc = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "password")
+        password = password_base64_decode(mysql_password_enc)
+        database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                        ' -e "show databases;" | grep ' + db_name)
+        # +--------------------+
+        # | Database           |
+        # +--------------------+
+        # | information_schema |
+        # | ggcc_prd           |
+        # | innodb             |
+        # | mysql              |
+        # | performance_schema |
+        # | tmp                |
+        # +--------------------+
+
+        # date = str(time.strftime("%x %X"))
+        # date = date.replace("/", "-")
+        # date = date.replace("/", "-")
+        date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
+        if database != "":
+            if os.path.isdir(local_dir) and exists(remote_dir):
+                sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                     ' -u ' + mysql_user + ' -p' + password + ' ' + db_name + ' > ' +
+                     remote_dir + 'backup-' + date + '.sql')
                 # check that the backup was created with a grep.
                 get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-" + env.host + '.sql',
                     use_sudo=True)
