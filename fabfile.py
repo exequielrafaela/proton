@@ -132,12 +132,14 @@ def load_configuration(conf_file, section, option):
                 #for options in option_list:
                 option_value = config_parser.get(section, option)
                 print "Section: " + section + " => " + option + " :" + option_value
+                return str(option_value)
 
             except Exception, e:
                 logging.critical(
                     "The configuration file extensions.conf cannot be correctly read. Check it out carefully. "
                     "More info: " + str(e))
                 sys.exit(1)
+
 
 def command(cmd):
     """
@@ -2767,7 +2769,7 @@ Password base64 decode
     """
     with settings(warn_only=False):
         password = base64.b64decode(password_base64)
-        #print password
+        # print password
         return str(password)
 
 
