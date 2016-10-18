@@ -1893,16 +1893,14 @@ eg: fab -R devtest mysql_restore_to_new_db:backup-2016-10-04-16-13-10-172.28.128
             print colored('Database: ' + database + ' already exists', 'red')
             print colored('===================================================', 'red')
 
-def mysql_restore_rds_to_new_db(mysqldump_fname, local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
+def mysql_restore_rds_to_new_db(mysqldump_fname, local_dir, db_name):
     """
 MySQLdump restore
 eg: fab -R localhost mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,/tmp/,root,127.0.0.1
     :param mysqldump_fname: mysqldump file name to be restored
     :param local_dir: mysqldump jumphost/bastion destination directory
-    :param remote_dir: mysqldump remote host destination directory
-    :param mysql_user: MySQL Server Admin User
     :param db_name: MySQL Database name to be restored
-    :param mysql_ip: MySQL Server IP Address
+
     """
     with settings(warn_only=False):
         mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "host")
