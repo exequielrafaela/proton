@@ -1734,6 +1734,10 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
 
             date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
+            print colored('===================================================', 'red')
+            print colored('Check that DIRs: ' + local_dir + ' & ' + remote_dir + ' do exist', 'red')
+            print colored('===================================================', 'red')
+
             if database != "":
                 if os.path.isdir(local_dir) and exists(remote_dir):
                     sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
