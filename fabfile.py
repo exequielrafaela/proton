@@ -110,19 +110,18 @@ def LoadConfiguration():
     Load configurations from file artemisa.conf
     """
     with settings(warn_only=False):
-        config = ConfigParser.ConfigParser()
+        configparser = ConfigParser.ConfigParser()
         try:
-            Temp = config.read(config.MYSQL_CONFIG_FILE_PATH)
-        except:
+            Temp = configparser.read(config.MYSQL_CONFIG_FILE_PATH)
+        except SystemExit:
             logging.critical("The configuration file artemisa.conf cannot be read.")
-            sys.exit(1)
 
         if Temp == []:
             logging.critical("The configuration file artemisa.conf cannot be read.")
             sys.exit(1)
         else:
             try:
-                if len(config.sections()) == 0:
+                if len(configparser.sections()) == 0:
                     logging.critical("At least one extension must be defined in extensions.conf.")
                     sys.exit(1)
 
