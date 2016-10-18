@@ -109,7 +109,7 @@ def load_configuration(conf_file, section, option):
     """
     Load configurations from file artemisa.conf
     """
-    global temp_parser
+    temp_parser = ""
     with settings(warn_only=False):
         config_parser = ConfigParser.ConfigParser()
         try:
@@ -117,8 +117,7 @@ def load_configuration(conf_file, section, option):
             # print temp_parser
         except SystemExit:
             logging.critical("The configuration file artemisa.conf cannot be read.")
-
-        if temp_parser == []:
+        #if temp_parser == []:
             logging.critical("The configuration file artemisa.conf cannot be read.")
             sys.exit(1)
         else:
@@ -1665,7 +1664,7 @@ eg: fab -R devtest mysql_restore_upgrade:backup-2016-10-04-16-13-10-172.28.128.4
             print colored('===================================================', 'red')
 
 
-def mysql_backup_db(local_dir, remote_dir, mysql_user, db_name, password_enc, mysql_ip="127.0.0.1"):
+def mysql_backup_db(local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
     """
 MySQLdump backup for a certain DB passed as argument
 fab -R devtest mysql_backup:/tmp/,/tmp/,root,127.0.0.1
@@ -1674,7 +1673,6 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
     :param remote_dir: mysqldump remote host destination directory
     :param mysql_user: MySQL Server Admin User
     :param db_name: MySQL Server DB name to be backuped
-    :param password_enc: Base64 Encripted mysql password
     :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
@@ -1738,27 +1736,33 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
                 if os.path.isdir(local_dir) and exists(remote_dir):
                     sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
                          ' -u ' + mysql_user + ' -p' + password + ' ' + db_name + ' > ' +
-                        remote_dir + 'backup-' + date + '.sql')
+                         remote_dir + 'backup-' + date + '.sql')
                     # check that the backup was created with a grep.
 
-                    print colored('============================================================================','blue')
+                    print colored('============================================================================',
+                                  'blue')
                     print colored('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
                                   ' -u ' + mysql_user + ' -p ' + db_name + ' > ' +
                                   remote_dir + 'backup-' + date + '.sql', 'blue')
-                    print colored('============================================================================','blue')
+                    print colored('============================================================================',
+                                  'blue')
 
                     get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-" + env.host + '.sql',
                         use_sudo=True)
-                    print colored('============================================================================','blue')
-                    print colored('get('+ remote_dir + 'backup-' + date + '.sql,' + local_dir + 'backup-' + date + "-"
-                                      + env.host + '.sql', 'blue')
-                    print colored('============================================================================','blue')
+                    print colored('============================================================================',
+                                  'blue')
+                    print colored('get(' + remote_dir + 'backup-' + date + '.sql,' + local_dir + 'backup-' + date + "-"
+                                  + env.host + '.sql', 'blue')
+                    print colored('============================================================================',
+                                  'blue')
 
                     sudo('rm -rf ' + remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
-                    print colored('============================================================================','blue')
+                    print colored('============================================================================',
+                                  'blue')
                     print colored('rm -rf ' + remote_dir + 'backup-' + date + '.sql,' + local_dir + 'backup-' + date +
                                   '.sql', 'blue')
-                    print colored('============================================================================','blue')
+                    print colored('============================================================================',
+                                  'blue')
 
                 else:
                     print colored('===================================================', 'red')
@@ -1839,14 +1843,16 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
                 if os.path.isdir(local_dir):
                     sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
                          ' -u ' + mysql_user + ' -p' + password + ' ' + db_name + ' > ' + local_dir + db_name + '-bak-'
-                        + date + '.sql')
+                         + date + '.sql')
                     # check that the backup was created with a grep.
 
-                    print colored('============================================================================','blue')
+                    print colored('============================================================================',
+                                  'blue')
                     print colored('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
-                                  ' -u ' + mysql_user + ' -p ' + db_name + ' > '  + local_dir + db_name + '-bak-'
+                                  ' -u ' + mysql_user + ' -p ' + db_name + ' > ' + local_dir + db_name + '-bak-'
                                   + date + '.sql', 'blue')
-                    print colored('============================================================================','blue')
+                    print colored('============================================================================',
+                                  'blue')
                 else:
                     print colored('=============================================', 'red')
                     print colored('Check that DIRs: ' + local_dir + ' does exist', 'red')
@@ -1857,10 +1863,10 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
                 print colored('=========================================', 'red')
 
 
-def mysql_restore_db(mysqldump_fname, local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
+def mysql_restore_to_new_db(mysqldump_fname, local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
     """
 MySQLdump restore
-eg: fab -R devtest mysql_restore_upgrade:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,/tmp/,root,127.0.0.1
+eg: fab -R devtest mysql_restore_to_new_db:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,/tmp/,root,127.0.0.1
     :param mysqldump_fname: mysqldump file name to be restored
     :param local_dir: mysqldump jumphost/bastion destination directory
     :param remote_dir: mysqldump remote host destination directory
@@ -1883,6 +1889,40 @@ eg: fab -R devtest mysql_restore_upgrade:backup-2016-10-04-16-13-10-172.28.128.4
             print colored('===================================================', 'red')
             print colored('Check that DIRs: ' + local_dir + mysqldump_fname + ' do exist', 'red')
             print colored('===================================================', 'red')
+            print colored('===================================================', 'red')
+            print colored('Database: ' + database + ' already exists', 'red')
+            print colored('===================================================', 'red')
+
+def mysql_restore_rds_to_new_db(mysqldump_fname, local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
+    """
+MySQLdump restore
+eg: fab -R localhost mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,/tmp/,root,127.0.0.1
+    :param mysqldump_fname: mysqldump file name to be restored
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param remote_dir: mysqldump remote host destination directory
+    :param mysql_user: MySQL Server Admin User
+    :param db_name: MySQL Database name to be restored
+    :param mysql_ip: MySQL Server IP Address
+    """
+    with settings(warn_only=False):
+        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "host")
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "username")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "password"))
+        password = password_base64_decode(mysql_password_enc)
+        date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
+        database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                        ' -e "show databases;" | grep ' + db_name)
+        if os.path.isfile(local_dir + mysqldump_fname) and database != "":
+            sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + '-e "CREATE DATABASE '
+                 + db_name + date + ';"')
+            sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' '
+                 + db_name + date + ' < ' + local_dir + mysqldump_fname)
+            sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "show databases;"')
+        else:
+            print colored('===============================================================', 'red')
+            print colored('Check that file: ' + local_dir + mysqldump_fname + ' does exist', 'red')
+            print colored('===============================================================', 'red')
             print colored('===================================================', 'red')
             print colored('Database: ' + database + ' already exists', 'red')
             print colored('===================================================', 'red')
