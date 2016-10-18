@@ -32,6 +32,7 @@ from termcolor import colored
 from distutils.util import strtobool
 import logging
 import os
+import base64
 import re
 
 # import yum
@@ -2585,7 +2586,8 @@ Install php-5.3.29 in a CentOS7 Server
                 with cd('php-5.3.29'):
                     sudo('./configure  --enable-cli --with-pgsql --with-curl --with-openssl --enable-pdo --with-gettext'
                          ' --enable-mbstring --with-apxs2 --with-gd --with-zlib --with-ldap --with-pspell --with-mcrypt'
-                         ' --with-imap-ssl --with-tidy --with-enchant --enable-soap --with-mssql --with-mysql --with-mysqli'
+                         ' --with-imap-ssl --with-tidy --with-enchant --enable-soap --with-mssql --with-mysql'
+                         ' --with-mysqli'
                          ' --enable-mbstring --enable-xml --enable-libxml --with-xmlrpc'
                          ' --with-config-file-scan-dir=/etc/php.d/ --with-jpeg-dir=/lib64/ --with-libdir=lib64')
                     sudo('make')
@@ -2600,7 +2602,8 @@ Install php-5.3.29 in a CentOS7 Server
                 with cd('/usr/src/php-5.3.29'):
                     sudo('./configure  --enable-cli --with-pgsql --with-curl --with-openssl --enable-pdo --with-gettext'
                          ' --enable-mbstring --with-apxs2 --with-gd --with-zlib --with-ldap --with-pspell --with-mcrypt'
-                         ' --with-imap-ssl --with-tidy --with-enchant --enable-soap --with-mssql --with-mysql --with-mysqli'
+                         ' --with-imap-ssl --with-tidy --with-enchant --enable-soap --with-mssql --with-mysql'
+                         ' --with-mysqli'
                          ' --enable-mbstring --enable-xml --enable-libxml --with-xmlrpc'
                          ' --with-config-file-scan-dir=/etc/php.d/ --with-jpeg-dir=/lib64/ --with-libdir=lib64')
                     sudo('make')
@@ -2623,13 +2626,47 @@ Remove php-5.3.29 in a CentOS7 Server
 
 def password_hash(password):
     """
-Remove php-5.3.29 in a CentOS7 Server
+Password hash func
+    :param password: plaintext password to be hashed
     """
     with settings(warn_only=False):
-        hash = pbkdf2_sha256.encrypt(password, rounds=200000, salt_size=16)
-        plainpass = pbkdf2_sha256.decrypt(hash, rounds=200000, salt_size=16)
-        print plainpass
-        #return hash
+        hash_pass = pbkdf2_sha256.encrypt(password, rounds=200000, salt_size=16)
+        # plainpass = pbkdf2_sha256.decrypt(hash, rounds=200000, salt_size=16)
+        return hash_pass
+
+
+def password_hash_verify(password, hash_password):
+    """
+Password hash func
+    :param password: plaintext password to be hashed
+    :param hash_password: password hash of the pass to be verified
+    """
+    with settings(warn_only=False):
+        if pbkdf2_sha256.verify(password, hash_password):
+            print "Correct Pass"
+        else:
+            print "Incorrect Pass"
+
+
+def password_base64_encode(password):
+    """
+Password hash func
+    :param password: plaintext password to be hashed
+    """
+    with settings(warn_only=False):
+        password_base64 = base64.b64encode(password)
+        print password_base64
+
+
+def password_base64_decode(password_base64):
+    """
+Password hash func
+    :param password_base64: base64 encoded password
+    """
+    with settings(warn_only=False):
+        password = base64.b64decode(password_base64)
+        print password
+
 
 """
 def iptables(action, ip_addr):
