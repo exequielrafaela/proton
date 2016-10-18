@@ -1910,7 +1910,7 @@ eg: fab -R localhost mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.
         date = strftime("%Y_%m_%d_%H_%M_%S", gmtime())
 
         try:
-            with settings(warn_only=False):
+            with settings(warn_only=True):
                 database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
                             ' -e "show databases;" | grep ' + db_name)
                 print "DATABASE!!!!!: " + database + "ENDS HERE!!!!"
