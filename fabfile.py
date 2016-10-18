@@ -1814,17 +1814,17 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
             print colored('=========================================', 'red')
 
 
-def mysql_backup_db_rds_from_conf(local_dir, remote_dir, db_name, mysql_ip="127.0.0.1"):
+def mysql_backup_db_rds_from_conf(local_dir, db_name):
     """
 MySQLdump backup for a certain DB passed as argument
-fab -R localhost mysql_backup:/tmp/,/tmp/,root,127.0.0.1
+fab -R localhost mysql_backup:/tmp/,testdb
 NOTE: Consider that the role after -R hast to be the remote MySQL Server.
     :param local_dir: mysqldump jumphost/bastion destination directory
-    :param remote_dir: mysqldump remote host destination directory
     :param db_name: MySQL Server DB name to be backuped
-    :param mysql_ip: MySQL Server IP Address
+
     """
     with settings(warn_only=False):
+        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "host")
         mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "username")
         mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "password"))
         password = password_base64_decode(mysql_password_enc)
@@ -1836,35 +1836,21 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
             date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
             if database != "":
-                if os.path.isdir(local_dir) and exists(remote_dir):
+                if os.path.isdir(local_dir):
                     sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
-                         ' -u ' + mysql_user + ' -p' + password + ' ' + db_name + ' > ' +
-                        remote_dir + 'backup-' + date + '.sql')
+                         ' -u ' + mysql_user + ' -p' + password + ' ' + db_name + ' > ' + local_dir + db_name + '-bak-'
+                        + date + '.sql')
                     # check that the backup was created with a grep.
 
                     print colored('============================================================================','blue')
                     print colored('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
-                                  ' -u ' + mysql_user + ' -p ' + db_name + ' > ' +
-                                  remote_dir + 'backup-' + date + '.sql', 'blue')
+                                  ' -u ' + mysql_user + ' -p ' + db_name + ' > '  + local_dir + db_name + '-bak-'
+                                  + date + '.sql', 'blue')
                     print colored('============================================================================','blue')
-
-                    get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-" + env.host + '.sql',
-                        use_sudo=True)
-                    print colored('============================================================================','blue')
-                    print colored('get('+ remote_dir + 'backup-' + date + '.sql,' + local_dir + 'backup-' + date + "-"
-                                      + env.host + '.sql', 'blue')
-                    print colored('============================================================================','blue')
-
-                    sudo('rm -rf ' + remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
-                    print colored('============================================================================','blue')
-                    print colored('rm -rf ' + remote_dir + 'backup-' + date + '.sql,' + local_dir + 'backup-' + date +
-                                  '.sql', 'blue')
-                    print colored('============================================================================','blue')
-
                 else:
-                    print colored('===================================================', 'red')
-                    print colored('Check that DIRs: ' + local_dir + ' & ' + remote_dir + ' do exist', 'red')
-                    print colored('===================================================', 'red')
+                    print colored('=============================================', 'red')
+                    print colored('Check that DIRs: ' + local_dir + ' does exist', 'red')
+                    print colored('=============================================', 'red')
             else:
                 print colored('=========================================', 'red')
                 print colored('Database : ' + db_name + ' does not exist', 'red')
