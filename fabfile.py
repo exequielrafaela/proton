@@ -1911,8 +1911,9 @@ eg: fab -R localhost mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.
 
         database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
                         ' -e "show databases;" | grep ' + db_name)
+
         if os.path.isfile(local_dir + mysqldump_fname) and database != "":
-            sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + '-e "CREATE DATABASE '
+            sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "CREATE DATABASE '
                  + db_name + date + ';"')
             sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' '
                  + db_name + date + ' < ' + local_dir + mysqldump_fname)
