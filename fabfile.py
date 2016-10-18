@@ -376,7 +376,7 @@ Add a user in Debian/Ubuntu based OS
                 print colored('##############################', 'green')
                 print colored('"' + usernamec + '" already exists', 'green')
                 print colored('##############################', 'green')
-                #sudo('gpasswd -a ' + usernamec + ' wheel')
+                # sudo('gpasswd -a ' + usernamec + ' wheel')
             else:
                 print colored('#################################', 'green')
                 print colored('"' + usernamec + '" doesnt exists', 'green')
@@ -384,7 +384,7 @@ Add a user in Debian/Ubuntu based OS
                 print colored('##################################', 'green')
                 sudo('useradd ' + usernamec + ' -m -d /home/' + usernamec)
                 # sudo('echo "' + usernamec + ':' + usernamec + '" | chpasswd')
-                #sudo('gpasswd -a ' + usernamec + ' wheel')
+                # sudo('gpasswd -a ' + usernamec + ' wheel')
         except SystemExit:
             # else:
             print colored('######################################################', 'green')
@@ -1636,7 +1636,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
     :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
-        database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;" | grep '+db_name)
+        database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;" | grep ' + db_name)
         # +--------------------+
         # | Database           |
         # +--------------------+
@@ -1655,8 +1655,8 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
 
         if database != "":
             if os.path.isdir(local_dir) and exists(remote_dir):
-                sudo('mysqldump -q -c --routines --triggers --single-transaction -h '+ mysql_ip +
-                     ' -u ' + mysql_user + ' -p '+ db_name + ' > ' + remote_dir + 'backup-' + date + '.sql')
+                sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                     ' -u ' + mysql_user + ' -p ' + db_name + ' > ' + remote_dir + 'backup-' + date + '.sql')
                 # check that the backup was created with a grep.
                 get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-" + env.host + '.sql',
                     use_sudo=True)
@@ -1671,19 +1671,18 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
             print colored('=========================================', 'red')
 
 
-def mysql_backup_db_RDS(local_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
+def mysql_backup_db_rds(local_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
     """
 MySQLdump backup for a certain DB passed as argument
-fab -R devtest mysql_backup:/tmp/,/tmp/,root,127.0.0.1
+fab -R local mysql_backup:/tmp/,root,testdb,ggcc-prd.xxyyzzuuiioo.us-east-1.rds.amazonaws.com
 NOTE: Consider that the role after -R hast to be the remote MySQL Server.
     :param local_dir: mysqldump jumphost/bastion destination directory
-    :param remote_dir: mysqldump remote host destination directory
     :param mysql_user: MySQL Server Admin User
     :param db_name: MySQL Server DB name to be backuped
     :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
-        database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;" | grep '+ db_name)
+        database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;" | grep ' + db_name)
         # +--------------------+
         # | Database           |
         # +--------------------+
@@ -1702,8 +1701,9 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
 
         if database != "":
             if os.path.isdir(local_dir):
-                sudo('mysqldump -q -c --routines --triggers --single-transaction -h '+ mysql_ip +
-                     ' -u ' + mysql_user + ' -p '+ db_name + ' > ' + local_dir + 'backup-' + db_name + date + '.sql')
+                sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                     ' -u ' + mysql_user + ' -p ' + db_name + ' > ' + local_dir + 'backup-' + db_name + '-'
+                     + date + '.sql')
                 # check that the backup was created with a grep.
             else:
                 print colored('============================================', 'red')
@@ -1723,6 +1723,7 @@ eg: fab -R devtest mysql_restore_upgrade:backup-2016-10-04-16-13-10-172.28.128.4
     :param local_dir: mysqldump jumphost/bastion destination directory
     :param remote_dir: mysqldump remote host destination directory
     :param mysql_user: MySQL Server Admin User
+    :param db_name: MySQL Database name to be restored
     :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
@@ -1733,7 +1734,8 @@ eg: fab -R devtest mysql_restore_upgrade:backup-2016-10-04-16-13-10-172.28.128.4
             if exists(remote_dir):
                 file_send_oldmod(local_dir + mysqldump_fname, remote_dir + mysqldump_fname)
                 sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "CREATE DATABASE ' + db_name + date + ';"')
-                sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p ' + db_name + date  + ' < ' + remote_dir + mysqldump_fname)
+                sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p ' + db_name + date + ' < ' + remote_dir +
+                     mysqldump_fname)
                 sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
         else:
             print colored('===================================================', 'red')
@@ -1790,7 +1792,8 @@ LAMP Stack installation in Centos7 OS.
         print colored('=================================', 'blue')
         print colored('INSTALLING : "APACHE2 WebqServer"', 'blue')
         print colored('=================================', 'blue')
-        # https://secure.kreationnext.com/support/the-perfect-server-centos-7-2-with-apache-postfix-dovecot-pure-ftpd-bind-and-ispconfig-3-1/
+        # https://secure.kreationnext.com/support/the-perfect-server-centos-7-2-with-apache-
+        # postfix-dovecot-pure-ftpd-bind-and-ispconfig-3-1/
         # MOD PYTHON COMPILE!!!
         #
         try:
@@ -2396,9 +2399,9 @@ fab -R devtest rsync_data_from_server()
                 # tar -czvf /path-to/other/directory/file.tar.gz file
                 # Consider tar | rsync // tar | scp // tar | netcat (insecure)
                 sudo('tar czvf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
-                #local('sudo chmod 757 -R ' + data_dir)
+                # local('sudo chmod 757 -R ' + data_dir)
                 get(tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
-                #local('sudo chmod 755 -R ' + data_dir)
+                # local('sudo chmod 755 -R ' + data_dir)
                 sudo('rm -rf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ')
 
             except SystemExit:
@@ -2414,9 +2417,9 @@ fab -R devtest rsync_data_from_server()
                 date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
                 sudo('tar czvf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
-                #local('sudo chmod 757 ' + data_dir )
+                # local('sudo chmod 757 ' + data_dir )
                 get(tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
-                #local('sudo chmod 755 ' + data_dir)
+                # local('sudo chmod 755 ' + data_dir)
                 sudo('rm -rf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ')
 
             except SystemExit:
@@ -2431,7 +2434,6 @@ Download LAMP data using download_data_from_server task
     :param data_dir: Directory where the data it's going to be stored in the jumphost
     """
     with settings(warn_only=False):
-
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('==========================', 'blue')
@@ -2445,9 +2447,9 @@ Download LAMP data using download_data_from_server task
         print colored('======================', 'blue')
         print colored('SYNC: PHP Config Files', 'blue')
         print colored('======================', 'blue')
-        #local('sudo chmod 757 ' + data_dir + env.host)
+        # local('sudo chmod 757 ' + data_dir + env.host)
         get('/etc/php.ini', data_dir + env.host, use_sudo=True)
-        #local('sudo chmod 755 ' + data_dir + env.host)
+        # local('sudo chmod 755 ' + data_dir + env.host)
         download_data_from_server(data_dir, '/etc/php.d/')
         download_data_from_server(data_dir, '/usr/include/php/')
 
@@ -2477,9 +2479,8 @@ IMPORTANT 3:
 It's a must to have in every server the rsync package already installed!
     """
     with settings(warn_only=False):
-
-        #key_gen("root")
-        #key_append("root")
+        # key_gen("root")
+        # key_append("root")
 
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
@@ -2496,7 +2497,7 @@ It's a must to have in every server the rsync package already installed!
         print colored('======================', 'blue')
         print colored('SYNC: PHP Config Files', 'blue')
         print colored('======================', 'blue')
-        #file_send_oldmod(data_dir + 'php.ini', remote_dir + '/etc/')
+        # file_send_oldmod(data_dir + 'php.ini', remote_dir + '/etc/')
         rsync_data_to_server_v2(data_dir, data_dir + 'etc-php.d.2016-09-30-15-36-47.tar.gz',
                                 data_dir + 'etc/php.d/', remote_dir + 'etc/php.d/')
         rsync_data_to_server_v2(data_dir, data_dir + 'usr-include-php.2016-09-30-15-36-48.tar.gz',
@@ -2546,8 +2547,8 @@ eg: fab -R devtest rsync_data_to_server_v2:/tmp/172.28.128.4/,/tmp/172.28.128.4/
                         sudo('mkdir -p ' + remote_dir)
                         rsync_project(local_dir=local_rsync_dir, remote_dir=remote_dir,
                                       default_opts='-avzP --progress')
-                        local('sudo find '+local_file_dir+'* -type d | sudo xargs rm -rf --')
-                        #local('sudo rm -rf ' + local_rsync_dir[:-1])
+                        local('sudo find ' + local_file_dir + '* -type d | sudo xargs rm -rf --')
+                        # local('sudo rm -rf ' + local_rsync_dir[:-1])
 
                     except SystemExit:
                         print colored('#################################################################', 'red')
@@ -2575,7 +2576,7 @@ Install php-5.3.29 in a CentOS7 Server
              ' mysql-devel ncurses-devel gettext-devel net-snmp-devel libevent-devel libtool-ltdl-devel'
              ' libc-client-devel postgresql-devel enchant-devel libpng-devel pam-devel libdb libdb-devel'
              ' freetds-devel recode-devel mod_ldap httpd-devel')
-        with cd ('/usr/src'):
+        with cd('/usr/src'):
             if exists('/usr/src/php-5.3.29', use_sudo=True):
                 print colored('###########################################', 'blue')
                 print colored('##### PHP Sources already downloaded ######', 'blue')
@@ -2617,6 +2618,7 @@ Remove php-5.3.29 in a CentOS7 Server
         sudo('rm -rf /usr/local/lib/php')
         sudo('rm -rf /usr/local/man/man1/php*')
         sudo('rm -rf /var/lib/php')
+
 
 """
 def iptables(action, ip_addr):
