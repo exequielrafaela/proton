@@ -2652,6 +2652,12 @@ def password_base64_encode(password):
     """
 Password base64 encode
     :param password: plaintext password to be hashed
+
+    eg: [vagrant@server proton]$ fab -R local password_base64_encode:Testing!
+    [localhost] Executing task 'password_base64_encode'
+    VGVzdGluZyE=
+    Done.
+
     """
     with settings(warn_only=False):
         password_base64 = base64.b64encode(password)
@@ -2662,6 +2668,11 @@ def password_base64_decode(password_base64):
     """
 Password base64 decode
     :param password_base64: base64 encoded password
+
+    eg: [vagrant@server proton]$ fab -R local password_base64_decode:"VGVzdGluZyE\="
+    [localhost] Executing task 'password_base64_decode'
+    Testing!
+    Done.
     """
     with settings(warn_only=False):
         password = base64.b64decode(password_base64)
