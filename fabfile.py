@@ -129,9 +129,9 @@ def LoadConfiguration():
                 # Gets the parameters of mysql
                 #self.mysql_section = Temp.GetConfigSection(config.CONFIG_SQL_DIR, "mysql")
                 mysql_username = config_parser.get("mysql", "username")
-                print "mysql username" + str(mysql_username)
+                print "mysql username: " + str(mysql_username)
                 mysql_password = config_parser.get("mysql", "password")
-                print "mysql password" + str(mysql_password)
+                print "mysql password: " + str(mysql_password)
 
             except Exception, e:
                 logging.critical(
