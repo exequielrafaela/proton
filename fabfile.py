@@ -391,6 +391,7 @@ Add a user in Debian/Ubuntu based OS
             print colored('"' + usernamec + '" couldnt be created for some reason', 'green')
             print colored('######################################################', 'green')
 
+
 def change_pass(usernameu, upass):
     """
 Change RedHat/Centos based OS user password
