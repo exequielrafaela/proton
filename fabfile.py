@@ -1814,6 +1814,63 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
             print colored('=========================================', 'red')
 
 
+def mysql_backup_db_rds_from_conf(local_dir, remote_dir, db_name, mysql_ip="127.0.0.1"):
+    """
+MySQLdump backup for a certain DB passed as argument
+fab -R localhost mysql_backup:/tmp/,/tmp/,root,127.0.0.1
+NOTE: Consider that the role after -R hast to be the remote MySQL Server.
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param remote_dir: mysqldump remote host destination directory
+    :param db_name: MySQL Server DB name to be backuped
+    :param mysql_ip: MySQL Server IP Address
+    """
+    with settings(warn_only=False):
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "username")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "password"))
+        password = password_base64_decode(mysql_password_enc)
+
+        with hide('running', 'stdout'):
+            database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                            ' -e "show databases;" | grep ' + db_name)
+
+            date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
+            if database != "":
+                if os.path.isdir(local_dir) and exists(remote_dir):
+                    sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                         ' -u ' + mysql_user + ' -p' + password + ' ' + db_name + ' > ' +
+                        remote_dir + 'backup-' + date + '.sql')
+                    # check that the backup was created with a grep.
+
+                    print colored('============================================================================','blue')
+                    print colored('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                                  ' -u ' + mysql_user + ' -p ' + db_name + ' > ' +
+                                  remote_dir + 'backup-' + date + '.sql', 'blue')
+                    print colored('============================================================================','blue')
+
+                    get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-" + env.host + '.sql',
+                        use_sudo=True)
+                    print colored('============================================================================','blue')
+                    print colored('get('+ remote_dir + 'backup-' + date + '.sql,' + local_dir + 'backup-' + date + "-"
+                                      + env.host + '.sql', 'blue')
+                    print colored('============================================================================','blue')
+
+                    sudo('rm -rf ' + remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
+                    print colored('============================================================================','blue')
+                    print colored('rm -rf ' + remote_dir + 'backup-' + date + '.sql,' + local_dir + 'backup-' + date +
+                                  '.sql', 'blue')
+                    print colored('============================================================================','blue')
+
+                else:
+                    print colored('===================================================', 'red')
+                    print colored('Check that DIRs: ' + local_dir + ' & ' + remote_dir + ' do exist', 'red')
+                    print colored('===================================================', 'red')
+            else:
+                print colored('=========================================', 'red')
+                print colored('Database : ' + db_name + ' does not exist', 'red')
+                print colored('=========================================', 'red')
+
+
 def mysql_restore_db(mysqldump_fname, local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
     """
 MySQLdump restore
