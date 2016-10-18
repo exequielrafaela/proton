@@ -112,7 +112,7 @@ def LoadConfiguration():
     with settings(warn_only=False):
         config = ConfigParser.ConfigParser()
         try:
-            Temp = config.read(config.CONFIG_SQL_DIR)
+            Temp = config.read(config.MYSQL_CONFIG_FILE_PATH)
         except:
             logging.critical("The configuration file artemisa.conf cannot be read.")
             sys.exit(1)
@@ -129,9 +129,9 @@ def LoadConfiguration():
 
                 # Gets the parameters of mysql
                 #self.mysql_section = Temp.GetConfigSection(config.CONFIG_SQL_DIR, "mysql")
-                mysql_username = config.get("mysql", "username")
+                mysql_username = Temp.get("mysql", "username")
                 print "mysql username" + str(mysql_username)
-                mysql_password = config.get("mysql", "password")
+                mysql_password = Temp.get("mysql", "password")
                 print "mysql password" + str(mysql_password)
 
             except Exception, e:
