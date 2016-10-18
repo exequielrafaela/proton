@@ -117,27 +117,27 @@ def LoadConfiguration():
         except SystemExit:
             logging.critical("The configuration file artemisa.conf cannot be read.")
 
-            if Temp == []:
-                logging.critical("The configuration file artemisa.conf cannot be read.")
-                sys.exit(1)
-            else:
-                try:
-                    if len(config_parser.sections()) == 0:
-                        logging.critical("At least one extension must be defined in extensions.conf.")
-                        sys.exit(1)
-
-                    # Gets the parameters of mysql
-                    #self.mysql_section = Temp.GetConfigSection(config.CONFIG_SQL_DIR, "mysql")
-                    mysql_username = config_parser.get("mysql", "username")
-                    print "mysql username" + str(mysql_username)
-                    mysql_password = config_parser.get("mysql", "password")
-                    print "mysql password" + str(mysql_password)
-
-                except Exception, e:
-                    logging.critical(
-                        "The configuration file extensions.conf cannot be correctly read. Check it out carefully. "
-                        "More info: " + str(e))
+        if Temp == []:
+            logging.critical("The configuration file artemisa.conf cannot be read.")
+            sys.exit(1)
+        else:
+            try:
+                if len(config_parser.sections()) == 0:
+                    logging.critical("At least one extension must be defined in extensions.conf.")
                     sys.exit(1)
+
+                # Gets the parameters of mysql
+                #self.mysql_section = Temp.GetConfigSection(config.CONFIG_SQL_DIR, "mysql")
+                mysql_username = config_parser.get("mysql", "username")
+                print "mysql username" + str(mysql_username)
+                mysql_password = config_parser.get("mysql", "password")
+                print "mysql password" + str(mysql_password)
+
+            except Exception, e:
+                logging.critical(
+                    "The configuration file extensions.conf cannot be correctly read. Check it out carefully. "
+                    "More info: " + str(e))
+                sys.exit(1)
 
 def command(cmd):
     """
