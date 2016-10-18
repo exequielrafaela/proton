@@ -1671,6 +1671,50 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
             print colored('=========================================', 'red')
 
 
+def mysql_backup_db_RDS(local_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
+    """
+MySQLdump backup for a certain DB passed as argument
+fab -R devtest mysql_backup:/tmp/,/tmp/,root,127.0.0.1
+NOTE: Consider that the role after -R hast to be the remote MySQL Server.
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param remote_dir: mysqldump remote host destination directory
+    :param mysql_user: MySQL Server Admin User
+    :param db_name: MySQL Server DB name to be backuped
+    :param mysql_ip: MySQL Server IP Address
+    """
+    with settings(warn_only=False):
+        database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;" | grep '+ db_name)
+        # +--------------------+
+        # | Database           |
+        # +--------------------+
+        # | information_schema |
+        # | ggcc_prd           |
+        # | innodb             |
+        # | mysql              |
+        # | performance_schema |
+        # | tmp                |
+        # +--------------------+
+
+        # date = str(time.strftime("%x %X"))
+        # date = date.replace("/", "-")
+        # date = date.replace("/", "-")
+        date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
+        if database != "":
+            if os.path.isdir(local_dir):
+                sudo('mysqldump -q -c --routines --triggers --single-transaction -h '+ mysql_ip +
+                     ' -u ' + mysql_user + ' -p '+ db_name + ' > ' + local_dir + 'backup-' + db_name + date + '.sql')
+                # check that the backup was created with a grep.
+            else:
+                print colored('============================================', 'red')
+                print colored('Check that DIR: ' + local_dir + ' does exist', 'red')
+                print colored('============================================', 'red')
+        else:
+            print colored('=========================================', 'red')
+            print colored('Database : ' + db_name + ' does not exist', 'red')
+            print colored('=========================================', 'red')
+
+
 def mysql_restore_db(mysqldump_fname, local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
     """
 MySQLdump restore
