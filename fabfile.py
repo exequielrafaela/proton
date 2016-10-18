@@ -1929,9 +1929,9 @@ eg: fab -R localhost mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.
                 print colored('Check that file: ' + local_dir + mysqldump_fname + ' does exist', 'red')
                 print colored('===============================================================', 'red')
         except SystemExit:
-            print colored('==========================================', 'red')
-            print colored('Database: ' + database + ' does not exists', 'red')
-            print colored('==========================================', 'red')
+            print colored('=========================================', 'red')
+            print colored('Database: ' + db_name + ' does not exists', 'red')
+            print colored('=========================================', 'red')
 
 def disk_usage(tree_dir='/'):
     """
