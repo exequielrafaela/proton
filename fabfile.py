@@ -14,6 +14,7 @@
 |    - $ fab show_help for more information                             |
 ========================================================================
 """
+import sys
 
 """
 ORDER THE IMPORTS ALPHABETICALLY and DIVIDE IN 3 SECTIONS
@@ -41,6 +42,8 @@ import pwd
 import iptools
 import getpass
 import time
+import ConfigParser
+from optparse import OptionParser
 from time import gmtime, strftime
 from passlib.hash import pbkdf2_sha256
 
@@ -101,6 +104,41 @@ Show the fabric declared roles
     for key, value in sorted(env.roledefs.items()):
         print key, value
 
+
+def LoadConfiguration(self):
+    """
+    Load configurations from file artemisa.conf
+    """
+    with settings(warn_only=False):
+        config = ConfigParser.ConfigParser()
+        try:
+            Temp = config.read(config.CONFIG_SQL_DIR)
+        except:
+            logging.critical("The configuration file artemisa.conf cannot be read.")
+            sys.exit(1)
+
+        if Temp == []:
+            logging.critical("The configuration file artemisa.conf cannot be read.")
+            sys.exit(1)
+        else:
+            try:
+                if len(config.sections()) == 0:
+                    logging.critical("At least one extension must be defined in extensions.conf.")
+                    sys.exit(1)
+
+
+                # Gets the parameters of mysql
+                #self.mysql_section = Temp.GetConfigSection(config.CONFIG_SQL_DIR, "mysql")
+                self.mysql_username = Temp.get("mysql", "username")
+                print self.mysql_username
+                self.mysql_password = Temp.get("mysql", "password")
+                print self.mysql_password
+
+            except Exception, e:
+                logging.critical(
+                    "The configuration file extensions.conf cannot be correctly read. Check it out carefully. "
+                    "More info: " + str(e))
+                sys.exit(1)
 
 def command(cmd):
     """
@@ -1626,7 +1664,7 @@ eg: fab -R devtest mysql_restore_upgrade:backup-2016-10-04-16-13-10-172.28.128.4
             print colored('===================================================', 'red')
 
 
-def mysql_backup_db(local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
+def mysql_backup_db(local_dir, remote_dir, mysql_user, db_name, password_enc, mysql_ip="127.0.0.1"):
     """
 MySQLdump backup for a certain DB passed as argument
 fab -R devtest mysql_backup:/tmp/,/tmp/,root,127.0.0.1
@@ -1638,7 +1676,8 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
     :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
-        database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;" | grep ' + db_name)
+        password = password_base64_decode(password_enc)
+        database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "show databases;" | grep ' + db_name)
         # +--------------------+
         # | Database           |
         # +--------------------+
@@ -1658,7 +1697,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         if database != "":
             if os.path.isdir(local_dir) and exists(remote_dir):
                 sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
-                     ' -u ' + mysql_user + ' -p ' + db_name + ' > ' + remote_dir + 'backup-' + date + '.sql')
+                     ' -u ' + mysql_user + ' -p' + password + db_name + ' > ' + remote_dir + 'backup-' + date + '.sql')
                 # check that the backup was created with a grep.
                 get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-" + env.host + '.sql',
                     use_sudo=True)
@@ -2661,6 +2700,7 @@ Password base64 encode
     """
     with settings(warn_only=False):
         password_base64 = base64.b64encode(password)
+        return password_base64
         print password_base64
 
 
@@ -2677,6 +2717,7 @@ Password base64 decode
     with settings(warn_only=False):
         password = base64.b64decode(password_base64)
         print password
+        return password
 
 
 """
