@@ -1728,7 +1728,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "password"))
         password = password_base64_decode(mysql_password_enc)
 
-        with hide('running', 'stderr'):
+        with hide('running', 'stdout'):
             database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
                             ' -e "show databases;" | grep ' + db_name)
 
