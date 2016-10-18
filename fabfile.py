@@ -1896,7 +1896,7 @@ eg: fab -R devtest mysql_restore_to_new_db:backup-2016-10-04-16-13-10-172.28.128
 def mysql_restore_rds_to_new_db(mysqldump_fname, local_dir, db_name):
     """
 MySQLdump restore
-eg: fab -R localhost mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,/tmp/,root,127.0.0.1
+eg: fab -R localhost mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,testdb
     :param mysqldump_fname: mysqldump file name to be restored
     :param local_dir: mysqldump jumphost/bastion destination directory
     :param db_name: MySQL Database name to be restored
