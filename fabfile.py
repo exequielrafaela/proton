@@ -1907,16 +1907,16 @@ eg: fab -R localhost mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.
         mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "username")
         mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "password"))
         password = password_base64_decode(mysql_password_enc)
-        date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+        date = strftime("%Y_%m_%d_%H_%M_%S", gmtime())
 
         database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
                         ' -e "show databases;" | grep ' + db_name)
 
         if os.path.isfile(local_dir + mysqldump_fname) and database != "":
             sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "CREATE DATABASE '
-                 + db_name + date + ';"')
+                 + db_name + '_' + date + ';"')
             sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' '
-                 + db_name + date + ' < ' + local_dir + mysqldump_fname)
+                 + db_name + '_' + date + ' < ' + local_dir + mysqldump_fname)
             sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "show databases;"')
         else:
             print colored('===============================================================', 'red')
