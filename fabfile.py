@@ -2751,9 +2751,9 @@ Password base64 encode
     """
     with settings(warn_only=False):
         password_base64 = base64.b64encode(password)
+        # print password_base64
         return password_base64
-        print password_base64
-
+        
 
 def password_base64_decode(password_base64):
     """
@@ -2767,7 +2767,7 @@ Password base64 decode
     """
     with settings(warn_only=False):
         password = base64.b64decode(password_base64)
-        print password
+        #print password
         return password
 
 
