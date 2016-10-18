@@ -113,6 +113,7 @@ def LoadConfiguration():
         configparser = ConfigParser.ConfigParser()
         try:
             Temp = configparser.read(config.MYSQL_CONFIG_FILE_PATH)
+            print Temp
         except SystemExit:
             logging.critical("The configuration file artemisa.conf cannot be read.")
 
