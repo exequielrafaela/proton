@@ -114,7 +114,7 @@ def load_configuration(conf_file, section, option):
         config_parser = ConfigParser.ConfigParser()
         try:
             temp_parser = config_parser.read(conf_file)
-            print temp_parser
+            # print temp_parser
         except SystemExit:
             logging.critical("The configuration file artemisa.conf cannot be read.")
 
@@ -131,7 +131,7 @@ def load_configuration(conf_file, section, option):
                 # self.mysql_section = temp.GetConfigSection(config.CONFIG_SQL_DIR, "mysql")
                 # for options in option_list:
                 option_value = config_parser.get(section, option)
-                print "Section: " + section + " => " + option + " :" + option_value
+                # print "Section: " + section + " => " + option + " :" + option_value
                 return str(option_value)
 
             except Exception, e:
@@ -1728,7 +1728,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "password"))
         password = password_base64_decode(mysql_password_enc)
 
-        with hide('running'):
+        with hide('running', 'stderr'):
             database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
                             ' -e "show databases;" | grep ' + db_name)
 
