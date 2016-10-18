@@ -1754,7 +1754,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
                                       + env.host + '.sql', 'blue')
                     print colored('============================================================================','blue')
 
-                    sudo('rm -rf ' + remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
+                    sudo('rm -rf ' + remote_dir + 'backup-' + date + '.sql,' + local_dir + 'backup-' + date + '.sql')
                     print colored('============================================================================','blue')
                     print colored('rm -rf ' + remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date +
                                   '.sql', 'blue')
