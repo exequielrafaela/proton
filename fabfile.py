@@ -2637,7 +2637,7 @@ Password hash func
 
 def password_hash_verify(password, hash_password):
     """
-Password hash func
+Password hash verify func
     :param password: plaintext password to be hashed
     :param hash_password: password hash of the pass to be verified
     """
@@ -2650,7 +2650,7 @@ Password hash func
 
 def password_base64_encode(password):
     """
-Password hash func
+Password base64 encode
     :param password: plaintext password to be hashed
     """
     with settings(warn_only=False):
@@ -2660,7 +2660,7 @@ Password hash func
 
 def password_base64_decode(password_base64):
     """
-Password hash func
+Password base64 decode
     :param password_base64: base64 encoded password
     """
     with settings(warn_only=False):
