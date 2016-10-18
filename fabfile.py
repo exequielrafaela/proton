@@ -105,7 +105,7 @@ Show the fabric declared roles
         print key, value
 
 
-def LoadConfiguration(conf_file, section, option):
+def load_configuration(conf_file, section, option):
     """
     Load configurations from file artemisa.conf
     """
@@ -130,7 +130,7 @@ def LoadConfiguration(conf_file, section, option):
                 #self.mysql_section = Temp.GetConfigSection(config.CONFIG_SQL_DIR, "mysql")
                 #for options in option_list:
                 option_value = config_parser.get(section, option)
-                print "Section: " + section + "=>" + option + " :" + option_value
+                print "Section: " + section + " => " + option + " :" + option_value
 
             except Exception, e:
                 logging.critical(
