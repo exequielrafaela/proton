@@ -1750,7 +1750,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
                     get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-" + env.host + '.sql',
                         use_sudo=True)
                     print colored('============================================================================','blue')
-                    print colored('get('+ remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-"
+                    print colored('get('+ remote_dir + 'backup-' + date + '.sql,' + local_dir + 'backup-' + date + "-"
                                       + env.host + '.sql', 'blue')
                     print colored('============================================================================','blue')
 
