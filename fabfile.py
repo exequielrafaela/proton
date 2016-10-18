@@ -2753,7 +2753,7 @@ Password base64 encode
     """
     with settings(warn_only=False):
         password_base64 = base64.b64encode(password)
-        # print password_base64
+        print password_base64
         return str(password_base64)
 
 
