@@ -105,14 +105,14 @@ Show the fabric declared roles
         print key, value
 
 
-def LoadConfiguration():
+def LoadConfiguration(conf_file, section, option):
     """
     Load configurations from file artemisa.conf
     """
     with settings(warn_only=False):
         config_parser = ConfigParser.ConfigParser()
         try:
-            Temp = config_parser.read(config.MYSQL_CONFIG_FILE_PATH)
+            Temp = config_parser.read(conf_file)
             print Temp
         except SystemExit:
             logging.critical("The configuration file artemisa.conf cannot be read.")
@@ -128,10 +128,9 @@ def LoadConfiguration():
 
                 # Gets the parameters of mysql
                 #self.mysql_section = Temp.GetConfigSection(config.CONFIG_SQL_DIR, "mysql")
-                mysql_username = config_parser.get("mysql", "username")
-                print "mysql username: " + str(mysql_username)
-                mysql_password = config_parser.get("mysql", "password")
-                print "mysql password: " + str(mysql_password)
+                #for options in option_list:
+                option_value = config_parser.get(section, option)
+                print "Section: " + section + "=>" + option + " :" + option_value
 
             except Exception, e:
                 logging.critical(
