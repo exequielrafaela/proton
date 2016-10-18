@@ -41,6 +41,7 @@ import iptools
 import getpass
 import time
 from time import gmtime, strftime
+from passlib.hash import pbkdf2_sha256
 
 import config
 
@@ -2619,6 +2620,16 @@ Remove php-5.3.29 in a CentOS7 Server
         sudo('rm -rf /usr/local/man/man1/php*')
         sudo('rm -rf /var/lib/php')
 
+
+def password_hash(password):
+    """
+Remove php-5.3.29 in a CentOS7 Server
+    """
+    with settings(warn_only=False):
+        hash = pbkdf2_sha256.encrypt(password, rounds=200000, salt_size=16)
+        plainpass = pbkdf2_sha256.decrypt(hash, rounds=200000, salt_size=16)
+        print plainpass
+        #return hash
 
 """
 def iptables(action, ip_addr):
