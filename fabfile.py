@@ -1734,21 +1734,32 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
 
             date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
-            print colored('===================================================', 'blue')
-            print colored('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
-                         ' -u ' + mysql_user + ' -p ' + db_name + ' > ' +
-                          remote_dir + 'backup-' + date + '.sql', 'blue')
-            print colored('===================================================', 'blue')
-
             if database != "":
                 if os.path.isdir(local_dir) and exists(remote_dir):
                     sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
                          ' -u ' + mysql_user + ' -p' + password + ' ' + db_name + ' > ' +
                         remote_dir + 'backup-' + date + '.sql')
                     # check that the backup was created with a grep.
+
+                    print colored('============================================================================','blue')
+                    print colored('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                                  ' -u ' + mysql_user + ' -p ' + db_name + ' > ' +
+                                  remote_dir + 'backup-' + date + '.sql', 'blue')
+                    print colored('============================================================================','blue')
+
                     get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-" + env.host + '.sql',
                         use_sudo=True)
+                    print colored('============================================================================','blue')
+                    print colored('get('+ remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-"
+                                      + env.host + '.sql', 'blue')
+                    print colored('============================================================================','blue')
+
                     sudo('rm -rf ' + remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
+                    print colored('============================================================================','blue')
+                    print colored('rm -rf ' + remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date +
+                                  '.sql', 'blue')
+                    print colored('============================================================================','blue')
+
                 else:
                     print colored('===================================================', 'red')
                     print colored('Check that DIRs: ' + local_dir + ' & ' + remote_dir + ' do exist', 'red')
