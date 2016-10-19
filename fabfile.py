@@ -1821,7 +1821,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
 def mysql_backup_db_rds_from_conf(local_dir, db_name):
     """
 MySQLdump backup for a certain DB passed as argument
-fab -R localhost mysql_backup:/tmp/,testdb
+fab -R local mysql_backup:/tmp/,testdb
 NOTE: Consider that the role after -R hast to be the remote MySQL Server.
     :param local_dir: mysqldump jumphost/bastion destination directory
     :param db_name: MySQL Server DB name to be backuped
@@ -1903,10 +1903,10 @@ eg: fab -R devtest mysql_restore_to_new_db:backup-2016-10-04-16-13-10-172.28.128
             print colored('===================================================', 'red')
 
 
-def mysql_restore_rds_to_new_db(mysqldump_fname, local_dir, db_name):
+def mysql_restore_rds_to_new_db_from_conf(mysqldump_fname, local_dir, db_name):
     """
 MySQLdump restore
-eg: fab -R localhost mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,testdb
+eg: fab -R local mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,testdb
     :param mysqldump_fname: mysqldump file name to be restored
     :param local_dir: mysqldump jumphost/bastion destination directory
     :param db_name: MySQL Database name to be restored
@@ -1925,9 +1925,9 @@ eg: fab -R localhost mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.
                     database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
                                     ' -e "show databases;" | grep ' + db_name)
 
-                    parts = database.split('\n')
-                    database = parts[1]
-
+                    dbparts = database.split('\n')
+                    database = dbparts[1]
+                    print colored('=======' + database + '=======','red')
                     # if database != "" and db_name in database:
                     if database == db_name:
                         sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "CREATE DATABASE '
