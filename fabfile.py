@@ -1834,9 +1834,8 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         password = password_base64_decode(mysql_password_enc)
         date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
-        with hide('running', 'stdout', 'stderr', 'warnings', 'aborts'):
+        with hide('running', 'stdout', 'aborts'):
             try:
-
                 if os.path.isdir(local_dir):
                     database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
                                     ' -e "show databases;" | grep ' + db_name)
@@ -1917,16 +1916,16 @@ eg: fab -R localhost mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.
         password = password_base64_decode(mysql_password_enc)
         date = strftime("%Y_%m_%d_%H_%M_%S", gmtime())
 
-        try:
-            with settings(warn_only=True):
+        with hide('running', 'stdout', 'aborts'):
+            try:
                 if os.path.isfile(local_dir + mysqldump_fname):
                     database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
                                     ' -e "show databases;" | grep ' + db_name)
                     if database != "" and db_name in database:
                         sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "CREATE DATABASE '
-                             + db_name + '_' + date + ';"')
+                            + db_name + '_' + date + ';"')
                         sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' '
-                             + db_name + '_' + date + ' < ' + local_dir + mysqldump_fname)
+                            + db_name + '_' + date + ' < ' + local_dir + mysqldump_fname)
                         sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "show databases;"')
                     else:
                         print colored('==========================================', 'red')
@@ -1936,10 +1935,10 @@ eg: fab -R localhost mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.
                     print colored('===============================================================', 'red')
                     print colored('Check that file: ' + local_dir + mysqldump_fname + ' does exist', 'red')
                     print colored('===============================================================', 'red')
-        except SystemExit:
-            print colored('=========================================', 'red')
-            print colored('Database: ' + db_name + ' does not exists', 'red')
-            print colored('=========================================', 'red')
+            except SystemExit:
+                print colored('=========================================', 'red')
+                print colored('Database: ' + db_name + ' does not exists', 'red')
+                print colored('=========================================', 'red')
 
 
 def disk_usage(tree_dir='/'):
