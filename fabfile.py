@@ -1834,8 +1834,9 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         password = password_base64_decode(mysql_password_enc)
         date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
-        try:
-            with hide('running', 'stdout', 'stderr'):
+        with hide('running', 'stdout', 'stderr'):
+            try:
+
                 if os.path.isdir(local_dir):
                     database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
                                     ' -e "show databases;" | grep ' + db_name)
@@ -1862,10 +1863,11 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
                     print colored('=============================================', 'red')
                     print colored('Check that DIRs: ' + local_dir + ' does exist', 'red')
                     print colored('=============================================', 'red')
-        except SystemExit:
-            print colored('=========================================', 'red')
-            print colored('Database : ' + db_name + ' does not exist', 'red')
-            print colored('=========================================', 'red')
+
+            except SystemExit:
+                print colored('=========================================', 'red')
+                print colored('Database : ' + db_name + ' does not exist', 'red')
+                print colored('=========================================', 'red')
 
 
 def mysql_restore_to_new_db(mysqldump_fname, local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
