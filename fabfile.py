@@ -1579,7 +1579,7 @@ to database 'wordpress'
             print colored('===================', 'red')
 
 
-def mysql_grant_user_db(db_name, db_user, db_user_pass="db_user", mysql_ip="127.0.0.1"):
+def mysql_grant_user_db_with_conf(db_name, db_user, db_user_pass="db_user", mysql_ip="127.0.0.1"):
     """
 Given the username, grant MySQL permissions for a certain DB to this username
     :param db_name: Database name to grant permissions in
@@ -1603,6 +1603,7 @@ to database 'wordpress'
             print colored('===================', 'red')
             print colored('MySQL query problem', 'red')
             print colored('===================', 'red')
+
 
 def mysql_grant_remote_cx(mysql_pass, remote_ip, mysql_ip="127.0.0.1"):
     """
