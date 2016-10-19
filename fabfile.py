@@ -1835,7 +1835,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
         try:
-            with hide('running', 'stdout'):
+            with hide('running', 'stdout', 'stderr'):
                 if os.path.isdir(local_dir):
                     database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
                                     ' -e "show databases;" | grep ' + db_name)
