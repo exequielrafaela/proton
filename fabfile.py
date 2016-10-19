@@ -1840,8 +1840,9 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
                     database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
                                     ' -e "show databases;" | grep ' + db_name)
 
-                    parts = database.split('\n')
-                    database = parts[1]
+                    dbparts = database.split('\n')
+                    database = dbparts[1]
+                    database = database.strip()
 
                     if database == db_name:
                         sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
@@ -1928,7 +1929,7 @@ eg: fab -R local mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.1
                     dbparts = database.split('\n')
                     database = dbparts[1]
                     database = database.strip()
-                    print colored('=======' + database + '=======','red')
+
                     # if database != "" and db_name in database:
                     if database == db_name:
                         sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "CREATE DATABASE '
