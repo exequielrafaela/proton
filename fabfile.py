@@ -1579,6 +1579,31 @@ to database 'wordpress'
             print colored('===================', 'red')
 
 
+def mysql_grant_user_db(db_name, db_user, db_user_pass="db_user", mysql_ip="127.0.0.1"):
+    """
+Given the username, grant MySQL permissions for a certain DB to this username
+    :param db_name: Database name to grant permissions in
+    :param db_user: Database Username to grant access to the before passsed DB
+    :param db_user_pass: Database Username password
+    :param mysql_ip: MySQL Server IP Address
+
+localhost] sudo: mysql -h 172.28.128.4 -u root -p -e "GRANT ALL PRIVILEGES ON wordpress.*
+TO wordpressuer@localhost IDENTIFIED BY 'password';"
+[localhost] out: Enter password:
+[localhost] out: ERROR 1044 (42000) at line 1: Access denied for user 'root'@'172.28.128.3'
+to database 'wordpress'
+    """
+    with settings(warn_only=False):
+        try:
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "GRANT ALL PRIVILEGES ON ' + db_name + '.* TO '
+                 + db_user + '@localhost IDENTIFIED BY \'' + db_user_pass + '\';"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
+        except SystemExit:
+            print colored('===================', 'red')
+            print colored('MySQL query problem', 'red')
+            print colored('===================', 'red')
+
 def mysql_grant_remote_cx(mysql_pass, remote_ip, mysql_ip="127.0.0.1"):
     """
 Grant MySQL remote conection from a certain host
