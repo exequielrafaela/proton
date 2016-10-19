@@ -1926,7 +1926,7 @@ eg: fab -R local mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.1
                                     ' -e "show databases;" | grep ' + db_name)
 
                     dbparts = database.split('\n')
-                    database = dbparts[1]
+                    database = dbparts[1].strip
                     print colored('=======' + database + '=======','red')
                     # if database != "" and db_name in database:
                     if database == db_name:
