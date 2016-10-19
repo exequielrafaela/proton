@@ -1839,6 +1839,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
                 if os.path.isdir(local_dir):
                     database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
                                     ' -e "show databases;" | grep ' + db_name)
+                    print colored('=======================' + database + '========================','blue')
 
                     if database != "" and db_name in database:
                         sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
