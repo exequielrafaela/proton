@@ -1834,7 +1834,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         password = password_base64_decode(mysql_password_enc)
         date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
-        with hide('running', 'stdout', 'stderr'):
+        with hide('running', 'stdout', 'stderr', 'warnings'):
             try:
 
                 if os.path.isdir(local_dir):
