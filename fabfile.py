@@ -1832,35 +1832,40 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "username")
         mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "password"))
         password = password_base64_decode(mysql_password_enc)
+        date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
-        with hide('running', 'stdout'):
-            database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
-                            ' -e "show databases;" | grep ' + db_name)
-
-            date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
-
-            if database != "":
+        try:
+            with hide('running', 'stdout'):
                 if os.path.isdir(local_dir):
-                    sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
-                         ' -u ' + mysql_user + ' -p' + password + ' ' + db_name + ' > ' + local_dir + db_name + '-bak-'
-                         + date + '.sql')
-                    # check that the backup was created with a grep.
+                    database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                                    ' -e "show databases;" | grep ' + db_name)
 
-                    print colored('============================================================================',
-                                  'blue')
-                    print colored('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
-                                  ' -u ' + mysql_user + ' -p ' + db_name + ' > ' + local_dir + db_name + '-bak-'
-                                  + date + '.sql', 'blue')
-                    print colored('============================================================================',
-                                  'blue')
+                    if database != "" and db_name in database:
+                        sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                             ' -u ' + mysql_user + ' -p' + password + ' ' + db_name + ' > ' + local_dir + db_name + '-bak-'
+                             + date + '.sql')
+                        # check that the backup was created with a grep.
+
+                        print colored('============================================================================',
+                                      'blue')
+                        print colored('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                                      ' -u ' + mysql_user + ' -p ' + db_name + ' > ' + local_dir + db_name + '-bak-'
+                                      + date + '.sql', 'blue')
+                        print colored('============================================================================',
+                                      'blue')
+                    else:
+                        print colored('=========================================', 'red')
+                        print colored('Database : ' + db_name + ' does not exist', 'red')
+                        print colored('=========================================', 'red')
+
                 else:
                     print colored('=============================================', 'red')
                     print colored('Check that DIRs: ' + local_dir + ' does exist', 'red')
                     print colored('=============================================', 'red')
-            else:
-                print colored('=========================================', 'red')
-                print colored('Database : ' + db_name + ' does not exist', 'red')
-                print colored('=========================================', 'red')
+        except SystemExit:
+            print colored('=========================================', 'red')
+            print colored('Database : ' + db_name + ' does not exist', 'red')
+            print colored('=========================================', 'red')
 
 
 def mysql_restore_to_new_db(mysqldump_fname, local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
@@ -1893,6 +1898,7 @@ eg: fab -R devtest mysql_restore_to_new_db:backup-2016-10-04-16-13-10-172.28.128
             print colored('Database: ' + database + ' already exists', 'red')
             print colored('===================================================', 'red')
 
+
 def mysql_restore_rds_to_new_db(mysqldump_fname, local_dir, db_name):
     """
 MySQLdump restore
@@ -1911,28 +1917,28 @@ eg: fab -R localhost mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.
 
         try:
             with settings(warn_only=True):
-                database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
-                            ' -e "show databases;" | grep ' + db_name)
-
-            if os.path.isfile(local_dir + mysqldump_fname):
-                if database != "" and db_name in database:
-                    sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "CREATE DATABASE '
-                         + db_name + '_' + date + ';"')
-                    sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' '
-                         + db_name + '_' + date + ' < ' + local_dir + mysqldump_fname)
-                    sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "show databases;"')
+                if os.path.isfile(local_dir + mysqldump_fname):
+                    database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                                    ' -e "show databases;" | grep ' + db_name)
+                    if database != "" and db_name in database:
+                        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "CREATE DATABASE '
+                             + db_name + '_' + date + ';"')
+                        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' '
+                             + db_name + '_' + date + ' < ' + local_dir + mysqldump_fname)
+                        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "show databases;"')
+                    else:
+                        print colored('==========================================', 'red')
+                        print colored('Database: ' + database + ' does not exists', 'red')
+                        print colored('==========================================', 'red')
                 else:
-                    print colored('==========================================', 'red')
-                    print colored('Database: ' + database + ' does not exists', 'red')
-                    print colored('==========================================', 'red')
-            else:
-                print colored('===============================================================', 'red')
-                print colored('Check that file: ' + local_dir + mysqldump_fname + ' does exist', 'red')
-                print colored('===============================================================', 'red')
+                    print colored('===============================================================', 'red')
+                    print colored('Check that file: ' + local_dir + mysqldump_fname + ' does exist', 'red')
+                    print colored('===============================================================', 'red')
         except SystemExit:
             print colored('=========================================', 'red')
             print colored('Database: ' + db_name + ' does not exists', 'red')
             print colored('=========================================', 'red')
+
 
 def disk_usage(tree_dir='/'):
     """
