@@ -1535,19 +1535,20 @@ Create a MySQL Database with the given db_name
             print colored('===================', 'red')
 
 
-def mysql_create_local_user(db_user, db_user_pass="password", mysql_ip="127.0.0.1"):
+def mysql_create_local_user(admin_user, db_user, db_user_pass="password", mysql_ip="127.0.0.1"):
     """
 Create a localhost MySQL user
+    :param admin_user: MySQL admin user
     :param db_user: Username to be created
     :param db_user_pass: Password for the new username
     :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
         try:
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "CREATE USER ' + db_user + '@localhost IDENTIFIED BY'
-                                                                                     ' \'' + db_user_pass + '\';"')
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
+            sudo('mysql -h ' + mysql_ip + ' -u ' + admin_user + ' -p -e "SELECT User, Host, Password FROM mysql.user;"')
+            sudo('mysql -h ' + mysql_ip + ' -u ' + admin_user + ' -p -e "CREATE USER ' + db_user +
+                 '@localhost IDENTIFIED BY\'' + db_user_pass + '\';"')
+            sudo('mysql -h ' + mysql_ip + ' -u ' + admin_user + ' -p -e "SELECT User, Host, Password FROM mysql.user;"')
         except SystemExit:
             print colored('===================', 'red')
             print colored('MySQL query problem', 'red')
