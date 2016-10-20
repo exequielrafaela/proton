@@ -1593,9 +1593,9 @@ Given the username, grant MySQL permissions for a certain DB to this username
         mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "password"))
         password = password_base64_decode(mysql_password_enc)
         db_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "db_user")
-        mysql_user_password_enc = \
-            str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "db_user_password"))
-        db_user_pass = password_base64_decode(mysql_user_password_enc)
+        #mysql_user_password_enc = \
+        #    str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "db_user_password"))
+        #db_user_pass = password_base64_decode(mysql_user_password_enc)
 
         try:
             sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
@@ -1904,6 +1904,116 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
                 print colored('=========================================', 'red')
 
 
+def mysql_backup_db_rds_from_conf_ggcc_stg(local_dir, db_name):
+    """
+MySQLdump backup for a certain DB passed as argument
+fab -R local mysql_backup:/tmp/,testdb
+NOTE: Consider that the role after -R hast to be the remote MySQL Server.
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param db_name: MySQL Server DB name to be backuped
+
+    """
+    with settings(warn_only=False):
+        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "host")
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "admin_user")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "password"))
+        password = password_base64_decode(mysql_password_enc)
+        date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
+        with hide('running', 'stdout', 'aborts'):
+            try:
+                if os.path.isdir(local_dir):
+                    database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                                    ' -e "show databases;" | grep ' + db_name + ' | grep -vi warning')
+
+                    dbparts = database.split('\n')
+                    database = dbparts[0]
+                    database = database.strip()
+
+                    if database == db_name:
+                        sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                             ' -u ' + mysql_user + ' -p' + password + ' ' + db_name + ' > '
+                             + local_dir + db_name + '-bak-' + date + '.sql')
+                        # check that the backup was created with a grep.
+
+                        print colored('============================================================================',
+                                      'blue')
+                        print colored('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                                      ' -u ' + mysql_user + ' -p ' + db_name + ' > ' + local_dir + db_name + '-bak-'
+                                      + date + '.sql', 'blue')
+                        print colored('============================================================================',
+                                      'blue')
+                    else:
+                        print colored('=========================================', 'red')
+                        print colored('Database : ' + db_name + ' does not exist', 'red')
+                        print colored('=========================================', 'red')
+
+                else:
+                    print colored('=============================================', 'red')
+                    print colored('Check that DIRs: ' + local_dir + ' does exist', 'red')
+                    print colored('=============================================', 'red')
+
+            except SystemExit:
+                print colored('=========================================', 'red')
+                print colored('Database : ' + db_name + ' does not exist', 'red')
+                print colored('=========================================', 'red')
+
+
+def mysql_backup_db_rds_from_conf_ggcc_prd(local_dir, db_name):
+    """
+MySQLdump backup for a certain DB passed as argument
+fab -R local mysql_backup:/tmp/,testdb
+NOTE: Consider that the role after -R hast to be the remote MySQL Server.
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param db_name: MySQL Server DB name to be backuped
+
+    """
+    with settings(warn_only=False):
+        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "host")
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "admin_user")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "password"))
+        password = password_base64_decode(mysql_password_enc)
+        date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
+        with hide('running', 'stdout', 'aborts'):
+            try:
+                if os.path.isdir(local_dir):
+                    database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                                    ' -e "show databases;" | grep ' + db_name + ' | grep -vi warning')
+
+                    dbparts = database.split('\n')
+                    database = dbparts[0]
+                    database = database.strip()
+
+                    if database == db_name:
+                        sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                             ' -u ' + mysql_user + ' -p' + password + ' ' + db_name + ' > '
+                             + local_dir + db_name + '-bak-' + date + '.sql')
+                        # check that the backup was created with a grep.
+
+                        print colored('============================================================================',
+                                      'blue')
+                        print colored('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                                      ' -u ' + mysql_user + ' -p ' + db_name + ' > ' + local_dir + db_name + '-bak-'
+                                      + date + '.sql', 'blue')
+                        print colored('============================================================================',
+                                      'blue')
+                    else:
+                        print colored('=========================================', 'red')
+                        print colored('Database : ' + db_name + ' does not exist', 'red')
+                        print colored('=========================================', 'red')
+
+                else:
+                    print colored('=============================================', 'red')
+                    print colored('Check that DIRs: ' + local_dir + ' does exist', 'red')
+                    print colored('=============================================', 'red')
+
+            except SystemExit:
+                print colored('=========================================', 'red')
+                print colored('Database : ' + db_name + ' does not exist', 'red')
+                print colored('=========================================', 'red')
+
+
 def mysql_restore_to_new_db(mysqldump_fname, local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
     """
 MySQLdump restore
@@ -1951,8 +2061,98 @@ eg: fab -R local mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.1
         password = password_base64_decode(mysql_password_enc)
         date = strftime("%Y_%m_%d_%H_%M_%S", gmtime())
 
-        # with hide('running', 'stdout', 'aborts'):
-        with hide('running'):
+        with hide('running', 'stdout', 'aborts'):
+            try:
+                if os.path.isfile(local_dir + mysqldump_fname):
+                    database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                                    ' -e "show databases;" | grep ' + db_name + ' | grep -vi warning')
+
+                    dbparts = database.split('\n')
+                    database = dbparts[0]
+                    database = database.strip()
+
+                    # if database != "" and db_name in database:
+                    if database == db_name:
+                        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "CREATE DATABASE '
+                             + db_name + '_' + date + ';"')
+                        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' '
+                             + db_name + '_' + date + ' < ' + local_dir + mysqldump_fname)
+                        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "show databases;"')
+                    else:
+                        print colored('==========================================', 'red')
+                        print colored('Database: ' + database + ' does not exists', 'red')
+                        print colored('==========================================', 'red')
+                else:
+                    print colored('===============================================================', 'red')
+                    print colored('Check that file: ' + local_dir + mysqldump_fname + ' does exist', 'red')
+                    print colored('===============================================================', 'red')
+            except SystemExit:
+                print colored('=========================================', 'red')
+                print colored('Database: ' + db_name + ' does not exists', 'red')
+                print colored('=========================================', 'red')
+
+
+def mysql_restore_rds_to_new_db_from_conf_ggcc_stg(mysqldump_fname, local_dir, db_name):
+    """
+MySQLdump restore
+eg: fab -R local mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,testdb
+    :param mysqldump_fname: mysqldump file name to be restored
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param db_name: MySQL Database name to be restored
+
+    """
+    with settings(warn_only=False):
+        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "host")
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "admin_user")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "password"))
+        password = password_base64_decode(mysql_password_enc)
+
+        with hide('running', 'stdout', 'aborts'):
+            try:
+                if os.path.isfile(local_dir + mysqldump_fname):
+                    database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                                    ' -e "show databases;" | grep ' + db_name + ' | grep -vi warning')
+
+                    dbparts = database.split('\n')
+                    database = dbparts[0]
+                    database = database.strip()
+
+                    # if database != "" and db_name in database:
+                    if database == db_name:
+                        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' '
+                             + db_name + ' < ' + local_dir + mysqldump_fname)
+                        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "show databases;"')
+                    else:
+                        print colored('==========================================', 'red')
+                        print colored('Database: ' + database + ' does not exists', 'red')
+                        print colored('==========================================', 'red')
+                else:
+                    print colored('===============================================================', 'red')
+                    print colored('Check that file: ' + local_dir + mysqldump_fname + ' does exist', 'red')
+                    print colored('===============================================================', 'red')
+            except SystemExit:
+                print colored('=========================================', 'red')
+                print colored('Database: ' + db_name + ' does not exists', 'red')
+                print colored('=========================================', 'red')
+
+
+def mysql_restore_rds_to_new_db_from_conf_ggcc_stg_back(mysqldump_fname, local_dir, db_name):
+    """
+MySQLdump restore
+eg: fab -R local mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,testdb
+    :param mysqldump_fname: mysqldump file name to be restored
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param db_name: MySQL Database name to be restored
+
+    """
+with settings(warn_only=False):
+        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "host")
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "admin_user")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "password"))
+        password = password_base64_decode(mysql_password_enc)
+        date = strftime("%Y_%m_%d_%H_%M_%S", gmtime())
+
+        with hide('running', 'stdout', 'aborts'):
             try:
                 if os.path.isfile(local_dir + mysqldump_fname):
                     database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
