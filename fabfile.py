@@ -1601,11 +1601,7 @@ Given the username, grant MySQL permissions for a certain DB to this username
             sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
                  ' -e "SELECT User, Host, Password FROM mysql.user;"')
             sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
-                 ' -e "GRANT ALL PRIVILEGES ON ' + db_name + '.* TO '
-                 + db_user + '@localhost IDENTIFIED BY \'' + db_user_pass + '\';"')
-            sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
-                 ' -e "GRANT ALL PRIVILEGES ON ' + db_name + '.* TO '
-                 + db_user + '@% IDENTIFIED BY \'' + db_user_pass + '\';"')
+                 ' -e "GRANT ALL ON ' + db_name + '.* TO ' + db_user + '@\'%\';"')
             sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
                  ' -e "SELECT User, Host, Password FROM mysql.user;"')
         except SystemExit:
