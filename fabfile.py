@@ -1947,7 +1947,8 @@ eg: fab -R local mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.1
         password = password_base64_decode(mysql_password_enc)
         date = strftime("%Y_%m_%d_%H_%M_%S", gmtime())
 
-        with hide('running', 'stdout', 'aborts'):
+        #with hide('running', 'stdout', 'aborts'):
+        with hide('running'):
             try:
                 if os.path.isfile(local_dir + mysqldump_fname):
                     database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
