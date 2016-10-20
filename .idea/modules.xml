@@ -3,8 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/conf/.idea/conf.iml" filepath="$PROJECT_DIR$/conf/.idea/conf.iml" />
-      <module fileurl="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/.idea/deploy_scripts.iml" filepath="$USER_HOME$/Globant/grey_repo/deploy_scripts/.idea/deploy_scripts.iml" />
+      <module fileurl="file://$USER_HOME$/Globant/grey_repo/deploy_scripts_back/.idea/deploy_scripts.iml" filepath="$USER_HOME$/Globant/grey_repo/deploy_scripts_back/.idea/deploy_scripts.iml" />
       <module fileurl="file://$PROJECT_DIR$/doc/.idea/doc.iml" filepath="$PROJECT_DIR$/doc/.idea/doc.iml" />
+      <module fileurl="file://$USER_HOME$/Globant/grey_repo/.idea/grey_repo.iml" filepath="$USER_HOME$/Globant/grey_repo/.idea/grey_repo.iml" />
       <module fileurl="file://$PROJECT_DIR$/logs/.idea/logs.iml" filepath="$PROJECT_DIR$/logs/.idea/logs.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules/.idea/modules.iml" filepath="$PROJECT_DIR$/modules/.idea/modules.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/proton.iml" filepath="$PROJECT_DIR$/.idea/proton.iml" />

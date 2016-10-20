@@ -1580,7 +1580,7 @@ to database 'wordpress'
             print colored('===================', 'red')
 
 
-def mysql_grant_user_db_with_conf(db_name, db_user, db_user_pass="db_user", mysql_ip="127.0.0.1"):
+def mysql_grant_user_db_rds_with_conf(db_name):
     """
 Given the username, grant MySQL permissions for a certain DB to this username
     :param db_name: Database name to grant permissions in
@@ -1595,11 +1595,22 @@ TO wordpressuer@localhost IDENTIFIED BY 'password';"
 to database 'wordpress'
     """
     with settings(warn_only=False):
+
+        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "host")
+        db_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "username")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "password"))
+        password = password_base64_decode(mysql_password_enc)
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "password"))
+        db_user_pass = password_base64_decode(mysql_password_enc)
+
+
         try:
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "GRANT ALL PRIVILEGES ON ' + db_name + '.* TO '
+            sudo('mysql -h ' + mysql_ip + ' -u root -p' + password + ' -e "SELECT User, Host, Password FROM mysql.user;"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p' + password + ' -e "GRANT ALL PRIVILEGES ON ' + db_name + '.* TO '
                  + db_user + '@localhost IDENTIFIED BY \'' + db_user_pass + '\';"')
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p' + password + ' -e "GRANT ALL PRIVILEGES ON ' + db_name + '.* TO '
+                + db_user + '@% IDENTIFIED BY \'' + db_user_pass + '\';"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p' + password + ' -e "SELECT User, Host, Password FROM mysql.user;"')
         except SystemExit:
             print colored('===================', 'red')
             print colored('MySQL query problem', 'red')
@@ -1749,8 +1760,8 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
     :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
-        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "username")
-        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "password"))
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "admin_user")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "password"))
         password = password_base64_decode(mysql_password_enc)
 
         with hide('running', 'stdout'):
@@ -1856,7 +1867,7 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
     """
     with settings(warn_only=False):
         mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "host")
-        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "username")
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "admin_user")
         mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "password"))
         password = password_base64_decode(mysql_password_enc)
         date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
@@ -1865,10 +1876,10 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
             try:
                 if os.path.isdir(local_dir):
                     database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
-                                    ' -e "show databases;" | grep ' + db_name)
+                                    ' -e "show databases;" | grep ' + db_name + ' | grep -vi warning')
 
                     dbparts = database.split('\n')
-                    database = dbparts[1]
+                    database = dbparts[0]
                     database = database.strip()
 
                     if database == db_name:
@@ -1942,7 +1953,7 @@ eg: fab -R local mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.1
     """
     with settings(warn_only=False):
         mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "host")
-        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "username")
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "admin_user")
         mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "password"))
         password = password_base64_decode(mysql_password_enc)
         date = strftime("%Y_%m_%d_%H_%M_%S", gmtime())
@@ -1952,10 +1963,10 @@ eg: fab -R local mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.1
             try:
                 if os.path.isfile(local_dir + mysqldump_fname):
                     database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
-                                    ' -e "show databases;" | grep ' + db_name)
+                                    ' -e "show databases;" | grep ' + db_name + ' | grep -vi warning')
 
                     dbparts = database.split('\n')
-                    database = dbparts[1]
+                    database = dbparts[0]
                     database = database.strip()
 
                     # if database != "" and db_name in database:
