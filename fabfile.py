@@ -1855,9 +1855,9 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
 
     """
     with settings(warn_only=False):
-        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "host")
-        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "username")
-        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "password"))
+        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "host")
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "username")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "password"))
         password = password_base64_decode(mysql_password_enc)
         date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
@@ -1941,9 +1941,9 @@ eg: fab -R local mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.1
 
     """
     with settings(warn_only=False):
-        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "host")
-        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "username")
-        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql", "password"))
+        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "host")
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "username")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "password"))
         password = password_base64_decode(mysql_password_enc)
         date = strftime("%Y_%m_%d_%H_%M_%S", gmtime())
 
