@@ -1863,7 +1863,8 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
 
         print colored('=========== DATABASE TEST! ==============', 'red')
 
-        with hide('running', 'stdout', 'aborts'):
+        #with hide('running', 'stdout', 'aborts'):
+        with hide('running'):
             try:
                 if os.path.isdir(local_dir):
                     database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
