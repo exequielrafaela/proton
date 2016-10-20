@@ -109,16 +109,17 @@ def load_configuration(conf_file, section, option):
     """
     Load configurations from file artemisa.conf
     """
-    temp_parser = ""
+    global temp_parser
+    #temp_parser = ""
     with settings(warn_only=False):
         config_parser = ConfigParser.ConfigParser()
         try:
             temp_parser = config_parser.read(conf_file)
             # print temp_parser
         except SystemExit:
-            logging.critical("The configuration file artemisa.conf cannot be read.")
+            logging.critical("The configuration file mysql.conf cannot be read.")
         #if temp_parser == []:
-            logging.critical("The configuration file artemisa.conf cannot be read.")
+            logging.critical("The configuration file mysql.conf cannot be read.")
             sys.exit(1)
         else:
             try:
