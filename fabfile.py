@@ -1871,6 +1871,8 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
                     database = dbparts[1]
                     database = database.strip()
 
+                    print colored ('===========' + database + '==============','red')
+
                     if database == db_name:
                         sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
                              ' -u ' + mysql_user + ' -p' + password + ' ' + db_name + ' > ' + local_dir + db_name + '-bak-'
