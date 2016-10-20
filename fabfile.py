@@ -1861,11 +1861,15 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
         password = password_base64_decode(mysql_password_enc)
         date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
+        print colored('=========== DATABASE TEST! ==============', 'red')
+
         with hide('running', 'stdout', 'aborts'):
             try:
                 if os.path.isdir(local_dir):
                     database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
                                     ' -e "show databases;" | grep ' + db_name)
+
+                    print colored ('===========' + database + '==============','red')
 
                     dbparts = database.split('\n')
                     database = dbparts[1]
