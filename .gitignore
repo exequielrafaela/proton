@@ -1,5 +1,6 @@
 conf/.idea/
 modules/.idea/
+logs/.idea/
 ./idea/misc.xml
 ./idea/modules.xml
 ./idea/proton.iml
