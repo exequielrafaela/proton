@@ -14,6 +14,7 @@
 |    - $ fab show_help for more information                             |
 ========================================================================
 """
+import sys
 
 """
 ORDER THE IMPORTS ALPHABETICALLY and DIVIDE IN 3 SECTIONS
@@ -25,13 +26,15 @@ ORDER THE IMPORTS ALPHABETICALLY and DIVIDE IN 3 SECTIONS
 
 # Import Fabric's API module#
 # from fabric.api import hosts, sudo, settings, hide, env, execute, prompt, run, local, task, put, cd, get
-from fabric.api import sudo, settings, env, run, local, put, cd, get
+from fabric.api import sudo, settings, env, run, local, put, cd, get, hide
 from fabric.contrib.files import append, exists, sed
 from fabric.contrib.project import rsync_project, upload_project
 from termcolor import colored
 from distutils.util import strtobool
 import logging
 import os
+import base64
+import re
 
 # import yum
 # import apt
@@ -39,7 +42,10 @@ import pwd
 import iptools
 import getpass
 import time
+import ConfigParser
+from optparse import OptionParser
 from time import gmtime, strftime
+from passlib.hash import pbkdf2_sha256
 
 import config
 
@@ -99,6 +105,42 @@ Show the fabric declared roles
         print key, value
 
 
+def load_configuration(conf_file, section, option):
+    """
+    Load configurations from file artemisa.conf
+    """
+    global temp_parser
+    # temp_parser = ""
+    with settings(warn_only=False):
+        config_parser = ConfigParser.ConfigParser()
+        try:
+            temp_parser = config_parser.read(conf_file)
+            # print temp_parser
+        except SystemExit:
+            logging.critical("The configuration file mysql.conf cannot be read.")
+            # if temp_parser == []:
+            logging.critical("The configuration file mysql.conf cannot be read.")
+            sys.exit(1)
+        else:
+            try:
+                if len(config_parser.sections()) == 0:
+                    logging.critical("At least one extension must be defined in extensions.conf.")
+                    sys.exit(1)
+
+                # Gets the parameters of mysql
+                # self.mysql_section = temp.GetConfigSection(config.CONFIG_SQL_DIR, "mysql")
+                # for options in option_list:
+                option_value = config_parser.get(section, option)
+                # print "Section: " + section + " => " + option + " :" + option_value
+                return str(option_value)
+
+            except Exception, e:
+                logging.critical(
+                    "The configuration file extensions.conf cannot be correctly read. Check it out carefully. "
+                    "More info: " + str(e))
+                sys.exit(1)
+
+
 def command(cmd):
     """
 Run a command in the host/s
@@ -142,7 +184,7 @@ Send a file to the host/s mirroring local permissions
     eg: fab -R dev file_send_oldmod:path/to/edited/ssh_config,/etc/ssh/ssh_config
     """
     with settings(warn_only=False):
-        put(localpath, remotepath, mirror_local_mode=True)
+        put(localpath, remotepath, mirror_local_mode=True, use_sudo=True)
 
 
 def file_get(remotepath, localpath):
@@ -341,8 +383,8 @@ Add a user in RedHat/Centos based OS
 
         try:
             # if(user_exists != ""):
-            user_exists = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamec)
-            if user_exists != "":
+            user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamec)
+            if user_true != "":
                 print colored('##############################', 'green')
                 print colored('"' + usernamec + '" already exists', 'green')
                 print colored('##############################', 'green')
@@ -362,6 +404,35 @@ Add a user in RedHat/Centos based OS
             print colored('######################################################', 'green')
 
 
+def user_add_ubuntu(usernamec):
+    """
+Add a user in Debian/Ubuntu based OS
+    :param usernamec: "username" to add
+    """
+    with settings(warn_only=True):
+        try:
+            # if(user_exists != ""):
+            user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamec)
+            if user_true != "":
+                print colored('##############################', 'green')
+                print colored('"' + usernamec + '" already exists', 'green')
+                print colored('##############################', 'green')
+                # sudo('gpasswd -a ' + usernamec + ' wheel')
+            else:
+                print colored('#################################', 'green')
+                print colored('"' + usernamec + '" doesnt exists', 'green')
+                print colored('WILL BE CREATED', 'green')
+                print colored('##################################', 'green')
+                sudo('useradd ' + usernamec + ' -m -d /home/' + usernamec)
+                # sudo('echo "' + usernamec + ':' + usernamec + '" | chpasswd')
+                # sudo('gpasswd -a ' + usernamec + ' wheel')
+        except SystemExit:
+            # else:
+            print colored('######################################################', 'green')
+            print colored('"' + usernamec + '" couldnt be created for some reason', 'green')
+            print colored('######################################################', 'green')
+
+
 def change_pass(usernameu, upass):
     """
 Change RedHat/Centos based OS user password
@@ -371,8 +442,8 @@ Change RedHat/Centos based OS user password
     with settings(warn_only=False):
         try:
             # if(user_exists != ""):
-            user_exists = sudo('cut -d: -f1 /etc/passwd | grep ' + usernameu)
-            if user_exists != "":
+            user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usernameu)
+            if user_true != "":
                 print colored('#######################################', 'green')
                 print colored('"' + usernameu + '" PASSWORD will be changed', 'green')
                 print colored('#######################################', 'green')
@@ -393,10 +464,12 @@ Generate an SSH key for a certain user
 Remember that this task it's intended to be run with role "local"
     :param usernameg: "username" to change password
     """
+    # global user_exists
     with settings(warn_only=False):
         # usernameg = prompt("Which USERNAME you like to GEN KEYS?")
         # user_exists = sudo('cut -d: -f1 /etc/passwd | grep '+usernameg)
         # user_exists = sudo('cat /etc/passwd | grep ' + usernameg)
+        # user_exists = ""
         try:
             user_struct = pwd.getpwnam(usernameg)
             user_exists = user_struct.pw_gecos.split(",")[0]
@@ -440,33 +513,48 @@ Remember that this task it's intended to be run with role "local"
                 sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
                 sudo('gpasswd -a ' + usernameg + ' wheel')
         except KeyError:
-            if user_exists == "" and usernameg != "root":
-                print colored('User ' + usernameg + ' does not exist', 'red')
-                print colored('#######################################################', 'blue')
-                print colored('Consider that we generate user: username pass: username', 'blue')
-                print colored('#######################################################', 'blue')
+            print colored('####################################', 'blue')
+            print colored('User ' + usernameg + 'does not exists', 'blue')
+            print colored('####################################', 'blue')
 
-                sudo('useradd ' + usernameg + ' -m -d /home/' + usernameg)
-                sudo('echo "' + usernameg + ':' + usernameg + '" | chpasswd')
-                sudo("ssh-keygen -t rsa -f /home/" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
-                sudo('chmod 755 /home/' + usernameg)
-                sudo('chmod 755 /home/' + usernameg + '/.ssh')
-                sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
-                sudo('gpasswd -a ' + usernameg + ' wheel')
+            # if user_exists == "" and usernameg != "root":
+            #     print colored('User ' + usernameg + ' does not exist', 'red')
+            #     print colored('#######################################################', 'blue')
+            #     print colored('Consider that we generate user: username pass: username', 'blue')
+            #     print colored('#######################################################', 'blue')
+            #
+            #     sudo('useradd ' + usernameg + ' -m -d /home/' + usernameg)
+            #     sudo('echo "' + usernameg + ':' + usernameg + '" | chpasswd')
+            #     sudo("ssh-keygen -t rsa -f /home/" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
+            #     sudo('chmod 755 /home/' + usernameg)
+            #     sudo('chmod 755 /home/' + usernameg + '/.ssh')
+            #     sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
+            #     sudo('gpasswd -a ' + usernameg + ' wheel')
 
 
-def key_read_file(key_file):
+def key_read_file(key_file, username):
     """
 In the localhost read and return as a string the public ssh key file given as parameter
+
     :param key_file: absolute path of the public ssh key
-    :return:
+    :param username: username that owns the ssh key
+    :return: The public key string
     """
     with settings(warn_only=False):
         key_file = os.path.expanduser(key_file)
-        if not key_file.endswith('pub'):
-            raise RuntimeWarning('Trying to push non-public part of key pair')
-        with open(key_file) as pyfile:
-            return pyfile.read()
+        if username == "root":
+            if not key_file.endswith('pub'):
+                raise RuntimeWarning('Trying to push non-public part of key pair')
+            local('sudo chmod 701 /' + username)
+            local('sudo chmod 741 /' + username + '/.ssh')
+            local('sudo chmod 604 /' + username + '/.ssh/id_rsa.pub')
+            with open(key_file) as pyfile:
+                return pyfile.read()
+        else:
+            if not key_file.endswith('pub'):
+                raise RuntimeWarning('Trying to push non-public part of key pair')
+            with open(key_file) as pyfile:
+                return pyfile.read()
 
 
 def key_append(usernamea):
@@ -477,35 +565,35 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
     with settings(warn_only=False):
         if usernamea == "root":
             key_file = '/' + usernamea + '/.ssh/id_rsa.pub'
-            key_text = key_read_file(key_file)
+            key_text = key_read_file(key_file, usernamea)
             if exists('/' + usernamea + '/.ssh/authorized_keys', use_sudo=True):
-                local('sudo chmod 701 /home/' + usernamea)
-                local('sudo chmod 741 /home/' + usernamea + '/.ssh')
-                local('sudo chmod 604 /home/' + usernamea + '/.ssh/id_rsa.pub')
+                local('sudo chmod 701 /' + usernamea)
+                local('sudo chmod 741 /' + usernamea + '/.ssh')
+                local('sudo chmod 604 /' + usernamea + '/.ssh/id_rsa.pub')
                 print colored('#########################################', 'blue')
                 print colored('##### authorized_keys file exists #######', 'blue')
                 print colored('#########################################', 'blue')
                 append('/' + usernamea + '/.ssh/authorized_keys', key_text, use_sudo=True)
-                sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
-                local('sudo chmod 700 /home/' + usernamea)
-                local('sudo chmod 700 /home/' + usernamea + '/.ssh')
-                local('sudo chmod 600 /home/' + usernamea + '/.ssh/id_rsa.pub')
+                sudo('chown -R ' + usernamea + ':' + usernamea + ' /' + usernamea + '/.ssh/')
+                local('sudo chmod 700 /' + usernamea)
+                local('sudo chmod 700 /' + usernamea + '/.ssh')
+                local('sudo chmod 600 /' + usernamea + '/.ssh/id_rsa.pub')
             else:
                 sudo('mkdir -p /' + usernamea + '/.ssh/')
                 sudo('touch /' + usernamea + '/.ssh/authorized_keys')
                 append('/' + usernamea + '/.ssh/authorized_keys', key_text, use_sudo=True)
-                sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
+                sudo('chown -R ' + usernamea + ':' + usernamea + ' /' + usernamea + '/.ssh/')
                 # put('/home/'+usernamea+'/.ssh/authorized_keys', '/home/'+usernamea+'/.ssh/')
-                local('sudo chmod 700 /home/' + usernamea)
-                local('sudo chmod 700 /home/' + usernamea + '/.ssh')
-                local('sudo chmod 600 /home/' + usernamea + '/.ssh/id_rsa.pub')
+                local('sudo chmod 700 /' + usernamea)
+                local('sudo chmod 700 /' + usernamea + '/.ssh')
+                local('sudo chmod 600 /' + usernamea + '/.ssh/id_rsa.pub')
 
         else:
             key_file = '/home/' + usernamea + '/.ssh/id_rsa.pub'
             local('sudo chmod 701 /home/' + usernamea)
             local('sudo chmod 741 /home/' + usernamea + '/.ssh')
             local('sudo chmod 604 /home/' + usernamea + '/.ssh/id_rsa.pub')
-            key_text = key_read_file(key_file)
+            key_text = key_read_file(key_file, usernamea)
             local('sudo chmod 700 /home/' + usernamea)
             local('sudo chmod 700 /home/' + usernamea + '/.ssh')
             local('sudo chmod 600 /home/' + usernamea + '/.ssh/id_rsa.pub')
@@ -521,6 +609,67 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
                 append('/home/' + usernamea + '/.ssh/authorized_keys', key_text, use_sudo=True)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
                 # put('/home/'+usernamea+'/.ssh/authorized_keys', '/home/'+usernamea+'/.ssh/')
+
+
+def key_remove(usernamea):
+    """
+Append the public key string in the /home/usernamea/.ssh/authorized_keys of the host
+    :param usernamea: "username" to append the key to.
+    """
+    with settings(warn_only=False):
+        if usernamea == "root":
+            key_file = '/' + usernamea + '/.ssh/id_rsa.pub'
+            key_text = key_read_file(key_file, usernamea)
+            key_text = key_text.rstrip()
+            if exists('/' + usernamea + '/.ssh/authorized_keys', use_sudo=True):
+                local('sudo chmod 701 /' + usernamea)
+                local('sudo chmod 741 /' + usernamea + '/.ssh')
+                local('sudo chmod 604 /' + usernamea + '/.ssh/id_rsa.pub')
+                print colored('#########################################', 'blue')
+                print colored('##### authorized_keys file exists #######', 'blue')
+                print colored('#########################################', 'blue')
+                key_text = key_text.replace("/", "\/")
+                sudo('sed -i -e \'s/' + key_text + '//g\' /' + usernamea + '/.ssh/authorized_keys')
+                # sed('/' + usernamea + '/.ssh/authorized_keys', key_text, key_clean,
+                #    limit='', use_sudo=True, backup='.bak', flags='', shell=False)
+                sudo('chown -R ' + usernamea + ':' + usernamea + ' /' + usernamea + '/.ssh/')
+                local('sudo chmod 700 /' + usernamea)
+                local('sudo chmod 700 /' + usernamea + '/.ssh')
+                local('sudo chmod 600 /' + usernamea + '/.ssh/id_rsa.pub')
+            else:
+                print colored('#######################################################################################',
+                              'yellow')
+                print colored(
+                    '##### ' + usernamea + ' authorized_keys server:' + env.host + ' file does NOT exists ######',
+                    'yellow')
+                print colored('#######################################################################################',
+                              'yellow')
+
+        else:
+            key_file = '/home/' + usernamea + '/.ssh/id_rsa.pub'
+            local('sudo chmod 701 /home/' + usernamea)
+            local('sudo chmod 741 /home/' + usernamea + '/.ssh')
+            local('sudo chmod 604 /home/' + usernamea + '/.ssh/id_rsa.pub')
+            key_text = key_read_file(key_file, usernamea)
+            local('sudo chmod 700 /home/' + usernamea)
+            local('sudo chmod 700 /home/' + usernamea + '/.ssh')
+            local('sudo chmod 600 /home/' + usernamea + '/.ssh/id_rsa.pub')
+            if exists('/home/' + usernamea + '/.ssh/authorized_keys', use_sudo=True):
+                print colored('#########################################', 'blue')
+                print colored('##### authorized_keys file exists #######', 'blue')
+                print colored('#########################################', 'blue')
+                key_text = key_text.rstrip()
+                key_text = key_text.replace("/", "\/")
+                sudo('sed -i -e \'s/' + key_text + '//g\' /home/' + usernamea + '/.ssh/authorized_keys')
+                sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
+            else:
+                print colored('#######################################################################################',
+                              'yellow')
+                print colored(
+                    '##### ' + usernamea + ' authorized_keys server:' + env.host + ' file does NOT exists ######',
+                    'yellow')
+                print colored('#######################################################################################',
+                              'yellow')
 
 
 def key_test(usernamet):
@@ -1386,19 +1535,20 @@ Create a MySQL Database with the given db_name
             print colored('===================', 'red')
 
 
-def mysql_create_local_user(db_user, db_user_pass="password", mysql_ip="127.0.0.1"):
+def mysql_create_local_user(admin_user, db_user, db_user_pass="password", mysql_ip="127.0.0.1"):
     """
 Create a localhost MySQL user
+    :param admin_user: MySQL admin user
     :param db_user: Username to be created
     :param db_user_pass: Password for the new username
     :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
         try:
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "CREATE USER ' + db_user + '@localhost IDENTIFIED BY'
-                                                                                     ' \'' + db_user_pass + '\';"')
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
+            sudo('mysql -h ' + mysql_ip + ' -u ' + admin_user + ' -p -e "SELECT User, Host, Password FROM mysql.user;"')
+            sudo('mysql -h ' + mysql_ip + ' -u ' + admin_user + ' -p -e "CREATE USER ' + db_user +
+                 '@localhost IDENTIFIED BY\'' + db_user_pass + '\';"')
+            sudo('mysql -h ' + mysql_ip + ' -u ' + admin_user + ' -p -e "SELECT User, Host, Password FROM mysql.user;"')
         except SystemExit:
             print colored('===================', 'red')
             print colored('MySQL query problem', 'red')
@@ -1431,6 +1581,35 @@ to database 'wordpress'
             print colored('===================', 'red')
 
 
+def mysql_grant_user_db_rds_with_conf(db_name):
+    """
+Given the username, grant MySQL permissions for a certain DB to this username
+    :param db_name: Database name to grant permissions in
+    """
+    with settings(warn_only=False):
+
+        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "host")
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "admin_user")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "password"))
+        password = password_base64_decode(mysql_password_enc)
+        db_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "db_user")
+        #mysql_user_password_enc = \
+        #    str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "db_user_password"))
+        #db_user_pass = password_base64_decode(mysql_user_password_enc)
+
+        try:
+            sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                 ' -e "SELECT User, Host, Password FROM mysql.user;"')
+            sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                 ' -e "GRANT ALL ON ' + db_name + '.* TO ' + db_user + '@\'%\';"')
+            sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                 ' -e "SELECT User, Host, Password FROM mysql.user;"')
+        except SystemExit:
+            print colored('===================', 'red')
+            print colored('MySQL query problem', 'red')
+            print colored('===================', 'red')
+
+
 def mysql_grant_remote_cx(mysql_pass, remote_ip, mysql_ip="127.0.0.1"):
     """
 Grant MySQL remote conection from a certain host
@@ -1452,10 +1631,10 @@ Grant MySQL remote conection from a certain host
             print colored('===================', 'red')
 
 
-def mysql_backup(local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
+def mysql_backup_all(local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
     """
-MySQLdump backup
-fab -R devtest mysql_backup:172.28.128.4,/tmp/
+MySQLdump backup for all databases
+fab -R devtest mysql_backup:/tmp/,/tmp/,root,127.0.0.1
 NOTE: Consider that the role after -R hast to be the remote MySQL Server.
     :param local_dir: mysqldump jumphost/bastion destination directory
     :param remote_dir: mysqldump remote host destination directory
@@ -1477,33 +1656,531 @@ NOTE: Consider that the role after -R hast to be the remote MySQL Server.
 
         # date = str(time.strftime("%x %X"))
         # date = date.replace("/", "-")
-        date = strftime("%Y-%m-%d-%H:%M:%S", gmtime())
+        date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
         if os.path.isdir(local_dir) and exists(remote_dir):
             sudo('mysqldump -Q -q -e -R --add-drop-table -A --single-transaction -u '
                  + mysql_user + ' -p --all-databases > ' + remote_dir + 'backup-' + date + '.sql')
             # check that the backup was created with a grep.
-            file_get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
+            get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-" + env.host + '.sql',
+                use_sudo=True)
+            sudo('rm -rf ' + remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
         else:
             print colored('===================================================', 'red')
             print colored('Check that DIRs: ' + local_dir + ' & ' + remote_dir + ' do exist', 'red')
             print colored('===================================================', 'red')
 
 
-def mysql_restore(mysqldump_fpath, mysql_ip="127.0.0.1"):
+def mysql_restore_upgrade_all(mysqldump_fname, local_dir, remote_dir, mysql_user, mysql_ip="127.0.0.1"):
     """
-MySQLdump restore
-IMPORTANT: Since the restore it's supouse to be run from a Jumphost (bastion) Server
-the role must be "local"
-eg: fab -R local mysql_restore:/tmp/backup-09-26-16.sql.172.17.2.30,10.0.4.30
-    :param mysqldump_fpath: mysqldump ".sql" file absolute path
+MySQLdump restore and upgrade for all DBs
+eg: fab -R devtest mysql_restore_upgrade:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,/tmp/,root,127.0.0.1
+    :param mysqldump_fname: mysqldump file name to be restored
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param remote_dir: mysqldump remote host destination directory
+    :param mysql_user: MySQL Server Admin User
     :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
-        # CONSIDERAR PRIMERO SCP luego restor (security)
-        sudo('mysql -h ' + mysql_ip + ' -u root -p -e "show databases;"')
-        sudo('mysql -h ' + mysql_ip + ' -u root -p < ' + mysqldump_fpath)
-        sudo('mysql -h ' + mysql_ip + ' -u root -p -e "show databases;"')
+        if os.path.isfile(local_dir + mysqldump_fname):
+            sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
+            if exists(remote_dir):
+                file_send_oldmod(local_dir + mysqldump_fname, remote_dir + mysqldump_fname)
+                sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p < ' + remote_dir + mysqldump_fname)
+                sudo('mysql_upgrade -h ' + mysql_ip + ' -u ' + mysql_user + ' -p')
+                sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
+        else:
+            print colored('===================================================', 'red')
+            print colored('Check that DIRs: ' + local_dir + mysqldump_fname + ' do exist', 'red')
+            print colored('===================================================', 'red')
+
+
+def mysql_backup_db(local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
+    """
+MySQLdump backup for a certain DB passed as argument
+fab -R devtest mysql_backup:/tmp/,/tmp/,root,127.0.0.1
+NOTE: Consider that the role after -R hast to be the remote MySQL Server.
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param remote_dir: mysqldump remote host destination directory
+    :param mysql_user: MySQL Server Admin User
+    :param db_name: MySQL Server DB name to be backuped
+    :param mysql_ip: MySQL Server IP Address
+    """
+    with settings(warn_only=False):
+        database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;" | grep ' + db_name)
+        # +--------------------+
+        # | Database           |
+        # +--------------------+
+        # | information_schema |
+        # | ggcc_prd           |
+        # | innodb             |
+        # | mysql              |
+        # | performance_schema |
+        # | tmp                |
+        # +--------------------+
+
+        # date = str(time.strftime("%x %X"))
+        # date = date.replace("/", "-")
+        # date = date.replace("/", "-")
+        date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
+        if database != "":
+            if os.path.isdir(local_dir) and exists(remote_dir):
+                sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                     ' -u ' + mysql_user + ' -p ' + db_name + ' > ' + remote_dir + 'backup-' + date + '.sql')
+                # check that the backup was created with a grep.
+                get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-" + env.host + '.sql',
+                    use_sudo=True)
+                sudo('rm -rf ' + remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
+            else:
+                print colored('===================================================', 'red')
+                print colored('Check that DIRs: ' + local_dir + ' & ' + remote_dir + ' do exist', 'red')
+                print colored('===================================================', 'red')
+        else:
+            print colored('=========================================', 'red')
+            print colored('Database : ' + db_name + ' does not exist', 'red')
+            print colored('=========================================', 'red')
+
+
+def mysql_backup_db_from_conf(local_dir, remote_dir, db_name, mysql_ip="127.0.0.1"):
+    """
+MySQLdump backup for a certain DB passed as argument
+fab -R devtest mysql_backup:/tmp/,/tmp/,root,127.0.0.1
+NOTE: Consider that the role after -R hast to be the remote MySQL Server.
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param remote_dir: mysqldump remote host destination directory
+    :param db_name: MySQL Server DB name to be backuped
+    :param mysql_ip: MySQL Server IP Address
+    """
+    with settings(warn_only=False):
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "admin_user")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "password"))
+        password = password_base64_decode(mysql_password_enc)
+
+        with hide('running', 'stdout'):
+            database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                            ' -e "show databases;" | grep ' + db_name)
+
+            date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
+            if database != "":
+                if os.path.isdir(local_dir) and exists(remote_dir):
+                    sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                         ' -u ' + mysql_user + ' -p' + password + ' ' + db_name + ' > ' +
+                         remote_dir + 'backup-' + date + '.sql')
+                    # check that the backup was created with a grep.
+
+                    print colored('============================================================================',
+                                  'blue')
+                    print colored('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                                  ' -u ' + mysql_user + ' -p ' + db_name + ' > ' +
+                                  remote_dir + 'backup-' + date + '.sql', 'blue')
+                    print colored('============================================================================',
+                                  'blue')
+
+                    get(remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + "-" + env.host + '.sql',
+                        use_sudo=True)
+                    print colored('============================================================================',
+                                  'blue')
+                    print colored('get(' + remote_dir + 'backup-' + date + '.sql,' + local_dir + 'backup-' + date + "-"
+                                  + env.host + '.sql', 'blue')
+                    print colored('============================================================================',
+                                  'blue')
+
+                    sudo('rm -rf ' + remote_dir + 'backup-' + date + '.sql', local_dir + 'backup-' + date + '.sql')
+                    print colored('============================================================================',
+                                  'blue')
+                    print colored('rm -rf ' + remote_dir + 'backup-' + date + '.sql,' + local_dir + 'backup-' + date +
+                                  '.sql', 'blue')
+                    print colored('============================================================================',
+                                  'blue')
+
+                else:
+                    print colored('===================================================', 'red')
+                    print colored('Check that DIRs: ' + local_dir + ' & ' + remote_dir + ' do exist', 'red')
+                    print colored('===================================================', 'red')
+            else:
+                print colored('=========================================', 'red')
+                print colored('Database : ' + db_name + ' does not exist', 'red')
+                print colored('=========================================', 'red')
+
+
+def mysql_backup_db_rds(local_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
+    """
+MySQLdump backup for a certain DB passed as argument
+fab -R local mysql_backup:/tmp/,root,testdb,ggcc-prd.xxyyzzuuiioo.us-east-1.rds.amazonaws.com
+NOTE: Consider that the role after -R hast to be the remote MySQL Server.
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param mysql_user: MySQL Server Admin User
+    :param db_name: MySQL Server DB name to be backuped
+    :param mysql_ip: MySQL Server IP Address
+    """
+    with settings(warn_only=False):
+        database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;" | grep ' + db_name)
+        # +--------------------+
+        # | Database           |
+        # +--------------------+
+        # | information_schema |
+        # | ggcc_prd           |
+        # | innodb             |
+        # | mysql              |
+        # | performance_schema |
+        # | tmp                |
+        # +--------------------+
+
+        # date = str(time.strftime("%x %X"))
+        # date = date.replace("/", "-")
+        # date = date.replace("/", "-")
+        date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
+        if database != "":
+            if os.path.isdir(local_dir):
+                sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                     ' -u ' + mysql_user + ' -p ' + db_name + ' > ' + local_dir + db_name + '-bak-'
+                     + date + '.sql')
+                # check that the backup was created with a grep.
+            else:
+                print colored('============================================', 'red')
+                print colored('Check that DIR: ' + local_dir + ' does exist', 'red')
+                print colored('============================================', 'red')
+        else:
+            print colored('=========================================', 'red')
+            print colored('Database : ' + db_name + ' does not exist', 'red')
+            print colored('=========================================', 'red')
+
+
+def mysql_backup_db_rds_from_conf(local_dir, db_name):
+    """
+MySQLdump backup for a certain DB passed as argument
+fab -R local mysql_backup:/tmp/,testdb
+NOTE: Consider that the role after -R hast to be the remote MySQL Server.
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param db_name: MySQL Server DB name to be backuped
+
+    """
+    with settings(warn_only=False):
+        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "host")
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "admin_user")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "password"))
+        password = password_base64_decode(mysql_password_enc)
+        date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
+        with hide('running', 'stdout', 'aborts'):
+            try:
+                if os.path.isdir(local_dir):
+                    database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                                    ' -e "show databases;" | grep ' + db_name + ' | grep -vi warning')
+
+                    dbparts = database.split('\n')
+                    database = dbparts[0]
+                    database = database.strip()
+
+                    if database == db_name:
+                        sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                             ' -u ' + mysql_user + ' -p' + password + ' ' + db_name + ' > '
+                             + local_dir + db_name + '-bak-' + date + '.sql')
+                        # check that the backup was created with a grep.
+
+                        print colored('============================================================================',
+                                      'blue')
+                        print colored('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                                      ' -u ' + mysql_user + ' -p ' + db_name + ' > ' + local_dir + db_name + '-bak-'
+                                      + date + '.sql', 'blue')
+                        print colored('============================================================================',
+                                      'blue')
+                    else:
+                        print colored('=========================================', 'red')
+                        print colored('Database : ' + db_name + ' does not exist', 'red')
+                        print colored('=========================================', 'red')
+
+                else:
+                    print colored('=============================================', 'red')
+                    print colored('Check that DIRs: ' + local_dir + ' does exist', 'red')
+                    print colored('=============================================', 'red')
+
+            except SystemExit:
+                print colored('=========================================', 'red')
+                print colored('Database : ' + db_name + ' does not exist', 'red')
+                print colored('=========================================', 'red')
+
+
+def mysql_backup_db_rds_from_conf_ggcc_stg(local_dir, db_name):
+    """
+MySQLdump backup for a certain DB passed as argument
+fab -R local mysql_backup:/tmp/,testdb
+NOTE: Consider that the role after -R hast to be the remote MySQL Server.
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param db_name: MySQL Server DB name to be backuped
+
+    """
+    with settings(warn_only=False):
+        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "host")
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "admin_user")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "password"))
+        password = password_base64_decode(mysql_password_enc)
+        date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
+        with hide('running', 'stdout', 'aborts'):
+            try:
+                if os.path.isdir(local_dir):
+                    database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                                    ' -e "show databases;" | grep ' + db_name + ' | grep -vi warning')
+
+                    dbparts = database.split('\n')
+                    database = dbparts[0]
+                    database = database.strip()
+
+                    if database == db_name:
+                        sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                             ' -u ' + mysql_user + ' -p' + password + ' ' + db_name + ' > '
+                             + local_dir + db_name + '-bak-' + date + '.sql')
+                        # check that the backup was created with a grep.
+
+                        print colored('============================================================================',
+                                      'blue')
+                        print colored('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                                      ' -u ' + mysql_user + ' -p ' + db_name + ' > ' + local_dir + db_name + '-bak-'
+                                      + date + '.sql', 'blue')
+                        print colored('============================================================================',
+                                      'blue')
+                    else:
+                        print colored('=========================================', 'red')
+                        print colored('Database : ' + db_name + ' does not exist', 'red')
+                        print colored('=========================================', 'red')
+
+                else:
+                    print colored('=============================================', 'red')
+                    print colored('Check that DIRs: ' + local_dir + ' does exist', 'red')
+                    print colored('=============================================', 'red')
+
+            except SystemExit:
+                print colored('=========================================', 'red')
+                print colored('Database : ' + db_name + ' does not exist', 'red')
+                print colored('=========================================', 'red')
+
+
+def mysql_backup_db_rds_from_conf_ggcc_prd(local_dir, db_name):
+    """
+MySQLdump backup for a certain DB passed as argument
+fab -R local mysql_backup:/tmp/,testdb
+NOTE: Consider that the role after -R hast to be the remote MySQL Server.
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param db_name: MySQL Server DB name to be backuped
+
+    """
+    with settings(warn_only=False):
+        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "host")
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "admin_user")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_prd", "password"))
+        password = password_base64_decode(mysql_password_enc)
+        date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
+        with hide('running', 'stdout', 'aborts'):
+            try:
+                if os.path.isdir(local_dir):
+                    database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                                    ' -e "show databases;" | grep ' + db_name + ' | grep -vi warning')
+
+                    dbparts = database.split('\n')
+                    database = dbparts[0]
+                    database = database.strip()
+
+                    if database == db_name:
+                        sudo('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                             ' -u ' + mysql_user + ' -p' + password + ' ' + db_name + ' > '
+                             + local_dir + db_name + '-bak-' + date + '.sql')
+                        # check that the backup was created with a grep.
+
+                        print colored('============================================================================',
+                                      'blue')
+                        print colored('mysqldump -q -c --routines --triggers --single-transaction -h ' + mysql_ip +
+                                      ' -u ' + mysql_user + ' -p ' + db_name + ' > ' + local_dir + db_name + '-bak-'
+                                      + date + '.sql', 'blue')
+                        print colored('============================================================================',
+                                      'blue')
+                    else:
+                        print colored('=========================================', 'red')
+                        print colored('Database : ' + db_name + ' does not exist', 'red')
+                        print colored('=========================================', 'red')
+
+                else:
+                    print colored('=============================================', 'red')
+                    print colored('Check that DIRs: ' + local_dir + ' does exist', 'red')
+                    print colored('=============================================', 'red')
+
+            except SystemExit:
+                print colored('=========================================', 'red')
+                print colored('Database : ' + db_name + ' does not exist', 'red')
+                print colored('=========================================', 'red')
+
+
+def mysql_restore_to_new_db(mysqldump_fname, local_dir, remote_dir, mysql_user, db_name, mysql_ip="127.0.0.1"):
+    """
+MySQLdump restore
+eg: fab -R devtest mysql_restore_to_new_db:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,/tmp/,root,127.0.0.1
+    :param mysqldump_fname: mysqldump file name to be restored
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param remote_dir: mysqldump remote host destination directory
+    :param mysql_user: MySQL Server Admin User
+    :param db_name: MySQL Database name to be restored
+    :param mysql_ip: MySQL Server IP Address
+    """
+    with settings(warn_only=False):
+        date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
+        database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;" | grep ' + db_name)
+        if os.path.isfile(local_dir + mysqldump_fname) and database != "":
+            if exists(remote_dir):
+                file_send_oldmod(local_dir + mysqldump_fname, remote_dir + mysqldump_fname)
+                sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "CREATE DATABASE ' + db_name + date + ';"')
+                sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p ' + db_name + date + ' < ' + remote_dir +
+                     mysqldump_fname)
+                sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p -e "show databases;"')
+        else:
+            print colored('===================================================', 'red')
+            print colored('Check that DIRs: ' + local_dir + mysqldump_fname + ' do exist', 'red')
+            print colored('===================================================', 'red')
+            print colored('===================================================', 'red')
+            print colored('Database: ' + database + ' already exists', 'red')
+            print colored('===================================================', 'red')
+
+
+def mysql_restore_rds_to_new_db_from_conf(mysqldump_fname, local_dir, db_name):
+    """
+MySQLdump restore
+eg: fab -R local mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,testdb
+    :param mysqldump_fname: mysqldump file name to be restored
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param db_name: MySQL Database name to be restored
+
+    """
+    with settings(warn_only=False):
+        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "host")
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "admin_user")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "password"))
+        password = password_base64_decode(mysql_password_enc)
+        date = strftime("%Y_%m_%d_%H_%M_%S", gmtime())
+
+        with hide('running', 'stdout', 'aborts'):
+            try:
+                if os.path.isfile(local_dir + mysqldump_fname):
+                    database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                                    ' -e "show databases;" | grep ' + db_name + ' | grep -vi warning')
+
+                    dbparts = database.split('\n')
+                    database = dbparts[0]
+                    database = database.strip()
+
+                    # if database != "" and db_name in database:
+                    if database == db_name:
+                        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "CREATE DATABASE '
+                             + db_name + '_' + date + ';"')
+                        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' '
+                             + db_name + '_' + date + ' < ' + local_dir + mysqldump_fname)
+                        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "show databases;"')
+                    else:
+                        print colored('==========================================', 'red')
+                        print colored('Database: ' + database + ' does not exists', 'red')
+                        print colored('==========================================', 'red')
+                else:
+                    print colored('===============================================================', 'red')
+                    print colored('Check that file: ' + local_dir + mysqldump_fname + ' does exist', 'red')
+                    print colored('===============================================================', 'red')
+            except SystemExit:
+                print colored('=========================================', 'red')
+                print colored('Database: ' + db_name + ' does not exists', 'red')
+                print colored('=========================================', 'red')
+
+
+def mysql_restore_rds_to_new_db_from_conf_ggcc_stg(mysqldump_fname, local_dir, db_name):
+    """
+MySQLdump restore
+eg: fab -R local mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,testdb
+    :param mysqldump_fname: mysqldump file name to be restored
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param db_name: MySQL Database name to be restored
+
+    """
+    with settings(warn_only=False):
+        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "host")
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "admin_user")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "password"))
+        password = password_base64_decode(mysql_password_enc)
+
+        with hide('running', 'stdout', 'aborts'):
+            try:
+                if os.path.isfile(local_dir + mysqldump_fname):
+                    database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                                    ' -e "show databases;" | grep ' + db_name + ' | grep -vi warning')
+
+                    dbparts = database.split('\n')
+                    database = dbparts[0]
+                    database = database.strip()
+
+                    # if database != "" and db_name in database:
+                    if database == db_name:
+                        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' '
+                             + db_name + ' < ' + local_dir + mysqldump_fname)
+                        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "show databases;"')
+                    else:
+                        print colored('==========================================', 'red')
+                        print colored('Database: ' + database + ' does not exists', 'red')
+                        print colored('==========================================', 'red')
+                else:
+                    print colored('===============================================================', 'red')
+                    print colored('Check that file: ' + local_dir + mysqldump_fname + ' does exist', 'red')
+                    print colored('===============================================================', 'red')
+            except SystemExit:
+                print colored('=========================================', 'red')
+                print colored('Database: ' + db_name + ' does not exists', 'red')
+                print colored('=========================================', 'red')
+
+
+def mysql_restore_rds_to_new_db_from_conf_ggcc_stg_back(mysqldump_fname, local_dir, db_name):
+    """
+MySQLdump restore
+eg: fab -R local mysql_restore_rds_to_new_db:backup-2016-10-04-16-13-10-172.28.128.4.sql,/tmp/,testdb
+    :param mysqldump_fname: mysqldump file name to be restored
+    :param local_dir: mysqldump jumphost/bastion destination directory
+    :param db_name: MySQL Database name to be restored
+
+    """
+    with settings(warn_only=False):
+        mysql_ip = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "host")
+        mysql_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "admin_user")
+        mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "password"))
+        password = password_base64_decode(mysql_password_enc)
+        date = strftime("%Y_%m_%d_%H_%M_%S", gmtime())
+
+        with hide('running', 'stdout', 'aborts'):
+            try:
+                if os.path.isfile(local_dir + mysqldump_fname):
+                    database = sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
+                                    ' -e "show databases;" | grep ' + db_name + ' | grep -vi warning')
+
+                    dbparts = database.split('\n')
+                    database = dbparts[0]
+                    database = database.strip()
+
+                    # if database != "" and db_name in database:
+                    if database == db_name:
+                        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "CREATE DATABASE '
+                             + db_name + '_' + date + ';"')
+                        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' '
+                             + db_name + '_' + date + ' < ' + local_dir + mysqldump_fname)
+                        sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password + ' -e "show databases;"')
+                    else:
+                        print colored('==========================================', 'red')
+                        print colored('Database: ' + database + ' does not exists', 'red')
+                        print colored('==========================================', 'red')
+                else:
+                    print colored('===============================================================', 'red')
+                    print colored('Check that file: ' + local_dir + mysqldump_fname + ' does exist', 'red')
+                    print colored('===============================================================', 'red')
+            except SystemExit:
+                print colored('=========================================', 'red')
+                print colored('Database: ' + db_name + ' does not exists', 'red')
+                print colored('=========================================', 'red')
 
 
 def disk_usage(tree_dir='/'):
@@ -1548,9 +2225,14 @@ LAMP Stack installation in Centos7 OS.
     """
     with settings(warn_only=False):
         sudo('yum update')
+        sudo('yum install epel-release')
         print colored('=================================', 'blue')
         print colored('INSTALLING : "APACHE2 WebqServer"', 'blue')
         print colored('=================================', 'blue')
+        # https://secure.kreationnext.com/support/the-perfect-server-centos-7-2-with-apache-
+        # postfix-dovecot-pure-ftpd-bind-and-ispconfig-3-1/
+        # MOD PYTHON COMPILE!!!
+        #
         try:
             sudo('yum install -y httpd-manual-2.2.3-91.el5.centos httpd-2.2.3-91.el5.centos')
             sudo('systemctl start httpd.service')
@@ -1559,6 +2241,7 @@ LAMP Stack installation in Centos7 OS.
             sudo('yum install -y httpd')
             sudo('systemctl start httpd.service')
             sudo('systemctl enable httpd.service')
+            sudo('chkconfig httpd on')
 
         print colored('===========================', 'blue')
         print colored('INSTALLING : "MYSQL Server"', 'blue')
@@ -1665,12 +2348,14 @@ Install custom list of packets
                  'http://download.opensuse.org/repositories/security://shibboleth/CentOS_7/security:shibboleth.repo')
             sudo('yum install -y shibboleth-2.5.6-3.1')
             sudo('systemctl start shibd.service')
+            sudo('chkconfig --levels 345 shibd on')
 
         except SystemExit:
             sudo('curl -o /etc/yum.repos.d/shibboleth.repo '
                  'http://download.opensuse.org/repositories/security://shibboleth/CentOS_7/security:shibboleth.repo')
             sudo('yum install -y shibboleth')
             sudo('systemctl start shibd.service')
+            sudo('chkconfig --levels 345 shibd on')
 
         print colored('===================', 'blue')
         print colored('INSTALLING : "CRON"', 'blue')
@@ -2149,8 +2834,12 @@ fab -R devtest rsync_data_from_server()
                 print colored('##########################################', 'blue')
                 date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
-                sudo('tar czvf '+ tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
+                # Consider tar | rsync // tar | scp // tar | netcat (insecure)
+                sudo('tar czvf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
+                # local('sudo chmod 757 -R ' + data_dir)
                 get(tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
+                # local('sudo chmod 755 -R ' + data_dir)
+                sudo('rm -rf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ')
 
             except SystemExit:
                 print colored('##########################################', 'red')
@@ -2164,8 +2853,11 @@ fab -R devtest rsync_data_from_server()
                 print colored('#########################', 'blue')
                 date = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
                 # tar -czvf /path-to/other/directory/file.tar.gz file
-                sudo('tar czvf '+ tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
+                sudo('tar czvf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ' + migrate_dir)
+                # local('sudo chmod 757 ' + data_dir )
                 get(tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz', data_dir, use_sudo=True)
+                # local('sudo chmod 755 ' + data_dir)
+                sudo('rm -rf ' + tmp_migrate_dir + migrate_dir_dash + '.' + date + '.tar.gz ')
 
             except SystemExit:
                 print colored('#############################################', 'red')
@@ -2176,36 +2868,87 @@ fab -R devtest rsync_data_from_server()
 def download_lamp_from_server(data_dir):
     """
 Download LAMP data using download_data_from_server task
-    :param data_dir: Directory where the data it's going to be stored
+    :param data_dir: Directory where the data it's going to be stored in the jumphost
     """
     with settings(warn_only=False):
-
-        data_dir = data_dir + env.host
-
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('==========================', 'blue')
-        download_data_from_server('/tmp/', '/var/www/')
+        download_data_from_server(data_dir, '/var/www/')
 
         print colored('=========================', 'blue')
         print colored('SYNC: Apache Config Files', 'blue')
         print colored('=========================', 'blue')
-        download_data_from_server('/tmp/', '/etc/httpd/')
+        download_data_from_server(data_dir, '/etc/httpd/')
 
         print colored('======================', 'blue')
         print colored('SYNC: PHP Config Files', 'blue')
         print colored('======================', 'blue')
-        get('/etc/php.ini', data_dir)
-        download_data_from_server('/tmp/', '/etc/php.d/')
-        download_data_from_server('/tmp/', '/usr/include/php/')
+        # local('sudo chmod 757 ' + data_dir + env.host)
+        get('/etc/php.ini', data_dir + env.host, use_sudo=True)
+        # local('sudo chmod 755 ' + data_dir + env.host)
+        download_data_from_server(data_dir, '/etc/php.d/')
+        download_data_from_server(data_dir, '/usr/include/php/')
 
         print colored('=============================', 'blue')
         print colored('SYNC: Shibboleth Config Files', 'blue')
         print colored('=============================', 'blue')
-        download_data_from_server('/tmp/', '/etc/shibboleth/')
+        download_data_from_server(data_dir, '/etc/shibboleth/')
 
 
-def rsync_data_to_server_v2(local_file_dir, local_file_path , local_rsync_dir, remote_dir):
+def upload_lamp_from_server(data_dir, remote_dir):
+    """
+Upload LAMP stack data using rsync_data_to_server_v2 task
+    :param data_dir: Directory where the data it's locally stored
+    :param remote_dir: Remote dir to store the LAMP stack data and conf
+
+IMPORTANT 1:
+Remeber to genereta a key pair for root, if the key does not exists this task won't work
+since it's a MANDATORY PREREQUISITE for it. Then, before executing it, you should use:
+"fab -R local key_gen:root"
+"fab -R devtest key_append:root"
+
+IMPORTANT 2:
+To mantain the files permissions you must run this taks with sudo:
+eg:sudo fab -R devtest upload_lamp_from_server:/tmp/172.28.128.4/,/tmp/
+
+IMPORTANT 3:
+It's a must to have in every server the rsync package already installed!
+    """
+    with settings(warn_only=False):
+        # key_gen("root")
+        # key_append("root")
+
+        print colored('==========================', 'blue')
+        print colored('SYNC: Apache Document Root', 'blue')
+        print colored('==========================', 'blue')
+        rsync_data_to_server_v2(data_dir, data_dir + 'var-www.2016-09-30-15-00-16.tar.gz',
+                                data_dir + 'var/www/', remote_dir + 'var/www/')
+
+        print colored('=========================', 'blue')
+        print colored('SYNC: Apache Config Files', 'blue')
+        print colored('=========================', 'blue')
+        rsync_data_to_server_v2(data_dir, data_dir + 'etc-httpd.2016-09-30-15-36-19.tar.gz',
+                                data_dir + 'etc/httpd/', remote_dir + 'etc/httpd/')
+
+        print colored('======================', 'blue')
+        print colored('SYNC: PHP Config Files', 'blue')
+        print colored('======================', 'blue')
+        # file_send_oldmod(data_dir + 'php.ini', remote_dir + '/etc/')
+        rsync_data_to_server_v2(data_dir, data_dir + 'etc-php.d.2016-09-30-15-36-47.tar.gz',
+                                data_dir + 'etc/php.d/', remote_dir + 'etc/php.d/')
+        rsync_data_to_server_v2(data_dir, data_dir + 'usr-include-php.2016-09-30-15-36-48.tar.gz',
+                                data_dir + 'usr/include/php/', remote_dir + 'usr/include/php/')
+
+        print colored('=============================', 'blue')
+        print colored('SYNC: Shibboleth Config Files', 'blue')
+        print colored('=============================', 'blue')
+        rsync_data_to_server_v2(data_dir, data_dir + 'etc-shibboleth.2016-09-30-15-36-51.tar.gz',
+                                data_dir + 'etc/shibboleth/', remote_dir + 'etc/shibboleth/')
+        key_remove("root")
+
+
+def rsync_data_to_server_v2(local_file_dir, local_file_path, local_rsync_dir, remote_dir):
     """
 Migrate the data from a Jumphost Server to a new Server mainly using rsync
 fab -R devtest rsync_data_to_server_v2()
@@ -2233,13 +2976,17 @@ eg: fab -R devtest rsync_data_to_server_v2:/tmp/172.28.128.4/,/tmp/172.28.128.4/
                 print colored('###############################################', 'blue')
                 local('sudo tar xzvf ' + local_file_path + ' -C ' + local_file_dir)
                 if os.path.isdir(local_rsync_dir) and exists(remote_dir):
-                    rsync_project(local_dir= local_rsync_dir, remote_dir=remote_dir,
+                    rsync_project(local_dir=local_rsync_dir, remote_dir=remote_dir,
                                   default_opts='-avzP --progress')
+                    local('sudo find ' + local_file_dir + '* -type d | sudo xargs rm -rf --')
                 else:
                     try:
                         sudo('mkdir -p ' + remote_dir)
-                        rsync_project(local_dir= local_rsync_dir, remote_dir=remote_dir,
+                        rsync_project(local_dir=local_rsync_dir, remote_dir=remote_dir,
                                       default_opts='-avzP --progress')
+                        local('sudo find ' + local_file_dir + '* -type d | sudo xargs rm -rf --')
+                        # local('sudo rm -rf ' + local_rsync_dir[:-1])
+
                     except SystemExit:
                         print colored('#################################################################', 'red')
                         print colored('##### Check that all the DIRS passed as args are consistent #####', 'red')
@@ -2252,6 +2999,252 @@ eg: fab -R devtest rsync_data_to_server_v2:/tmp/172.28.128.4/,/tmp/172.28.128.4/
             print colored('##########################################################', 'red')
             print colored('##### Check that files ' + local_file_path + 'exists #####', 'red')
             print colored('##########################################################', 'red')
+
+
+def php53_install_centos7():
+    """
+Install php-5.3.29 in a CentOS7 Server
+    """
+    with settings(warn_only=False):
+        sudo('yum groupinstall \'Development Tools\'')
+        sudo('yum install -y libxml2-devel libXpm-devel gmp-devel libicu-devel t1lib-devel aspell-devel'
+             ' openssl-devel openssl openssl-common bzip2-devel libcurl-devel libjpeg-devel libvpx-devel libpng-devel'
+             ' freetype-devel readline-devel libtidy-devel libxslt-devel libmcrypt-devel pcre-devel curl-devel'
+             ' mysql-devel ncurses-devel gettext-devel net-snmp-devel libevent-devel libtool-ltdl-devel'
+             ' libc-client-devel postgresql-devel enchant-devel libpng-devel pam-devel libdb libdb-devel'
+             ' freetds-devel recode-devel mod_ldap httpd-devel')
+        with cd('/usr/src'):
+            if exists('/usr/src/php-5.3.29', use_sudo=True):
+                print colored('###########################################', 'blue')
+                print colored('##### PHP Sources already downloaded ######', 'blue')
+                print colored('###########################################', 'blue')
+                with cd('php-5.3.29'):
+                    sudo('./configure  --enable-cli --with-pgsql --with-curl --with-openssl --enable-pdo --with-gettext'
+                         ' --enable-mbstring --with-apxs2 --with-gd --with-zlib --with-ldap --with-pspell --with-mcrypt'
+                         ' --with-imap-ssl --with-tidy --with-enchant --enable-soap --with-mssql --with-mysql'
+                         ' --with-mysqli'
+                         ' --enable-mbstring --enable-xml --enable-libxml --with-xmlrpc'
+                         ' --with-config-file-scan-dir=/etc/php.d/ --with-jpeg-dir=/lib64/ --with-libdir=lib64')
+                    sudo('make')
+                    sudo('make install')
+            else:
+                print colored('###########################################################', 'red')
+                print colored('###### PHP Sources will be downloaded and installed #######', 'red')
+                print colored('###########################################################', 'red')
+                sudo('wget "http://php.net/get/php-5.3.29.tar.gz/from/this/mirror"')
+                sudo('mv mirror php.tar.gz')
+                sudo('tar -xzf php.tar.gz')
+                with cd('/usr/src/php-5.3.29'):
+                    sudo('./configure  --enable-cli --with-pgsql --with-curl --with-openssl --enable-pdo --with-gettext'
+                         ' --enable-mbstring --with-apxs2 --with-gd --with-zlib --with-ldap --with-pspell --with-mcrypt'
+                         ' --with-imap-ssl --with-tidy --with-enchant --enable-soap --with-mssql --with-mysql'
+                         ' --with-mysqli'
+                         ' --enable-mbstring --enable-xml --enable-libxml --with-xmlrpc'
+                         ' --with-config-file-scan-dir=/etc/php.d/ --with-jpeg-dir=/lib64/ --with-libdir=lib64')
+                    sudo('make')
+                    sudo('make install')
+
+
+def php53_remove_centos7():
+    """
+Remove php-5.3.29 in a CentOS7 Server
+    """
+    with settings(warn_only=False):
+        sudo('rm -rf /usr/local/bin/php')
+        sudo('rm -rf /usr/local/bin/phpize')
+        sudo('rm -rf /usr/local/bin/php-config')
+        sudo('rm -rf /usr/local/include/php')
+        sudo('rm -rf /usr/local/lib/php')
+        sudo('rm -rf /usr/local/man/man1/php*')
+        sudo('rm -rf /var/lib/php')
+
+
+def password_hash(password):
+    """
+Password hash func
+    :param password: plaintext password to be hashed
+    """
+    with settings(warn_only=False):
+        hash_pass = pbkdf2_sha256.encrypt(password, rounds=200000, salt_size=16)
+        # plainpass = pbkdf2_sha256.decrypt(hash, rounds=200000, salt_size=16)
+        return hash_pass
+
+
+def password_hash_verify(password, hash_password):
+    """
+Password hash verify func
+    :param password: plaintext password to be hashed
+    :param hash_password: password hash of the pass to be verified
+    """
+    with settings(warn_only=False):
+        if pbkdf2_sha256.verify(password, hash_password):
+            print "Correct Pass"
+        else:
+            print "Incorrect Pass"
+
+
+def password_base64_encode(password):
+    """
+Password base64 encode
+    :param password: plaintext password to be hashed
+
+    eg: [vagrant@server proton]$ fab -R local password_base64_encode:Testing!
+    [localhost] Executing task 'password_base64_encode'
+    VGVzdGluZyE=
+    Done.
+
+    """
+    with settings(warn_only=False):
+        password_base64 = base64.b64encode(password)
+        print password_base64
+        return str(password_base64)
+
+
+def password_base64_decode(password_base64):
+    """
+Password base64 decode
+    :param password_base64: base64 encoded password
+
+    eg: [vagrant@server proton]$ fab -R local password_base64_decode:"VGVzdGluZyE\="
+    [localhost] Executing task 'password_base64_decode'
+    Testing!
+    Done.
+    """
+    with settings(warn_only=False):
+        password = base64.b64decode(password_base64)
+        # print password
+        return str(password)
+
+
+def install_docker_centos7():
+    with settings(warn_only=False):
+
+        print colored('################################################################', 'red', attrs=['bold'])
+        print colored('################################################################', 'red', attrs=['bold'])
+
+
+        print colored(' ____             _               ____                           ', 'blue', attrs=['bold'])
+        print colored('|  _ \  ___   ___| | _____ _ __  / ___|  ___ _ ____   _____ _ __ ', 'blue', attrs=['bold'])
+        print colored('| | | |/ _ \ / __| |/ / _ \  __| \___ \ / _ \  __\ \ / / _ \  __|', 'blue', attrs=['bold'])
+        print colored('| |_| | (_) | (__|   <  __/ |     ___) |  __/ |   \ V /  __/ |   ', 'blue', attrs=['bold'])
+        print colored('|____/ \___/ \___|_|\_\___|_|    |____/ \___|_|    \_/ \___|_|   ', 'blue', attrs=['bold'])
+
+        print colored('                                                                  ', 'blue')
+        print colored('                                                                  ', 'blue')
+
+        print colored('                                 xMMMMMMc', 'cyan')
+        print colored('                                 xMMMMMMc', 'cyan')
+        print colored('                                 xMMMMMMc', 'cyan')
+        print colored('                  ......  ...... ;dddddd ', 'cyan')
+        print colored('                 oWWWWWWo0NNNNNN,dNNNNNN:                     dOl.', 'cyan')
+        print colored('                 dMMMMMMdXMMMMMM,xMMMMMMc                    kMMMWd.', 'cyan')
+        print colored('                 dMMMMMMdXMMMMMM,xMMMMMMc                   cMMMMMMO.', 'cyan')
+        print colored('                ,,,,,, :xxxxxx;oxxxxxx.:xxxxxx .,,,,,,.           xMMMMMMMO. ....', 'cyan')
+        print colored('                .XMMMMMW,dMMMMMMdXMMMMMM,xMMMMMMckMMMMMMc           lMMMMMMMMXNWMWWX0x:.', 'cyan')
+        print colored('        .XMMMMMW,dMMMMMMdXMMMMMM,dMMMMMMckMMMMMMc           .0MMMMMMMMMMMMMMMMK.', 'cyan')
+        print colored('        .XMMMMMW,dMMMMMMdXMMMMMM,xMMMMMMckMMMMMMc            ;NMMMMMMMMMMMMMWk.', 'cyan')
+        print colored(',;;;;;;:dddddddclddddddloddddddclddddddcoddddddl;;;;;;:cldOKWMMMMMMMMMWXOdc.', 'cyan')
+        print colored('WMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMWc''..', 'cyan')
+        print colored('MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNc', 'cyan')
+        print colored('WMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN;', 'cyan')
+        print colored('0MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMO.', 'cyan')
+        print colored(':WMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMd', 'cyan')
+        print colored(' dMMMMMMMMMMMMMMMMMMW0KxKMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM0:', 'cyan')
+        print colored('  dMMMMMMMMMMMMMMMMMNOKO0MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNx,', 'cyan')
+        print colored('   oWMMMMMMMMMWWX0ONMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMWx.', 'cyan')
+        print colored('    .d0o .......    0MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNOc.', 'cyan')
+        print colored('      .dOl.          lNMMMMMMMMMMMMMMMMMMMMMMMMMNOc.', 'cyan')
+        print colored('        .:odo:.       .lKWMMMMMMMMMMMMMMMMMWKxc,.', 'cyan')
+        print colored('            .;dxxxoc:;, .ckXMMMMMMMMWX0xo: .', 'cyan')
+        print colored('                     cxOKNWWWWWWNXKOxo; .', 'cyan')
+
+        print colored('                                                                  ', 'blue')
+        print colored('                                                                  ', 'blue')
+
+        print colored('              cd.                                ,dc', 'blue')
+        print colored('              XMo                                kMW.', 'blue')
+        print colored('     .,:cc: . XMo     .;ccc;.           :ccc;.   kMW.   ;;       :llc;.         . ;:,', 'blue')
+        print colored('   c0WW0OOKWW0WMo  .dXMN0OOXMNx.    ,OWWKOO0NW:  kMW..dNMO   ,OWMKOk0NMKl.    :0WWK0x', 'blue')
+        print colored('  OMXc     .cXMMo  NMO,      xWN;  oMNo.         kMWONWk,   oWNl.     xMMK  .0MK:.', 'blue')
+        print colored(' cMW         .WMo OMk         oMN.,MM:           kMMWx.    ;MM;    .lKM0l.  dMX.', 'blue')
+        print colored(' cMN.        .NMl 0Mx         lMW.,MM,           kMMWl     :MM,  ,OWM0;     kM0', 'blue')
+        print colored(' .KMO'      '0MK. :WWo.      cNMd  xMK;          kMMXMXl.   xMKl0WXd        kM0', 'blue')
+        print colored('  .xWMKdooxKMWd.   ,0MWOdlokNMX:    lNMNkdodOK;  kMW.;0MNo   cXMMNxoxOK:    kM0', 'blue')
+        print colored('    .;ldxxdl,        .:oxxxo:.        ,ldxxdo;   ,dl    do      cdxxxo;     ;x:', 'blue')
+
+        print colored('                                                                  ', 'blue')
+        print colored('                                                                  ', 'blue')
+
+        print colored('                                                                  ', 'blue')
+        print colored('                                                                  ', 'blue')
+
+        print colored('===================================================================', 'blue')
+        print colored('DEPENDENCIES PROVISIONING                          ', 'blue', attrs=['bold'])
+        print colored('===================================================================', 'blue')
+        sudo('yum clean all')
+        sudo('yum update')
+        sudo('yum install -y gcc glibc glibc-common gd gd-devel wget net-tools git')
+        sudo('yum install -y python-devel vim net-tools')
+        sudo('yum install -y epel-release')
+
+        print colored('===================================================================', 'blue')
+        print colored('INSTALLING PYTHON PIP + FABRIC                     ', 'blue', attrs=['bold'])
+        print colored('===================================================================', 'blue')
+        sudo('yum install -y python-pip')
+        sudo('pip install --upgrade pip')
+        sudo('pip install fabric')
+        sudo('pip install termcolor')
+        sudo('pip install iptools')
+        sudo('pip install passlib')
+
+        print colored('===================================================================', 'blue')
+        print colored('DOCKER ENGINE PROVISIONING                         ', 'blue', attrs=['bold'])
+        print colored('===================================================================', 'blue')
+
+        with settings(warn_only=True):
+            docker_version = run('docker -v')
+            docker_version.strip()
+            if "Docker version" not in docker_version:
+                # Run the Docker installation script.
+                sudo('curl -fsSL https://get.docker.com/ | sh')
+            else:
+                print colored('===================================================================', 'blue')
+                print colored('DOCKER '+ docker_version + ' INSTALLED          ', 'blue', attrs=['bold'])
+                print colored('===================================================================', 'blue')
+
+        # Enable the service.
+        sudo('systemctl enable docker.service')
+        # Start the Docker daemon.
+        sudo('systemctl start docker')
+        #Verify docker is installed correctly by running a test image in a container.
+        sudo('docker run --rm hello-world')
+        # Configure the Docker daemon to start automatically when the host starts:
+        sudo('systemctl enable docker')
+
+        # The docker daemon binds to a Unix socket instead of a TCP port.
+        # By default that Unix socket is owned by the user root and other users can access it with sudo.
+        # For this reason, docker daemon always runs as the root user.
+        # To avoid having to use sudo when you use the docker command, create a Unix group called
+        # docker and add users to it. When the docker daemon starts, it makes the ownership of
+        # the Unix socket read/writable by the docker group. Uncoment the sudo() lines below if you like
+        # to achieve this result
+        # Create the docker group
+        # sudo('groupadd docker')
+        # Add your user to docker group.
+        # sudo('usermod -aG docker vagrant')
+
+        print colored('===================================================================', 'blue')
+        print colored('DOCKER COMPOSE PROVISIONING                         ', 'blue', attrs=['bold'])
+        print colored('===================================================================', 'blue')
+
+        sudo('pip install docker-compose')
+
+        print colored('===================================================================', 'blue')
+        print colored('DOCKER MACHINE PROVISIONING                         ', 'blue', attrs=['bold'])
+        print colored('===================================================================', 'blue')
+
+        sudo('curl -L https://github.com/docker/machine/releases/download/v0.8.2/docker-machine-`uname -s`-`uname -m`'
+            ' >/usr/local/bin/docker-machine && chmod +x /usr/local/bin/docker-machine')
 
 """
 def iptables(action, ip_addr):
@@ -2395,11 +3388,14 @@ def db_backup():
 
         DATE=`date +%Y-%m-%d`
         mysqldump -q -c --routines --triggers --single-transaction -h ggcc-prd.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p ggcc_prd > /ops/backups/ggcc_prd-$DATE.sql
+        mysqldump -q -c --routines --triggers --single-transaction -h ggcc-prd.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p ggcc_prd > /ops/backups/ggcc_prd-$DATE.sql
+
         #check that the backup was created with a grep.
 
         #mysql --defaults-file=scripts/conf/connect-stg/connect-stg-my.cnf -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -e "CREATE DATABASE grey_stg_v2"
         #mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "DROP DATABASE grey_stg_v2"
         mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "CREATE DATABASE ggcc_stg_v3"
+        mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "CREATE DATABASE ggcc_stg_v4"
         mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "show databases;"
         Enter password:
         +--------------------+
@@ -2417,6 +3413,9 @@ def db_backup():
 
         DATE=`date +%Y-%m-%d`
         mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p ggcc_stg_v3 < /ops/backups/ggcc_prd-$DATE.sql
+        mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p ggcc_stg_v4 < /ops/backups/ggcc-prd-$DATE.sql
+
+        mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "use ggcc_stg_v4; show tables;"
 
         THEN IN STG
         If User not created:
@@ -2429,6 +3428,7 @@ def db_backup():
 
         #To grant permisions for a certain user for a specific DB (for Connect)
         mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "grant all on ggcc_stg_v3.* to 'ggcc_stg_user'@'%';"
+        mysql -h ggcc-stg.cqrpklcv3mzd.us-east-1.rds.amazonaws.com -u greyrdsadmin -p -e "grant all on ggcc_stg_v4.* to 'ggcc_stg_user'@'%';"
 
         #Remove the dump
 
