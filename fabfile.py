@@ -1593,9 +1593,9 @@ Given the username, grant MySQL permissions for a certain DB to this username
         mysql_password_enc = str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "password"))
         password = password_base64_decode(mysql_password_enc)
         db_user = load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "db_user")
-        #mysql_user_password_enc = \
+        # mysql_user_password_enc = \
         #    str(load_configuration(config.MYSQL_CONFIG_FILE_PATH, "mysql_stg", "db_user_password"))
-        #db_user_pass = password_base64_decode(mysql_user_password_enc)
+        # db_user_pass = password_base64_decode(mysql_user_password_enc)
 
         try:
             sudo('mysql -h ' + mysql_ip + ' -u ' + mysql_user + ' -p' + password +
@@ -3116,7 +3116,11 @@ Password base64 decode
         return str(password)
 
 
-def install_docker_centos7():
+def install_docker_centos7(username):
+    """
+Install Docker Engine, docker-compose, docker-machine
+    :param username: user to be aded to the docker group
+    """
     with settings(warn_only=False):
 
         print colored('################################################################', 'red', attrs=['bold'])
@@ -3222,7 +3226,7 @@ def install_docker_centos7():
             # Create the docker group
             sudo('groupadd docker')
             # Add your user to docker group.
-            sudo('usermod -aG docker vagrant')
+            sudo('usermod -aG docker '+ username)
 
         print colored('===================================================================', 'blue')
         print colored('DOCKER COMPOSE PROVISIONING                         ', 'blue', attrs=['bold'])
@@ -3234,8 +3238,19 @@ def install_docker_centos7():
         print colored('DOCKER MACHINE PROVISIONING                         ', 'blue', attrs=['bold'])
         print colored('===================================================================', 'blue')
 
-        sudo('curl -L https://github.com/docker/machine/releases/download/v0.8.2/docker-machine-`uname -s`-`uname -m`'
-            ' >/usr/local/bin/docker-machine && chmod +x /usr/local/bin/docker-machine')
+        with settings(warn_only=True):
+            docker_machine_version = run('docker-machine -v')
+            docker_machine_version.strip()
+            if "docker-machine version" not in docker_machine_version:
+                # Run the Docker installation script.
+                sudo('curl -L https://github.com/docker/machine/releases/download/v0.8.2/'
+                     'docker-machine-`uname -s`-`uname -m` '
+                     '>/usr/local/bin/docker-machine && chmod +x /usr/local/bin/docker-machine')
+            else:
+                print colored('===================================================================', 'blue')
+                print colored('DOCKER '+ docker_version + ' INSTALLED             ', 'blue', attrs=['bold'])
+                print colored('===================================================================', 'blue')
+
 
 """
 def iptables(action, ip_addr):
