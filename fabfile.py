@@ -3240,6 +3240,7 @@ Install Docker Engine, docker-compose, docker-machine
 
         with settings(warn_only=True):
             docker_machine_version = run('docker-machine -v')
+            print colored(docker_machine_version, 'red', attrs=['bold'])
             docker_machine_version.strip()
             if "docker-machine version" not in docker_machine_version:
                 # Run the Docker installation script.
