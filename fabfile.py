@@ -3218,10 +3218,11 @@ def install_docker_centos7():
         # docker and add users to it. When the docker daemon starts, it makes the ownership of
         # the Unix socket read/writable by the docker group. Uncoment the sudo() lines below if you like
         # to achieve this result
-        # Create the docker group
-        sudo('groupadd docker')
-        # Add your user to docker group.
-        sudo('usermod -aG docker vagrant')
+        with settings(warn_only=True):
+            # Create the docker group
+            sudo('groupadd docker')
+            # Add your user to docker group.
+            sudo('usermod -aG docker vagrant')
 
         print colored('===================================================================', 'blue')
         print colored('DOCKER COMPOSE PROVISIONING                         ', 'blue', attrs=['bold'])
