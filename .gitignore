@@ -6,4 +6,5 @@ logs/.idea/
 ./idea/proton.iml
 ./idea/vcs.xml
 ./idea/workspace.xml
+.idea/workspace.xml
 .gitignore
