@@ -3248,7 +3248,7 @@ Install Docker Engine, docker-compose, docker-machine
                      '>/usr/local/bin/docker-machine && chmod +x /usr/local/bin/docker-machine')
             else:
                 print colored('===================================================================', 'blue')
-                print colored('DOCKER '+ docker_version + ' INSTALLED             ', 'blue', attrs=['bold'])
+                print colored('DOCKER '+ docker_machine_version + ' INSTALLED     ', 'blue', attrs=['bold'])
                 print colored('===================================================================', 'blue')
 
 
