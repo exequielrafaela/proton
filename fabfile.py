@@ -3219,9 +3219,9 @@ def install_docker_centos7():
         # the Unix socket read/writable by the docker group. Uncoment the sudo() lines below if you like
         # to achieve this result
         # Create the docker group
-        # sudo('groupadd docker')
+        sudo('groupadd docker')
         # Add your user to docker group.
-        # sudo('usermod -aG docker vagrant')
+        sudo('usermod -aG docker vagrant')
 
         print colored('===================================================================', 'blue')
         print colored('DOCKER COMPOSE PROVISIONING                         ', 'blue', attrs=['bold'])
