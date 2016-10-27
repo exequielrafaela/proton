@@ -2896,6 +2896,19 @@ Download LAMP data using download_data_from_server task
         download_data_from_server(data_dir, '/etc/shibboleth/')
 
 
+def download_feeds_from_server(data_dir):
+    """
+Download LAMP data using download_data_from_server task
+    :param data_dir: Directory where the data it's going to be stored in the jumphost
+    """
+    with settings(warn_only=False):
+        print colored('==========================', 'blue')
+        print colored('SYNC: Apache Document Root', 'blue')
+        print colored('==========================', 'blue')
+        download_data_from_server(data_dir, '/var/www/feedsreader')
+
+    mysql_backup_db("/mnt/resource/172.17.2.30/", "/tmp/", root, feedsreader, mysql_ip="127.0.0.1")
+
 def upload_lamp_from_server(data_dir, remote_dir):
     """
 Upload LAMP stack data using rsync_data_to_server_v2 task
