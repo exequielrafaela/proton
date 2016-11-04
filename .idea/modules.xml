@@ -2,6 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$USER_HOME$/Globant/grey_repo/Feeds-docker-stack/.idea/Feeds-docker-stack.iml" filepath="$USER_HOME$/Globant/grey_repo/Feeds-docker-stack/.idea/Feeds-docker-stack.iml" />
+      <module fileurl="file://$USER_HOME$/Globant/grey_repo/Feeds-docker-stack-LAMP/.idea/Feeds-docker-stack-LAMP.iml" filepath="$USER_HOME$/Globant/grey_repo/Feeds-docker-stack-LAMP/.idea/Feeds-docker-stack-LAMP.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../.idea/Programming.iml" filepath="$PROJECT_DIR$/../.idea/Programming.iml" />
+      <module fileurl="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/.idea/deploy_scripts.iml" filepath="$USER_HOME$/Globant/grey_repo/deploy_scripts/.idea/deploy_scripts.iml" />
+      <module fileurl="file://$USER_HOME$/Globant/grey_repo/docker-stacks-demo/.idea/docker-stacks-demo.iml" filepath="$USER_HOME$/Globant/grey_repo/docker-stacks-demo/.idea/docker-stacks-demo.iml" />
+      <module fileurl="file://$USER_HOME$/Globant/grey_repo/feeds-docker-stack/.idea/feeds-docker-stack.iml" filepath="$USER_HOME$/Globant/grey_repo/feeds-docker-stack/.idea/feeds-docker-stack.iml" />
       <module fileurl="file://$USER_HOME$/vagrant_projects/.idea/vagrant_projects.iml" filepath="$USER_HOME$/vagrant_projects/.idea/vagrant_projects.iml" />
     </modules>
   </component>

@@ -2905,10 +2905,18 @@ Download LAMP data using download_data_from_server task
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('==========================', 'blue')
+<<<<<<< HEAD
         download_data_from_server(data_dir, '/var/www/feedsreader')
 
     mysql_backup_db("/mnt/resource/172.17.2.30/", "/tmp/", root, feedsreader, mysql_ip="127.0.0.1")
 
+=======
+        download_data_from_server(data_dir, '/var/www/feedsreader/')
+
+    mysql_backup_db("/mnt/resource/172.17.2.30/", "/tmp/", root, feedsreader, mysql_ip="127.0.0.1")
+
+
+>>>>>>> dev-test
 def upload_lamp_from_server(data_dir, remote_dir):
     """
 Upload LAMP stack data using rsync_data_to_server_v2 task
