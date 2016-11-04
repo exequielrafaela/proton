@@ -10,19 +10,19 @@
   <a href="#">https://goo.gl/yMNmON</a> |
   <a href="#">http://docs.fabfile.org/en/1.12/</a>
   <br><br>
-  <img src="https://github.com/exequielrafaela/Vagrant_PyFab-Fabric/blob/master/Figures/fabric_pyenv.png" 
+  <img src="https://github.com/exequielrafaela/proton/blob/dev-test/Figures/fabric_pyenv.png" 
 </p>
 
 Execution example: 
 	
-1st Pre requisites: Run the requirements.sh script that comes with proton
+**1st Pre requisites:** Run the requirements.sh script that comes with proton
 	
 	 $ git clone https://github.com/exequielrafaela/proton.git
 	 $ cd proton
 	 $ sudo ./requirements.sh
 
 
-2nd Proton help: Useful command guide
+**2nd Proton help:** Useful command guide
 	
 	$ fab show_help 
 	./conf/
@@ -38,8 +38,10 @@ Execution example:
 
 	Done.
 
+ <img src="https://github.com/exequielrafaela/proton/blob/dev-test/Figures/proton-multi-node-deployment-workflow.png" 
+ </p>
 
-3rd Proton Available Commands: inside the proton folder run "fab -l" 
+**3rd Proton Available Commands:** inside the proton folder run "fab -l" 
 	
 	$ fab -l
 	
@@ -134,7 +136,7 @@ Execution example:
     	yum_package                                          Install/Upgrade an RedHat/Centos yum based linux package
 
 
-4th Check the arguments of each Proton Function: Before running a Proton command you should check the expected parameters you must pass to it.
+**4th Check the arguments of each Proton Function:** Before running a Proton command you should check the expected parameters you must pass to it.
 	
 	$ fab -d mysql_backup_all
 	Displaying detailed information for task 'mysql_backup_all':
@@ -150,7 +152,7 @@ Execution example:
     	Arguments: local_dir, remote_dir, mysql_user, mysql_ip='127.0.0.1'
 	
 
-5th Validate the manually configured Proton Roles: Use the standar Proton "show_roles" function to check your roles
+**5th Validate the manually configured Proton Roles:** Use the standar Proton "show_roles" function to check your roles
 	
 	$ fab show_roles
 	./conf/
