@@ -1,11 +1,13 @@
 #pip freeze > requirements.txt
-#BeautifulSoup==3.2.0
-#Library>=0.2
 #pip install -r /path/to/requirements.txt
-#pip install -r requirements.txt
-fabric
-termcolor
+Fabric
 iptools
-getpass
-apt
 passlib
+termcolor
+
+
+
+
+
+
+

@@ -2905,7 +2905,7 @@ Download LAMP data using download_data_from_server task
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('==========================', 'blue')
-        download_data_from_server(data_dir, '/var/www/feedsreader')
+        download_data_from_server(data_dir, '/var/www/feedsreader/')
 
     mysql_backup_db("/mnt/resource/172.17.2.30/", "/tmp/", root, feedsreader, mysql_ip="127.0.0.1")
 
