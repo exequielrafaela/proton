@@ -1,7 +1,7 @@
 #PROTON
-*_Basic Fabric implementation usign Vagrant._*
+*_Proton is a Python Fabric based CM&D (Configuration Management & Deployment) Custom Tool._*
 
-*In this repo you'll find the Vagrant file and its python fabric provisioning file. Moreover, a fabfile.py with 4 declared roles (localhost, dev, stg, prod). You'll be able to generate shh keys and test them in a list of remote Servers.*
+*In this repo you'll find all the Proton project files. 1st you'll be able to generate an provisioning user and it's shh keys to test them in a list of remote Servers. Afterwards you'll use any of the Proton Standard functions targeting your manually configured ServerList.*
 
 <p align="center">
   <b>Some Related Links:</b><br>
@@ -15,14 +15,31 @@
 
 Execution example: 
 	
-Pre requisites: Run the requirements.sh script that comes with proton
+1st Pre requisites: Run the requirements.sh script that comes with proton
 	
 	 $ git clone https://github.com/exequielrafaela/proton.git
 	 $ cd proton
 	 $ sudo ./requirements.sh
 
 
-Ejercicios Tema3: Línea de Comandos. Comandos básicosI 
+2nd Proton help: Useful command guide
+	
+	$ fab show_help 
+	./conf/
+
+	Commands list:
+
+	fab show_help                Change behaviour mode to passive
+	fab -l                       To list all the fabric functions defined in proton
+	fab -d "task_name"           To list all the fabric functions defined in proton
+	fab show_roles               Change behaviour mode to aggressive
+	
+	s, q, quit, exit             Exit
+
+	Done.
+
+
+3rd Proton Available Commands: inside the proton folder run "fab -l" 
 	
 	$ fab -l
 	
@@ -117,7 +134,7 @@ Ejercicios Tema3: Línea de Comandos. Comandos básicosI
     	yum_package                                          Install/Upgrade an RedHat/Centos yum based linux package
 
 
-Ejercicios Tema 4: Linea de comandos. Comandos básicos II 
+4th Check the arguments of each Proton Function: Before running a Proton command you should check the expected parameters you must pass to it.
 	
 	$ fab -d mysql_backup_all
 	Displaying detailed information for task 'mysql_backup_all':
@@ -131,5 +148,17 @@ Ejercicios Tema 4: Linea de comandos. Comandos básicos II
         	:param mysql_ip: MySQL Server IP Address
     
     	Arguments: local_dir, remote_dir, mysql_user, mysql_ip='127.0.0.1'
+	
+
+5th Validate the manually configured Proton Roles: Use the standar Proton "show_roles" function to check your roles
+	
+	$ fab show_roles
+	./conf/
+	devtest ['10.191.231.182', '10.191.231.203']
+	local ['localhost']
+
+	Done.
+
+
 
 
