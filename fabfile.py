@@ -2335,6 +2335,58 @@ LAMP Stack installation in Centos7 OS.
                 # /var/www/icons/php.gif
 
 
+def install_mysql_server():
+    """
+MySQL Server installation in Centos7 OS.
+    """
+    with settings(warn_only=False):
+        print colored('===========================', 'blue')
+        print colored('INSTALLING : "MYSQL Server"', 'blue')
+        print colored('===========================', 'blue')
+
+        if exists('/etc/yum.repos.d/mysql-community.repo') and exists('/etc/yum.repos.d/mysql-community-source.repo'):
+            print colored('############################################', 'blue')
+            print colored('##### MySQL Repository already exists ######', 'blue')
+            print colored('############################################', 'blue')
+        else:
+            sudo('wget -P /home/vagrant/ http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm')
+            with cd('/home/vagrant/'):
+                if exists('mysql-community-release-el7-5.noarch.rpm', use_sudo=True):
+                    print colored('################################################', 'blue')
+                    print colored('##### MySQL Repository File downloaded OK ######', 'blue')
+                    print colored('################################################', 'blue')
+                    try:
+                        print colored('#########################################', 'blue')
+                        print colored('####### ADDING MySQL Repository #########', 'blue')
+                        print colored('#########################################', 'blue')
+                        sudo('rpm -ivh mysql-community-release-el7-5.noarch.rpm')
+                    except SystemExit:
+                        print colored('##############################################', 'red')
+                        print colored('####### FAIL to add MySQL repository #########', 'red')
+                        print colored('##############################################', 'red')
+                else:
+                    print colored('######################################', 'red')
+                    print colored('##### Repo File does not exists ######', 'red')
+                    print colored('######################################', 'red')
+
+        try:
+            sudo('yum install -y mysql-server-5.0.95-5.el5_9 mod_auth_mysql-3.0.0-3.2.el5_3 '
+                 'MySQL-python-1.2.3-0.1.c1.el5')
+            sudo('yum install -y mysql-devel-5.0.95-5.el5_9 perl-DBD-MySQL-3.0007-2.el5'
+                 ' mysql-connector-odbc-3.51.26r1127-2.el5')
+            sudo('yum install -y libdbi-dbd-mysql-0.8.1a-1.2.2 mysql-5.0.95-5.el5_9')
+            sudo('systemctl start mysqld')
+            sudo('mysql_secure_installation')
+            sudo('chkconfig mysqld on')
+        except SystemExit:
+            sudo('yum install -y mysql-server mod_auth_mysql MySQL-python')
+            sudo('yum install -y mysql-devel perl-DBD-MySQL mysql mysql-connector-odbc')
+            sudo('yum install -y libdbi-dbd-mysql')
+            sudo('systemctl start mysqld')
+            sudo('mysql_secure_installation')
+            sudo('chkconfig mysqld on')
+
+
 def install_various_centos7():
     """
 Install custom list of packets
