@@ -3,4 +3,5 @@ create database ggcc_prd; grant all on ggcc_prd.* to 'root' identified by 'Temp0
 
 SHOW VARIABLES LIKE "%version%";
 SET PASSWORD FOR 'grey_ggcc_user'@'localhost' = PASSWORD('ggcc_stg_us3r');
+SET PASSWORD FOR 'root'@'172.18.0.2' = PASSWORD('Temp01');
 DROP DATABASE ggcc_stg_2016_10_20_15_06_40;
