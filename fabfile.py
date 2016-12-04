@@ -2228,11 +2228,12 @@ Postfix Internet Mailserver installation in Ubuntu 14.04.
         print colored('INSTALLING : "Postfix Mailserver"', 'blue')
         print colored('=================================', 'blue')
 
-        sudo('DEBIAN_FRONTEND=noninteractive apt-get -y install postfix mailutils')
-        sudo('cp /conf/postfix/mani.cf /etc/postfix/main.cf')
+        sudo('apt-get -y install postfix mailutils')
+        sudo('cp /conf/postfix/main.cf /etc/postfix/main.cf')
         sudo('service postfix restart')
         sudo('netstat -putona | grep 25')
         sudo('cat /var/log/mail.log')
+
 
 def install_lamp_centos7():
     """
