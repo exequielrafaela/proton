@@ -2219,6 +2219,21 @@ Check a certain folder Disk Usage
             total_avail_space_non_root / 1024 / 1024 / 1024)
 
 
+def install_postfix_ubuntu_14():
+    """
+Postfix Internet Mailserver installation in Ubuntu 14.04.
+    """
+    with settings(warn_only=False):
+        print colored('=================================', 'blue')
+        print colored('INSTALLING : "Postfix Mailserver"', 'blue')
+        print colored('=================================', 'blue')
+
+        sudo('DEBIAN_FRONTEND=noninteractive apt-get -y install postfix mailutils')
+        sudo('cp /conf/postfix/mani.cf /etc/postfix/main.cf')
+        sudo('service postfix restart')
+        sudo('netstat -putona | grep 25')
+        sudo('cat /var/log/mail.log')
+
 def install_lamp_centos7():
     """
 LAMP Stack installation in Centos7 OS.
@@ -2959,7 +2974,7 @@ Download LAMP data using download_data_from_server task
         print colored('==========================', 'blue')
         download_data_from_server(data_dir, '/var/www/feedsreader/')
 
-    mysql_backup_db("/mnt/resource/172.17.2.30/", "/tmp/", root, feedsreader, mysql_ip="127.0.0.1")
+    mysql_backup_db("/mnt/resource/172.17.2.30/", "/tmp/", "root", "feedsreader", mysql_ip="127.0.0.1")
 
 
 def upload_lamp_from_server(data_dir, remote_dir):
