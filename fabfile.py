@@ -2290,6 +2290,22 @@ Apache2 HTTP Server installation in Ubuntu 14.04.
         sudo('service apache2 restart')
 
 
+def install_logrotate_ubuntu_14():
+    """
+Squid3 HTTP Proxy installation in Ubuntu 14.04.
+    """
+    with settings(warn_only=False):
+        print colored('======================================', 'blue')
+        print colored('INSTALLING : "Logrotate Service      "', 'blue')
+        print colored('======================================', 'blue')
+
+        sudo('apt-get install -y logrotate')
+        sudo('cp /conf/logrotate/logrotate.conf /etc/logrotate/logrotate.conf')
+        sudo('cp /conf/logrotate/squid3 /etc/logrotate/lograte.d/squid3')
+        sudo('cp /conf/logrotate/apache2 /etc/logrotate/lograte.d/apache2')
+        sudo('cp /conf/logrotate/postfix /etc/logrotate/lograte.d/postfix')
+
+
 def install_lamp_centos7():
     """
 LAMP Stack installation in Centos7 OS.
