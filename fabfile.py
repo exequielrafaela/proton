@@ -1228,7 +1228,7 @@ Install in the host7s NFS Server under Debian/Ubuntu based systems
             sudo('chmod -R 777 '+nfs_dir+'/')
             sudo('chown nobody:nogroup ' + nfs_dir + '/')
 
-        sudo('chkconfig nfs on')
+        #sudo('chkconfig nfs on')
         sudo('service rpcbind start')
         sudo('service nfs start')
 
