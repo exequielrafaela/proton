@@ -2258,12 +2258,13 @@ Squid3 HTTP Proxy installation in Ubuntu 14.04.
 
 def install_apache24_ubuntu_14():
     """
-Squid3 HTTP Proxy installation in Ubuntu 14.04.
+Apache2 HTTP Server installation in Ubuntu 14.04.
     """
     with settings(warn_only=False):
         print colored('##########################', 'blue')
         print colored('#### APACHE2 WEB_SERV ####', 'blue')
         print colored('##########################', 'blue')
+        sudo('apt-get install apache2')
         sudo('sh /conf/apache2/gen-cer.sh binbash.com.ar')
         sudo('cp /conf/apache2/ports.conf /etc/apache2/ports.conf')
         sudo('cp /conf/apache2/binbash.com.ar.conf /etc/apache2/sites-available/binbash.com.ar')
