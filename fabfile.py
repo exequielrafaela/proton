@@ -2306,7 +2306,7 @@ Logrotate installation in Ubuntu 14.04.
         sudo('cp /conf/logrotate/postfix /etc/logrotate.d/postfix')
 
 
-def install_munin_ubuntu_14():
+def install_munin_master_ubuntu_14():
     """
 Munin HTTP Monitoring installation in Ubuntu 14.04.
     """
@@ -2316,6 +2316,24 @@ Munin HTTP Monitoring installation in Ubuntu 14.04.
         print colored('=======================================', 'blue')
 
         sudo('apt-get install -y apache2 apache2-utils libcgi-fast-perl libapache2-mod-fcgid munin')
+        with settings(warn_only=True):
+            sudo('a2enmod fcgid')
+        sudo('cp /conf/munin/munin.conf /etc/munin/munin.conf')
+        sudo('cp /conf/munin/apache.conf /etc/munin/apache.conf')
+        sudo('service apache2 restart')
+        sudo('service munin-node restart')
+
+
+def install_munin_node_ubuntu_14():
+    """
+Munin HTTP Monitoring installation in Ubuntu 14.04.
+    """
+    with settings(warn_only=False):
+        print colored('=======================================', 'blue')
+        print colored('INSTALLING : "Munin Monitoring Service"', 'blue')
+        print colored('=======================================', 'blue')
+
+        sudo('apt-get install -y munin-node')
         with settings(warn_only=True):
             sudo('a2enmod fcgid')
         sudo('cp /conf/munin/munin.conf /etc/munin/munin.conf')
