@@ -2292,7 +2292,7 @@ Apache2 HTTP Server installation in Ubuntu 14.04.
 
 def install_logrotate_ubuntu_14():
     """
-Squid3 HTTP Proxy installation in Ubuntu 14.04.
+Logrotate installation in Ubuntu 14.04.
     """
     with settings(warn_only=False):
         print colored('======================================', 'blue')
@@ -2304,6 +2304,24 @@ Squid3 HTTP Proxy installation in Ubuntu 14.04.
         sudo('cp /conf/logrotate/squid3 /etc/logrotate.d/squid3')
         sudo('cp /conf/logrotate/apache2 /etc/logrotate.d/apache2')
         sudo('cp /conf/logrotate/postfix /etc/logrotate.d/postfix')
+
+
+def install_munin_ubuntu_14():
+    """
+Squid3 HTTP Proxy installation in Ubuntu 14.04.
+    """
+    with settings(warn_only=False):
+        print colored('======================================', 'blue')
+        print colored('INSTALLING : "Logrotate Service      "', 'blue')
+        print colored('======================================', 'blue')
+
+        sudo('apt-get install -y apache2 apache2-utils libcgi-fast-perl libapache2-mod-fcgid munin')
+        with settings(warn_only=True):
+            sudo('a2enmod fcgid')
+        sudo('cp /conf/munin/munin.conf /etc/munin/munin.conf')
+        sudo('cp /conf/munin/apache.conf /etc/munin/apache.conf')
+        sudo('service apache2 restart')
+        sudo('service munin-node restart')
 
 
 def install_lamp_centos7():
