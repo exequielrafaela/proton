@@ -2301,9 +2301,9 @@ Squid3 HTTP Proxy installation in Ubuntu 14.04.
 
         sudo('apt-get install -y logrotate')
         sudo('cp /conf/logrotate/logrotate.conf /etc/logrotate.conf')
-        sudo('cp /conf/logrotate/squid3 /etc/lograte.d/squid3')
-        sudo('cp /conf/logrotate/apache2 /etc/lograte.d/apache2')
-        sudo('cp /conf/logrotate/postfix /etc/lograte.d/postfix')
+        sudo('cp /conf/logrotate/squid3 /etc/logrotate.d/squid3')
+        sudo('cp /conf/logrotate/apache2 /etc/logrotate.d/apache2')
+        sudo('cp /conf/logrotate/postfix /etc/logrotate.d/postfix')
 
 
 def install_lamp_centos7():
