@@ -2255,6 +2255,7 @@ Squid3 HTTP Proxy installation in Ubuntu 14.04.
         sudo('netstat -putona | grep 3128')
         sudo('cat /var/log/squid3/access.log')
 
+
 def install_apache24_ubuntu_14():
     """
 Squid3 HTTP Proxy installation in Ubuntu 14.04.
