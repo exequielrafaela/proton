@@ -2230,9 +2230,62 @@ Postfix Internet Mailserver installation in Ubuntu 14.04.
 
         sudo('DEBIAN_FRONTEND=noninteractive apt-get -y install postfix mailutils')
         sudo('cp /conf/postfix/main.cf /etc/postfix/main.cf')
+        sudo('cp /conf/postfix/virtual /etc/postfix/virtual')
+        sudo('postmap /etc/postfix/virtual')
         sudo('service postfix restart')
         sudo('netstat -putona | grep 25')
         sudo('cat /var/log/mail.log')
+
+
+def install_squid_ubuntu_14():
+    """
+Squid3 HTTP Proxy installation in Ubuntu 14.04.
+    """
+    with settings(warn_only=False):
+        print colored('======================================', 'blue')
+        print colored('INSTALLING : "Squid HTTP Proxy Server"', 'blue')
+        print colored('======================================', 'blue')
+
+        sudo('apt-get install -y squid apache2-utils')
+        sudo('cp /conf/squid/squid.conf /etc/squid3/squid.conf')
+        sudo('cp /conf/squid/squid_passwd /etc/squid3/squid_passwd')
+        sudo('cp /conf/squid/restricted-sites.squid /etc/squid3/restricted-sites.squid')
+        sudo('service squid3 restart')
+        sudo('cat /etc/squid3/squid.conf | egrep -v \'^#|^$\'')
+        sudo('netstat -putona | grep 3128')
+        sudo('cat /var/log/squid3/access.log')
+
+def install_apache24_ubuntu_14():
+    """
+Squid3 HTTP Proxy installation in Ubuntu 14.04.
+    """
+    with settings(warn_only=False):
+        print colored('##########################', 'blue')
+        print colored('#### APACHE2 WEB_SERV ####', 'blue')
+        print colored('##########################', 'blue')
+        sudo('sh /conf/apache2/gen-cer.sh binbash.com.ar')
+        sudo('cp /conf/apache2/ports.conf /etc/apache2/ports.conf')
+        sudo('cp /conf/apache2/binbash.com.ar.conf /etc/apache2/sites-available/binbash.com.ar')
+        sudo('mkdir -p /var/www/binbash.com.ar/public_html')
+        sudo('mkdir -p /var/www/binbash.com.ar/logs')
+
+        sudo('wget -P /var/www/binbash.com.ar'
+            ' --recursive'
+            ' --no-clobber'
+            ' --page-requisites'
+            ' --html-extension'
+            ' --convert-links'
+            ' --restrict-file-names=windows'
+            ' --domains website.org'
+            ' --no-parent'
+            ' http://www.binbash.com.ar')
+
+        sudo('cp /var/www/binbash.com.ar/www.binbash.com.ar/index.html /var/www/binbash.com.ar/public_html/index.html')
+        sudo('rm -r /var/www/binbash.com.ar/www.binbash.com.ar/')
+        sudo('echo "ServerName localhost" >> /etc/apache2/apache2.conf')
+        sudo('a2ensite binbash.com.ar')
+        sudo('chmod -R 755 /var/www')
+        sudo('service apache2 restart')
 
 
 def install_lamp_centos7():
