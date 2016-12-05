@@ -2308,33 +2308,61 @@ Logrotate installation in Ubuntu 14.04.
 
 def install_munin_master_ubuntu_14():
     """
-Munin HTTP Monitoring installation in Ubuntu 14.04.
+Munin Master HTTP Monitoring installation in Ubuntu 14.04.
     """
     with settings(warn_only=False):
         print colored('=======================================', 'blue')
         print colored('INSTALLING : "Munin Monitoring Service"', 'blue')
         print colored('=======================================', 'blue')
 
-        sudo('apt-get install -y apache2 apache2-utils libcgi-fast-perl libapache2-mod-fcgid munin')
+        sudo('apt-get install -y apache2 apache2-utils libcgi-fast-perl libwww-perl libapache2-mod-fcgid munin')
+        sudo('apt-get install munin-plugins-extra')
         with settings(warn_only=True):
             sudo('a2enmod fcgid')
         sudo('cp /conf/munin/munin.conf /etc/munin/munin.conf')
         sudo('cp /conf/munin/apache.conf /etc/munin/apache.conf')
+        sudo('cp /conf/munin/apache.conf /etc/munin/plugin-conf.d/munin-node')
+
+        #Activating extra plugins (Apache & Squid)
+        sudo('/usr/sbin/munin-node-configure --suggest')
+        sudo('/usr/sbin/munin-node-configure --shell | sudo sh')
+        sudo('ln -s /usr/share/munin/plugins/squid_cache /etc/munin/plugins/')
+        sudo('ln -s /usr/share/munin/plugins/squid_icp /etc/munin/plugins/')
+        sudo('ln -s /usr/share/munin/plugins/squid_objectsize /etc/munin/plugins/')
+        sudo('ln -s /usr/share/munin/plugins/squid_requests /etc/munin/plugins/')
+        sudo('ln -s /usr/share/munin/plugins/squid_traffic /etc/munin/plugins/')
+        sudo('/usr/sbin/munin-node-configure --suggest | egrep \'squid|apache|nfs|postfix|firewall|munin\'')
+
+        #Restarting services
+
         sudo('service apache2 restart')
         sudo('service munin-node restart')
 
 
 def install_munin_node_ubuntu_14():
     """
-Munin HTTP Monitoring installation in Ubuntu 14.04.
+Munin Node HTTP Monitoring installation in Ubuntu 14.04.
     """
     with settings(warn_only=False):
         print colored('=======================================', 'blue')
         print colored('INSTALLING : "Munin Monitoring Service"', 'blue')
         print colored('=======================================', 'blue')
 
-        sudo('apt-get install -y munin-node')
+        sudo('apt-get install -y munin-node libwww-perl')
+        sudo('apt-get install munin-plugins-extra')
         sudo('cp /conf/munin/munin-node.conf /etc/munin/munin-node.conf')
+
+        # Activating extra plugins (Apache & Squid)
+        sudo('/usr/sbin/munin-node-configure --suggest')
+        sudo('/usr/sbin/munin-node-configure --shell | sudo sh')
+        sudo('ln -s /usr/share/munin/plugins/squid_cache /etc/munin/plugins/')
+        sudo('ln -s /usr/share/munin/plugins/squid_icp /etc/munin/plugins/')
+        sudo('ln -s /usr/share/munin/plugins/squid_objectsize /etc/munin/plugins/')
+        sudo('ln -s /usr/share/munin/plugins/squid_requests /etc/munin/plugins/')
+        sudo('ln -s /usr/share/munin/plugins/squid_traffic /etc/munin/plugins/')
+        sudo('/usr/sbin/munin-node-configure --suggest | egrep \'squid|apache|nfs|postfix|firewall|munin\'')
+
+        #  Restarting services
         sudo('service munin-node restart')
 
 
