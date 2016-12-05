@@ -2264,7 +2264,7 @@ Apache2 HTTP Server installation in Ubuntu 14.04.
         print colored('##########################', 'blue')
         print colored('#### APACHE2 WEB_SERV ####', 'blue')
         print colored('##########################', 'blue')
-        sudo('apt-get install apache2')
+        sudo('apt-get install -y apache2')
         sudo('sh /conf/apache2/gen-cer.sh binbash.com.ar')
         sudo('cp /conf/apache2/ports.conf /etc/apache2/ports.conf')
         sudo('cp /conf/apache2/binbash.com.ar.conf /etc/apache2/sites-available/binbash.com.ar')
