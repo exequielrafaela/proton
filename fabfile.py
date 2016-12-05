@@ -2334,8 +2334,7 @@ Munin HTTP Monitoring installation in Ubuntu 14.04.
         print colored('=======================================', 'blue')
 
         sudo('apt-get install -y munin-node')
-        #sudo('cp /conf/munin/munin.conf /etc/munin/munin.conf')
-        #sudo('cp /conf/munin/apache.conf /etc/munin/apache.conf')
+        sudo('cp /conf/munin/munin-node.conf /etc/munin/munin-node.conf')
         sudo('service munin-node restart')
 
 
