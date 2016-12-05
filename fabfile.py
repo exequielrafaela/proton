@@ -1228,9 +1228,10 @@ Install in the host7s NFS Server under Debian/Ubuntu based systems
             sudo('chmod -R 777 '+nfs_dir+'/')
             sudo('chown nobody:nogroup ' + nfs_dir + '/')
 
-        #sudo('chkconfig nfs on')
-        sudo('service rpcbind start')
-        sudo('service nfs start')
+        with settings(warn_only=True):
+            #sudo('chkconfig nfs on')
+            sudo('service rpcbind start')
+            sudo('service nfs start')
 
         ip_addr = sudo('ifconfig eth1 | awk \'/inet /{print substr($2,6)}\'')
         netmask = sudo('ifconfig eth1 | awk \'/inet /{print substr($4,6)}\'')
