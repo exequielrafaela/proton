@@ -1216,7 +1216,7 @@ Install in the host7s NFS Server under Debian/Ubuntu based systems
         sudo('apt-get update')
         sudo('apt-get -y install nfs-kernel-server')
 
-        if exists('/var/' + nfs_dir, use_sudo=True):
+        if exists( nfs_dir, use_sudo=True):
             print colored('###########################################', 'blue')
             print colored('####### Directory already created #########', 'blue')
             print colored('###########################################', 'blue')
@@ -1224,21 +1224,20 @@ Install in the host7s NFS Server under Debian/Ubuntu based systems
             print colored('###########################################', 'red')
             print colored('###### Creating NFS share Directory #######', 'red')
             print colored('###########################################', 'red')
-            sudo('mkdir /var/' + nfs_dir)
-            # sudo('chmod -R 777 /var/'+nfs_dir+'/')
-            sudo('chown nobody:nogroup /var/' + nfs_dir + '/')
+            sudo('mkdir ' + nfs_dir)
+            sudo('chmod -R 777 '+nfs_dir+'/')
+            sudo('chown nobody:nogroup ' + nfs_dir + '/')
 
-        # sudo('chkconfig nfs on')
-        # sudo('service rpcbind start')
-        # sudo('service nfs start')
+        sudo('chkconfig nfs on')
+        sudo('service rpcbind start')
+        sudo('service nfs start')
 
-        # ip_addr = sudo('ifconfig eth0 | awk \'/inet /{print substr($2,6)}\'')
-        # netmask = sudo('ifconfig eth0 | awk \'/inet /{print substr($4,6)}\'')
-        # subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
-        # subnet = subnet_temp[0]
-        # sudo('echo "/var/' + nfs_dir + '     ' + subnet + '/' + netmask +
-        # '(rw,sync,no_root_squash,no_subtree_check)" > /etc/exports')
-        sudo('echo "/var/' + nfs_dir + '     *(rw,sync,no_root_squash)" > /etc/exports')
+        ip_addr = sudo('ifconfig eth1 | awk \'/inet /{print substr($2,6)}\'')
+        netmask = sudo('ifconfig eth1 | awk \'/inet /{print substr($4,6)}\'')
+        subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
+        subnet = subnet_temp[0]
+        sudo('echo "' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_subtree_check)" > /etc/exports')
+        sudo('echo "' + nfs_dir + '     *(rw,sync,no_root_squash)" > /etc/exports')
 
         sudo('sudo exportfs -a')
 
