@@ -2228,7 +2228,6 @@ Postfix Internet Mailserver installation in Ubuntu 14.04.
         print colored('INSTALLING : "Postfix Mailserver"', 'blue')
         print colored('=================================', 'blue')
 
-        sudo('apt-get -y install postfix mailutils')
         sudo('DEBIAN_FRONTEND=noninteractive apt-get -y install postfix mailutils')
         sudo('cp /conf/postfix/main.cf /etc/postfix/main.cf')
         sudo('service postfix restart')
@@ -2975,14 +2974,10 @@ Download LAMP data using download_data_from_server task
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('==========================', 'blue')
         download_data_from_server(data_dir, '/var/www/feedsreader')
-        mysql_backup_db("/mnt/resource/172.17.2.30/", "/tmp/", root, feedsreader, mysql_ip="127.0.0.1")
+        mysql_backup_db("/mnt/resource/172.17.2.30/", "/tmp/", "root", "feedsreader", mysql_ip="127.0.0.1")
         download_data_from_server(data_dir, '/var/www/feedsreader/')
-<<<<<<< HEAD
-        mysql_backup_db("/mnt/resource/172.17.2.30/", "/tmp/", root, feedsreader, mysql_ip="127.0.0.1")
-=======
-
-    mysql_backup_db("/mnt/resource/172.17.2.30/", "/tmp/", "root", "feedsreader", mysql_ip="127.0.0.1")
->>>>>>> dev-test
+        mysql_backup_db("/mnt/resource/172.17.2.30/", "/tmp/", "root", "feedsreader", mysql_ip="127.0.0.1")
+        mysql_backup_db("/mnt/resource/172.17.2.30/", "/tmp/", "root", "feedsreader", mysql_ip="127.0.0.1")
 
 
 def upload_lamp_from_server(data_dir, remote_dir):
