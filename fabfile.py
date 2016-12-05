@@ -2255,14 +2255,16 @@ Squid3 HTTP Proxy installation in Ubuntu 14.04.
         sudo('netstat -putona | grep 3128')
         sudo('cat /var/log/squid3/access.log')
 
+
 def install_apache24_ubuntu_14():
     """
-Squid3 HTTP Proxy installation in Ubuntu 14.04.
+Apache2 HTTP Server installation in Ubuntu 14.04.
     """
     with settings(warn_only=False):
         print colored('##########################', 'blue')
         print colored('#### APACHE2 WEB_SERV ####', 'blue')
         print colored('##########################', 'blue')
+        sudo('apt-get install apache2')
         sudo('sh /conf/apache2/gen-cer.sh binbash.com.ar')
         sudo('cp /conf/apache2/ports.conf /etc/apache2/ports.conf')
         sudo('cp /conf/apache2/binbash.com.ar.conf /etc/apache2/sites-available/binbash.com.ar')
@@ -2286,6 +2288,7 @@ Squid3 HTTP Proxy installation in Ubuntu 14.04.
         sudo('a2ensite binbash.com.ar')
         sudo('chmod -R 755 /var/www')
         sudo('service apache2 restart')
+
 
 def install_lamp_centos7():
     """
@@ -3025,11 +3028,9 @@ Download LAMP data using download_data_from_server task
         print colored('==========================', 'blue')
         print colored('SYNC: Apache Document Root', 'blue')
         print colored('==========================', 'blue')
-        download_data_from_server(data_dir, '/var/www/feedsreader')
-        mysql_backup_db("/mnt/resource/172.17.2.30/", "/tmp/", "root", "feedsreader", mysql_ip="127.0.0.1")
         download_data_from_server(data_dir, '/var/www/feedsreader/')
-        mysql_backup_db("/mnt/resource/172.17.2.30/", "/tmp/", "root", "feedsreader", mysql_ip="127.0.0.1")
-        mysql_backup_db("/mnt/resource/172.17.2.30/", "/tmp/", "root", "feedsreader", mysql_ip="127.0.0.1")
+
+    mysql_backup_db("/mnt/resource/172.17.2.30/", "/tmp/", "root", "feedsreader", mysql_ip="127.0.0.1")
 
 
 def upload_lamp_from_server(data_dir, remote_dir):
