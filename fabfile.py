@@ -2308,12 +2308,12 @@ Logrotate installation in Ubuntu 14.04.
 
 def install_munin_ubuntu_14():
     """
-Squid3 HTTP Proxy installation in Ubuntu 14.04.
+Munin HTTP Monitoring installation in Ubuntu 14.04.
     """
     with settings(warn_only=False):
-        print colored('======================================', 'blue')
-        print colored('INSTALLING : "Logrotate Service      "', 'blue')
-        print colored('======================================', 'blue')
+        print colored('=======================================', 'blue')
+        print colored('INSTALLING : "Munin Monitoring Service"', 'blue')
+        print colored('=======================================', 'blue')
 
         sudo('apt-get install -y apache2 apache2-utils libcgi-fast-perl libapache2-mod-fcgid munin')
         with settings(warn_only=True):
