@@ -2324,14 +2324,15 @@ Munin Master HTTP Monitoring installation in Ubuntu 14.04.
         sudo('cp /conf/munin/apache.conf /etc/munin/plugin-conf.d/munin-node')
 
         #Activating extra plugins (Apache & Squid)
-        sudo('/usr/sbin/munin-node-configure --suggest')
-        sudo('/usr/sbin/munin-node-configure --shell | sudo sh')
-        sudo('ln -s /usr/share/munin/plugins/squid_cache /etc/munin/plugins/')
-        sudo('ln -s /usr/share/munin/plugins/squid_icp /etc/munin/plugins/')
-        sudo('ln -s /usr/share/munin/plugins/squid_objectsize /etc/munin/plugins/')
-        sudo('ln -s /usr/share/munin/plugins/squid_requests /etc/munin/plugins/')
-        sudo('ln -s /usr/share/munin/plugins/squid_traffic /etc/munin/plugins/')
-        sudo('/usr/sbin/munin-node-configure --suggest | egrep \'squid|apache|nfs|postfix|firewall|munin\'')
+        with settings(warn_only=True):
+            sudo('/usr/sbin/munin-node-configure --suggest')
+            sudo('/usr/sbin/munin-node-configure --shell | sudo sh')
+            sudo('ln -s /usr/share/munin/plugins/squid_cache /etc/munin/plugins/')
+            sudo('ln -s /usr/share/munin/plugins/squid_icp /etc/munin/plugins/')
+            sudo('ln -s /usr/share/munin/plugins/squid_objectsize /etc/munin/plugins/')
+            sudo('ln -s /usr/share/munin/plugins/squid_requests /etc/munin/plugins/')
+            sudo('ln -s /usr/share/munin/plugins/squid_traffic /etc/munin/plugins/')
+            sudo('/usr/sbin/munin-node-configure --suggest | egrep \'squid|apache|nfs|postfix|firewall|munin\'')
 
         #Restarting services
 
@@ -2353,14 +2354,15 @@ Munin Node HTTP Monitoring installation in Ubuntu 14.04.
         sudo('cp /conf/munin/munin-node.conf /etc/munin/munin-node.conf')
 
         # Activating extra plugins (Apache & Squid)
-        sudo('/usr/sbin/munin-node-configure --suggest')
-        sudo('/usr/sbin/munin-node-configure --shell | sudo sh')
-        sudo('ln -s /usr/share/munin/plugins/squid_cache /etc/munin/plugins/')
-        sudo('ln -s /usr/share/munin/plugins/squid_icp /etc/munin/plugins/')
-        sudo('ln -s /usr/share/munin/plugins/squid_objectsize /etc/munin/plugins/')
-        sudo('ln -s /usr/share/munin/plugins/squid_requests /etc/munin/plugins/')
-        sudo('ln -s /usr/share/munin/plugins/squid_traffic /etc/munin/plugins/')
-        sudo('/usr/sbin/munin-node-configure --suggest | egrep \'squid|apache|nfs|postfix|firewall|munin\'')
+        with settings(warn_only=True):
+            sudo('/usr/sbin/munin-node-configure --suggest')
+            sudo('/usr/sbin/munin-node-configure --shell | sudo sh')
+            sudo('ln -s /usr/share/munin/plugins/squid_cache /etc/munin/plugins/')
+            sudo('ln -s /usr/share/munin/plugins/squid_icp /etc/munin/plugins/')
+            sudo('ln -s /usr/share/munin/plugins/squid_objectsize /etc/munin/plugins/')
+            sudo('ln -s /usr/share/munin/plugins/squid_requests /etc/munin/plugins/')
+            sudo('ln -s /usr/share/munin/plugins/squid_traffic /etc/munin/plugins/')
+            sudo('/usr/sbin/munin-node-configure --suggest | egrep \'squid|apache|nfs|postfix|firewall|munin\'')
 
         #  Restarting services
         sudo('service munin-node restart')
