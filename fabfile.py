@@ -2229,6 +2229,13 @@ Postfix Internet Mailserver installation in Ubuntu 14.04.
         print colored('=================================', 'blue')
 
         sudo('DEBIAN_FRONTEND=noninteractive apt-get -y install postfix mailutils')
+        sudo('pwd')
+        sudo('pwd')
+        sudo('pwd')
+        sudo('pwd')
+        sudo('pwd')
+        sudo('pwd')
+        sudo('pwd')
         sudo('cp ./conf/UNC/postfix/main.cf /etc/postfix/main.cf')
         sudo('cp ./conf/UNC/postfix/virtual /etc/postfix/virtual')
         sudo('postmap /etc/postfix/virtual')
