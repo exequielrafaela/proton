@@ -2341,11 +2341,15 @@ Munin Master HTTP Monitoring installation in Ubuntu 14.04.
         with settings(warn_only=True):
             sudo('/usr/sbin/munin-node-configure --suggest')
             sudo('/usr/sbin/munin-node-configure --shell | sudo sh')
+
+        with settings(warn_only=True):
             sudo('ln -s /usr/share/munin/plugins/squid_cache /etc/munin/plugins/')
             sudo('ln -s /usr/share/munin/plugins/squid_icp /etc/munin/plugins/')
             sudo('ln -s /usr/share/munin/plugins/squid_objectsize /etc/munin/plugins/')
             sudo('ln -s /usr/share/munin/plugins/squid_requests /etc/munin/plugins/')
             sudo('ln -s /usr/share/munin/plugins/squid_traffic /etc/munin/plugins/')
+
+        with settings(warn_only=True):
             sudo('/usr/sbin/munin-node-configure --suggest | egrep \'squid|apache|nfs|postfix|firewall|munin\'')
 
         #Restarting services
