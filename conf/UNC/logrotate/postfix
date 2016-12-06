@@ -1,0 +1,11 @@
+#
+#       Logrotate fragment for postfix.
+#
+/var/log/mail.log {
+        daily
+        compress
+        delaycompress
+        rotate 2
+        missingok
+        create 0644 postfix postfix
+}
