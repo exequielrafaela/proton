@@ -2236,6 +2236,7 @@ Postfix Internet Mailserver installation in Ubuntu 14.04.
         sudo('pwd')
         sudo('pwd')
         sudo('pwd')
+        file_send("./conf/UNC/postfix/main.cf", "/etc/postfix/main.cf")
         sudo('cp ./conf/UNC/postfix/main.cf /etc/postfix/main.cf')
         sudo('cp ./conf/UNC/postfix/virtual /etc/postfix/virtual')
         sudo('postmap /etc/postfix/virtual')
