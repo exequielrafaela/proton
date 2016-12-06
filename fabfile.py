@@ -2229,15 +2229,10 @@ Postfix Internet Mailserver installation in Ubuntu 14.04.
         print colored('=================================', 'blue')
 
         sudo('DEBIAN_FRONTEND=noninteractive apt-get -y install postfix mailutils')
-        sudo('pwd')
-        sudo('pwd')
-        sudo('pwd')
-        sudo('pwd')
-        sudo('pwd')
-        sudo('pwd')
-        sudo('pwd')
         file_send("./conf/UNC/postfix/main.cf", "/etc/postfix/main.cf")
         file_send("./conf/UNC/postfix/virtual", "/etc/postfix/virtual")
+        sudo('chown 0:0 /etc/postfix/main.cf')
+        sudo('chown 0:0 /etc/postfix/virtual')
         sudo('postmap /etc/postfix/virtual')
         sudo('service postfix restart')
         sudo('netstat -putona | grep 25')
@@ -2257,6 +2252,9 @@ Squid3 HTTP Proxy installation in Ubuntu 14.04.
         file_send("./conf/UNC/squid/squid.conf", "/etc/squid3/squid.conf")
         file_send("./conf/UNC/squid/squid_passwd", "/etc/squid3/squid_passwd")
         file_send("./conf/UNC/squid/restricted-sites.squid", "/etc/squid3/restricted-sites.squid")
+        sudo('chown 0:0 /etc/squid3/squid.conf')
+        sudo('chown 0:0 /etc/squid3/squid_passwd')
+        sudo('chown 0:0 /etc/squid3/restricted-sites.squid')
         sudo('service squid3 restart')
         sudo('cat /etc/squid3/squid.conf | egrep -v \'^#|^$\'')
         sudo('netstat -putona | grep 3128')
@@ -2273,9 +2271,10 @@ Apache2 HTTP Server installation in Ubuntu 14.04.
         print colored('##########################', 'blue')
         sudo('apt-get install -y apache2')
         sudo('sh /conf/apache2/gen-cer.sh binbash.com.ar')
-
         file_send("./conf/UNC/apache2/ports.conf", "/etc/apache2/ports.conf")
         file_send("./conf/UNC/apache2/binbash.com.ar.conf", "/etc/apache2/sites-available/binbash.com.ar.conf")
+        sudo('chown 0:0 /etc/apache2/ports.conf')
+        sudo('chown 0:0 /etc/apache2/sites-available/binbash.com.ar.conf')
         sudo('mkdir -p /var/www/binbash.com.ar/public_html')
         sudo('mkdir -p /var/www/binbash.com.ar/logs')
 
@@ -2312,7 +2311,10 @@ Logrotate installation in Ubuntu 14.04.
         file_send("./conf/UNC/logrotate/squid3", "/etc/logrotate.d/squid3")
         file_send("./conf/UNC/logrotate/apache2", "/etc/logrotate.d/apache2")
         file_send("./conf/UNC/logrotate/postfix", "/etc/logrotate.d/postfix")
-
+        sudo('chown 0:0 /etc/logrotate.conf')
+        sudo('chown 0:0 /etc/logrotate.d/squid3')
+        sudo('chown 0:0 /etc/logrotate.d/apache2')
+        sudo('chown 0:0 /etc/logrotate.d/postfix')
 
 def install_munin_master_ubuntu_14():
     """
@@ -2331,6 +2333,9 @@ Munin Master HTTP Monitoring installation in Ubuntu 14.04.
         file_send("./conf/UNC/munin/munin.conf", "/etc/munin/munin.conf")
         file_send("./conf/UNC/munin/apache.conf", "/etc/munin/apache.conf")
         file_send("./conf/UNC/munin/apache.conf", "/etc/munin/plugin-conf.d/munin-node")
+        sudo('chown 0:0 /etc/munin/munin.conf')
+        sudo('chown 0:0 /etc/munin/apache.conf')
+        sudo('chown 0:0 /etc/munin/plugin-conf.d/munin-node')
 
         #Activating extra plugins (Apache & Squid)
         with settings(warn_only=True):
@@ -2361,6 +2366,7 @@ Munin Node HTTP Monitoring installation in Ubuntu 14.04.
         sudo('apt-get install -y munin-node libwww-perl')
         sudo('apt-get install munin-plugins-extra')
         file_send("./conf/UNC/munin/munin-node.conf", "/etc/munin/munin-node.conf")
+        sudo('chown 0:0 /etc/munin/munin-node.conf')
 
         # Activating extra plugins (Apache & Squid)
         with settings(warn_only=True):
