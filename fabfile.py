@@ -680,7 +680,7 @@ Test SSH (authorized_keys) in the host
     """
     env.abort_on_prompts = True
     try:
-        with settings(warn_only=True):
+        with settings(warn_only=False):
             # TAKE THE HOME DIR FROM /ETC/PASSWD
             hostvm = sudo('hostname')
             local('sudo chmod 701 /home/' + usernamet)
