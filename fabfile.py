@@ -76,6 +76,7 @@ env.roledefs = {
 env.pararel = True
 env.shell = "/bin/sh -c"
 env.skip_bad_hosts = True
+#env.abort_on_prompts = True
 env.timeout = 5
 
 
@@ -677,59 +678,65 @@ def key_test(usernamet):
 Test SSH (authorized_keys) in the host
     :param usernamet: "username" keys to test
     """
-    with settings(warn_only=False):
-        # TAKE THE HOME DIR FROM /ETC/PASSWD
-        hostvm = sudo('hostname')
-        local('sudo chmod 701 /home/' + usernamet)
-        local('sudo chmod 741 /home/' + usernamet + '/.ssh')
-        local_user = getpass.getuser()
-        if os.path.exists('/home/' + local_user + '/temp/'):
-            print colored('##################################', 'blue')
-            print colored('##### Directory Exists ###########', 'blue')
-            print colored('##################################', 'blue')
-        else:
-            local('mkdir ~/temp')
+    env.abort_on_prompts = True
+    try:
+        with settings(warn_only=False):
+            # TAKE THE HOME DIR FROM /ETC/PASSWD
+            hostvm = sudo('hostname')
+            local('sudo chmod 701 /home/' + usernamet)
+            local('sudo chmod 741 /home/' + usernamet + '/.ssh')
+            local_user = getpass.getuser()
+            if os.path.exists('/home/' + local_user + '/temp/'):
+                print colored('##################################', 'blue')
+                print colored('##### Directory Exists ###########', 'blue')
+                print colored('##################################', 'blue')
+            else:
+                local('mkdir ~/temp')
 
-        local('sudo cp /home/' + usernamet + '/.ssh/id_rsa ~/temp/id_rsa')
-        local('sudo chown -R ' + local_user + ':' + local_user + ' ~/temp/id_rsa')
-        local('chmod 600 ~/temp/id_rsa')
-        # local('sudo chmod 604 /home/' + usernamet + '/.ssh/id_rsa')
+            local('sudo cp /home/' + usernamet + '/.ssh/id_rsa ~/temp/id_rsa')
+            local('sudo chown -R ' + local_user + ':' + local_user + ' ~/temp/id_rsa')
+            local('chmod 600 ~/temp/id_rsa')
+            # local('sudo chmod 604 /home/' + usernamet + '/.ssh/id_rsa')
 
-        # FIX DONE! - Must copy the key temporaly with the proper permissions
-        # in the home directory of the current user executing fabric to use it.
-        # Temporally we comment the line 379 and the script must be run by
-        # user that desires to test it keys
-        # [ntorres@jumphost fabric]$ ssh -i /home/ntorres/.ssh/id_rsa ntorres@10.0.3.113   Warning: Permanently added
-        #  '10.0.3.113' (ECDSA) to the list of known hosts.
-        # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        # @         WARNING: UNPROTECTED PRIVATE KEY FILE!          @
-        # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        # Permissions 0604 for '/home/ntorres/.ssh/id_rsa' are too open.
-        # It is required that your private key files are NOT accessible by others.
-        # This private key will be ignored.
-        # bad permissions: ignore key: /home/ntorres/.ssh/id_rsa
-        # Permission denied (publickey).
-        # NOTE:
-        # there is no way to bypass the keyfile permission check with ssh or ssh-add
-        # (and you can't trick it with named pipe or such). Besides, you do not actually want to trick ssh,' \
-        # ' but just to be able to use your key files.
+            # FIX DONE! - Must copy the key temporaly with the proper permissions
+            # in the home directory of the current user executing fabric to use it.
+            # Temporally we comment the line 379 and the script must be run by
+            # user that desires to test it keys
+            # [ntorres@jumphost fabric]$ ssh -i /home/ntorres/.ssh/id_rsa ntorres@10.0.3.113   Warning: Permanently added
+            #  '10.0.3.113' (ECDSA) to the list of known hosts.
+            # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+            # @         WARNING: UNPROTECTED PRIVATE KEY FILE!          @
+            # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+            # Permissions 0604 for '/home/ntorres/.ssh/id_rsa' are too open.
+            # It is required that your private key files are NOT accessible by others.
+            # This private key will be ignored.
+            # bad permissions: ignore key: /home/ntorres/.ssh/id_rsa
+            # Permission denied (publickey).
+            # NOTE:
+            # there is no way to bypass the keyfile permission check with ssh or ssh-add
+            # (and you can't trick it with named pipe or such). Besides, you do not actually want to trick ssh,' \
+            # ' but just to be able to use your key files.
 
-        if os.path.exists('/home/' + usernamet + '/.ssh/'):
-            ssh_test = local(
-                'ssh -i ~/temp/id_rsa -o "StrictHostKeyChecking no" -q ' + usernamet + '@' + env.host_string + ' exit')
-            if ssh_test.succeeded:
-                print colored('###################################################', 'blue')
-                print colored(usernamet + ' WORKED! in:' + hostvm + ' IP:' + env.host_string, 'blue')
-                print colored('###################################################', 'blue')
-                local('sudo chmod 700 /home/' + usernamet)
-                local('sudo chmod 700 /home/' + usernamet + '/.ssh')
-                # local('sudo chmod 600 /home/'+usernamet+'/.ssh/id_rsa')
-                local('sudo rm ~/temp/id_rsa')
-        else:
-            print colored('###################################################', 'red')
-            print colored(usernamet + ' FAIL! in:' + hostvm + '- IP:' + env.host_string, 'red')
-            print colored('###################################################', 'red')
+            if os.path.exists('/home/' + usernamet + '/.ssh/'):
+                ssh_test = local(
+                    'ssh -i ~/temp/id_rsa -o "StrictHostKeyChecking no" -q ' + usernamet + '@' + env.host_string + ' exit')
+                if ssh_test.succeeded:
+                    print colored('###################################################', 'blue')
+                    print colored(usernamet + ' WORKED! in:' + hostvm + ' IP:' + env.host_string, 'blue')
+                    print colored('###################################################', 'blue')
+                    local('sudo chmod 700 /home/' + usernamet)
+                    local('sudo chmod 700 /home/' + usernamet + '/.ssh')
+                    # local('sudo chmod 600 /home/'+usernamet+'/.ssh/id_rsa')
+                    local('sudo rm ~/temp/id_rsa')
+            else:
+                print colored('###################################################', 'red')
+                print colored(usernamet + ' FAIL! in:' + hostvm + '- IP:' + env.host_string, 'red')
+                print colored('###################################################', 'red')
 
+    except SystemExit:
+        print colored('###################################################', 'red')
+        print colored(usernamet + ' FAIL! in:' + hostvm + '- IP:' + env.host_string, 'red')
+        print colored('###################################################', 'red')
 
 def ruby_install_centos():
     """
