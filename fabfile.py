@@ -735,7 +735,7 @@ Test SSH (authorized_keys) in the host
 
     except SystemExit:
         print colored('###################################################', 'red')
-        print colored(usernamet + ' FAIL! in:' + hostvm + '- IP:' + env.host_string, 'red')
+        print colored(usernamet + ' FAIL! IP:' + env.host_string, 'red')
         print colored('###################################################', 'red')
 
 def ruby_install_centos():
