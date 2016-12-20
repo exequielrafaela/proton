@@ -27,6 +27,7 @@ ORDER THE IMPORTS ALPHABETICALLY and DIVIDE IN 3 SECTIONS
 # Import Fabric's API module#
 # from fabric.api import hosts, sudo, settings, hide, env, execute, prompt, run, local, task, put, cd, get
 from fabric.api import sudo, settings, env, run, local, put, cd, get, hide
+from fabric.colors import red, blue, yellow, green
 from fabric.contrib.files import append, exists, sed
 from fabric.contrib.project import rsync_project, upload_project
 from termcolor import colored
@@ -45,9 +46,10 @@ import time
 import ConfigParser
 from optparse import OptionParser
 from time import gmtime, strftime
-from passlib.hash import pbkdf2_sha256
+# from passlib.hash import pbkdf2_sha256
 
 import config
+from modules import users
 
 print config.CONFIG_DIR
 
@@ -76,7 +78,7 @@ env.roledefs = {
 env.pararel = True
 env.shell = "/bin/sh -c"
 env.skip_bad_hosts = True
-#env.abort_on_prompts = True
+# env.abort_on_prompts = True
 env.timeout = 5
 
 
@@ -150,6 +152,10 @@ Run a command in the host/s
     """
     with settings(warn_only=False):
         run(cmd)
+        print blue('cmd has been run')
+        print red('cmd has been run')
+        print yellow('cmd has been run')
+        print green('cmd has been run')
 
 
 def file_send(localpath, remotepath):
@@ -368,163 +374,198 @@ Install/Upgrade an RedHat/Centos yum based linux package
             print colored('############################################################################', 'blue')
 
 
-def user_add_centos_sudo(usernamec):
-    """
-Add a user in RedHat/Centos based OS in wheel group (sudo)
-    :param usernamec: "username" to add
-    """
-    with settings(warn_only=True):
-        # usernamep = prompt("Which USERNAME you like to CREATE & PUSH KEYS?")
-        # user_exists = sudo('cat /etc/passwd | grep '+usernamep)
-        # user_exists =sudo('grep "^'+usernamep+':" /etc/passwd')
-        # #user_exists = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamep)
-        # print colored(user_exists, 'green')
-        # print(env.host_string)
-        # sudo('uname -a')
-
-        try:
-            # if(user_exists != ""):
-            user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamec)
-            if user_true != "":
-                print colored('##############################', 'green')
-                print colored('"' + usernamec + '" already exists', 'green')
-                print colored('##############################', 'green')
-                sudo('gpasswd -a ' + usernamec + ' wheel')
-            else:
-                print colored('#################################', 'green')
-                print colored('"' + usernamec + '" doesnt exists', 'green')
-                print colored('WILL BE CREATED', 'green')
-                print colored('##################################', 'green')
-                sudo('useradd ' + usernamec + ' -m -d /home/' + usernamec)
-                # sudo('echo "' + usernamec + ':' + usernamec + '" | chpasswd')
-                sudo('gpasswd -a ' + usernamec + ' wheel')
-        except SystemExit:
-            # else:
-            print colored('######################################################', 'green')
-            print colored('"' + usernamec + '" couldnt be created for some reason', 'green')
-            print colored('######################################################', 'green')
 
 
-def user_add_centos(usernamec):
-    """
-Add a user in RedHat/Centos based OS
-    :param usernamec: "username" to add
-    """
-    with settings(warn_only=True):
-        # usernamep = prompt("Which USERNAME you like to CREATE & PUSH KEYS?")
-        # user_exists = sudo('cat /etc/passwd | grep '+usernamep)
-        # user_exists =sudo('grep "^'+usernamep+':" /etc/passwd')
-        # #user_exists = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamep)
-        # print colored(user_exists, 'green')
-        # print(env.host_string)
-        # sudo('uname -a')
-
-        try:
-            # if(user_exists != ""):
-            user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamec)
-            if user_true != "":
-                print colored('##############################', 'green')
-                print colored('"' + usernamec + '" already exists', 'green')
-                print colored('##############################', 'green')
-
-            else:
-                print colored('#################################', 'green')
-                print colored('"' + usernamec + '" doesnt exists', 'green')
-                print colored('WILL BE CREATED', 'green')
-                print colored('##################################', 'green')
-                sudo('useradd ' + usernamec + ' -m -d /home/' + usernamec)
-
-        except SystemExit:
-            # else:
-            print colored('######################################################', 'green')
-            print colored('"' + usernamec + '" couldnt be created for some reason', 'green')
-            print colored('######################################################', 'green')
-
-
-def user_add_ubuntu(usernamec):
-    """
-Add a user in Debian/Ubuntu based OS
-    :param usernamec: "username" to add
-    """
-    with settings(warn_only=True):
-        try:
-            # if(user_exists != ""):
-            user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamec)
-            if user_true != "":
-                print colored('##############################', 'green')
-                print colored('"' + usernamec + '" already exists', 'green')
-                print colored('##############################', 'green')
-                # sudo('gpasswd -a ' + usernamec + ' wheel')
-            else:
-                print colored('#################################', 'green')
-                print colored('"' + usernamec + '" doesnt exists', 'green')
-                print colored('WILL BE CREATED', 'green')
-                print colored('##################################', 'green')
-                sudo('useradd ' + usernamec + ' -m -d /home/' + usernamec)
-                # sudo('echo "' + usernamec + ':' + usernamec + '" | chpasswd')
-                # sudo('gpasswd -a ' + usernamec + ' wheel')
-        except SystemExit:
-            # else:
-            print colored('######################################################', 'green')
-            print colored('"' + usernamec + '" couldnt be created for some reason', 'green')
-            print colored('######################################################', 'green')
-
-
-def user_remove_from_group_centos(usernamelist, group):
-    """
-Remove a user from a certain group in RedHat/Centos based OS
-    :param usernamec: "username" list to add
-    :param group: "group" where the user is going to be romoved
-
-eg: fab -f fabfile.py user_remove_from_group_centos:'tom;dick;harry',wheel
-    """
-    with settings(warn_only=True):
-        try:
-            if isinstance(usernamelist, basestring):
-                usernamelist = usernamelist.split(";")
-            for usern in usernamelist:
-                user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usern)
-                if user_true != "":
-                    print colored('##################################################', 'green')
-                    print colored('"' + usern + 'will be removed from gorup '+ group, 'green')
-                    print colored('##################################################', 'green')
-                    sudo('gpasswd -d ' + usern + ' ' +group)
-                else:
-                    print colored('#################################', 'green')
-                    print colored('"' + usern + '" doesnt exists', 'green')
-                    print colored('NOT possible to remove it', 'green')
-                    print colored('##################################', 'green')
-
-        except SystemExit:
-            # else:
-            print colored('######################################################', 'green')
-            print colored('"' + usernamelist + '" couldnt be removed for some reason', 'green')
-            print colored('######################################################', 'green')
-
-
-def change_pass(usernameu, upass):
-    """
-Change RedHat/Centos based OS user password
-    :param usernameu: "username" to change password
-    :param upass: "password" to be used
-    """
-    with settings(warn_only=False):
-        try:
-            # if(user_exists != ""):
-            user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usernameu)
-            if user_true != "":
-                print colored('#######################################', 'green')
-                print colored('"' + usernameu + '" PASSWORD will be changed', 'green')
-                print colored('#######################################', 'green')
-                sudo('echo ' + usernameu + ':' + upass + ' | chpasswd')
-            else:
-                print colored('#################################', 'red')
-                print colored('"' + usernameu + '" doesnt exists', 'red')
-                print colored('#################################', 'red')
-        except SystemExit:
-            print colored('#################################', 'red')
-            print colored('"' + usernameu + '" doesnt exists', 'red')
-            print colored('##################################', 'red')
+# def user_add_centos_sudo(usernamec):
+#     """
+# Add a user in RedHat/Centos based OS in wheel group (sudo)
+#     :param usernamec: "username" to add
+#     """
+#     with settings(warn_only=True):
+#         # usernamep = prompt("Which USERNAME you like to CREATE & PUSH KEYS?")
+#         # user_exists = sudo('cat /etc/passwd | grep '+usernamep)
+#         # user_exists =sudo('grep "^'+usernamep+':" /etc/passwd')
+#         # #user_exists = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamep)
+#         # print colored(user_exists, 'green')
+#         # print(env.host_string)
+#         # sudo('uname -a')
+#
+#         try:
+#             # if(user_exists != ""):
+#             user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamec)
+#             if user_true != "":
+#                 print colored('##############################', 'red')
+#                 print colored('"' + usernamec + '" already exists', 'red')
+#                 print colored('##############################', 'red')
+#                 sudo('gpasswd -a ' + usernamec + ' wheel')
+#             else:
+#                 print colored('#################################', 'blue')
+#                 print colored('"' + usernamec + '" doesnt exists', 'blue')
+#                 print colored('WILL BE CREATED', 'blue')
+#                 print colored('##################################', 'blue')
+#                 sudo('useradd ' + usernamec + ' -m -d /home/' + usernamec)
+#                 # sudo('echo "' + usernamec + ':' + usernamec + '" | chpasswd')
+#                 sudo('gpasswd -a ' + usernamec + ' wheel')
+#         except SystemExit:
+#             # else:
+#             print colored('######################################################', 'red')
+#             print colored('"' + usernamec + '" couldnt be created for some reason', 'red')
+#             print colored('######################################################', 'red')
+#
+#
+# def user_add_centos_sudo_no_prompt(usernamec):
+#     """
+# Add a user in RedHat/Centos based OS in wheel group (sudo) skiping servers that throws pass prompt
+#     :param usernamec: "username" to add
+#     """
+#     env.abort_on_prompts = True
+#     try:
+#         with settings(warn_only=True):
+#             try:
+#                 user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamec)
+#                 if user_true != "":
+#                     print colored('##############################', 'red')
+#                     print colored('"' + usernamec + '" already exists', 'red')
+#                     print colored('##############################', 'red')
+#                     sudo('gpasswd -a ' + usernamec + ' wheel')
+#                 else:
+#                     print colored('#################################', 'blue')
+#                     print colored('"' + usernamec + '" doesnt exists', 'blue')
+#                     print colored('WILL BE CREATED', 'blue')
+#                     print colored('##################################', 'blue')
+#                     sudo('useradd ' + usernamec + ' -m -d /home/' + usernamec)
+#                     # sudo('echo "' + usernamec + ':' + usernamec + '" | chpasswd')
+#                     sudo('gpasswd -a ' + usernamec + ' wheel')
+#             except SystemExit:
+#                 print colored('######################################################', 'red')
+#                 print colored('"' + usernamec + '" couldnt be created for some reason', 'red')
+#                 print colored('######################################################', 'red')
+#     except SystemExit:
+#         print colored('######################################################', 'red')
+#         print colored('"' + usernamec + '" couldnt be created for some reason', 'red')
+#         print colored('######################################################', 'red')
+#
+#
+# def user_add_centos(usernamec):
+#     """
+# Add a user in RedHat/Centos based OS
+#     :param usernamec: "username" to add
+#     """
+#     with settings(warn_only=True):
+#         # usernamep = prompt("Which USERNAME you like to CREATE & PUSH KEYS?")
+#         # user_exists = sudo('cat /etc/passwd | grep '+usernamep)
+#         # user_exists =sudo('grep "^'+usernamep+':" /etc/passwd')
+#         # #user_exists = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamep)
+#         # print colored(user_exists, 'green')
+#         # print(env.host_string)
+#         # sudo('uname -a')
+#
+#         try:
+#             # if(user_exists != ""):
+#             user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamec)
+#             if user_true != "":
+#                 print colored('##############################', 'green')
+#                 print colored('"' + usernamec + '" already exists', 'green')
+#                 print colored('##############################', 'green')
+#
+#             else:
+#                 print colored('#################################', 'green')
+#                 print colored('"' + usernamec + '" doesnt exists', 'green')
+#                 print colored('WILL BE CREATED', 'green')
+#                 print colored('##################################', 'green')
+#                 sudo('useradd ' + usernamec + ' -m -d /home/' + usernamec)
+#
+#         except SystemExit:
+#             # else:
+#             print colored('######################################################', 'green')
+#             print colored('"' + usernamec + '" couldnt be created for some reason', 'green')
+#             print colored('######################################################', 'green')
+#
+#
+# def user_add_ubuntu(usernamec):
+#     """
+# Add a user in Debian/Ubuntu based OS
+#     :param usernamec: "username" to add
+#     """
+#     with settings(warn_only=True):
+#         try:
+#             # if(user_exists != ""):
+#             user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamec)
+#             if user_true != "":
+#                 print colored('##############################', 'green')
+#                 print colored('"' + usernamec + '" already exists', 'green')
+#                 print colored('##############################', 'green')
+#                 # sudo('gpasswd -a ' + usernamec + ' wheel')
+#             else:
+#                 print colored('#################################', 'green')
+#                 print colored('"' + usernamec + '" doesnt exists', 'green')
+#                 print colored('WILL BE CREATED', 'green')
+#                 print colored('##################################', 'green')
+#                 sudo('useradd ' + usernamec + ' -m -d /home/' + usernamec)
+#                 # sudo('echo "' + usernamec + ':' + usernamec + '" | chpasswd')
+#                 # sudo('gpasswd -a ' + usernamec + ' wheel')
+#         except SystemExit:
+#             # else:
+#             print colored('######################################################', 'green')
+#             print colored('"' + usernamec + '" couldnt be created for some reason', 'green')
+#             print colored('######################################################', 'green')
+#
+#
+# def user_remove_from_group_centos(usernamelist, group):
+#     """
+# Remove a user from a certain group in RedHat/Centos based OS
+#     :param usernamelist: "username" list to add
+#     :param group: "group" where the user is going to be romoved
+#
+# eg: fab -f fabfile.py user_remove_from_group_centos:'tom;dick;harry',wheel
+#     """
+#     with settings(warn_only=True):
+#         try:
+#             if isinstance(usernamelist, basestring):
+#                 usernamelist = usernamelist.split(";")
+#             for usern in usernamelist:
+#                 user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usern)
+#                 if user_true != "":
+#                     print colored('##################################################', 'green')
+#                     print colored('"' + usern + 'will be removed from gorup ' + group, 'green')
+#                     print colored('##################################################', 'green')
+#                     sudo('gpasswd -d ' + usern + ' ' + group)
+#                 else:
+#                     print colored('#################################', 'green')
+#                     print colored('"' + usern + '" doesnt exists', 'green')
+#                     print colored('NOT possible to remove it', 'green')
+#                     print colored('##################################', 'green')
+#
+#         except SystemExit:
+#             # else:
+#             print colored('######################################################', 'green')
+#             print colored('"' + usernamelist + '" couldnt be removed for some reason', 'green')
+#             print colored('######################################################', 'green')
+#
+#
+# def change_pass(usernameu, upass):
+#     """
+# Change RedHat/Centos based OS user password
+#     :param usernameu: "username" to change password
+#     :param upass: "password" to be used
+#     """
+#     with settings(warn_only=False):
+#         try:
+#             # if(user_exists != ""):
+#             user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usernameu)
+#             if user_true != "":
+#                 print colored('#######################################', 'green')
+#                 print colored('"' + usernameu + '" PASSWORD will be changed', 'green')
+#                 print colored('#######################################', 'green')
+#                 sudo('echo ' + usernameu + ':' + upass + ' | chpasswd')
+#             else:
+#                 print colored('#################################', 'red')
+#                 print colored('"' + usernameu + '" doesnt exists', 'red')
+#                 print colored('#################################', 'red')
+#         except SystemExit:
+#             print colored('#################################', 'red')
+#             print colored('"' + usernameu + '" doesnt exists', 'red')
+#             print colored('##################################', 'red')
 
 
 def key_gen(usernameg):
@@ -678,6 +719,67 @@ Append the public key string in the /home/usernamea/.ssh/authorized_keys of the 
                 append('/home/' + usernamea + '/.ssh/authorized_keys', key_text, use_sudo=True)
                 sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
                 # put('/home/'+usernamea+'/.ssh/authorized_keys', '/home/'+usernamea+'/.ssh/')
+
+
+def key_append_no_prompt(usernamea):
+    """
+Append the public key string in the /home/usernamea/.ssh/authorized_keys of the host skiping servers that throws pass
+prompt skiping servers that throws pass prompt
+    :param usernamea: "username" to append the key to.
+    """
+    env.abort_on_prompts = True
+    try:
+        with settings(warn_only=False):
+            if usernamea == "root":
+                key_file = '/' + usernamea + '/.ssh/id_rsa.pub'
+                key_text = key_read_file(key_file, usernamea)
+                if exists('/' + usernamea + '/.ssh/authorized_keys', use_sudo=True):
+                    local('sudo chmod 701 /' + usernamea)
+                    local('sudo chmod 741 /' + usernamea + '/.ssh')
+                    local('sudo chmod 604 /' + usernamea + '/.ssh/id_rsa.pub')
+                    print colored('#########################################', 'blue')
+                    print colored('##### authorized_keys file exists #######', 'blue')
+                    print colored('#########################################', 'blue')
+                    append('/' + usernamea + '/.ssh/authorized_keys', key_text, use_sudo=True)
+                    sudo('chown -R ' + usernamea + ':' + usernamea + ' /' + usernamea + '/.ssh/')
+                    local('sudo chmod 700 /' + usernamea)
+                    local('sudo chmod 700 /' + usernamea + '/.ssh')
+                    local('sudo chmod 600 /' + usernamea + '/.ssh/id_rsa.pub')
+                else:
+                    sudo('mkdir -p /' + usernamea + '/.ssh/')
+                    sudo('touch /' + usernamea + '/.ssh/authorized_keys')
+                    append('/' + usernamea + '/.ssh/authorized_keys', key_text, use_sudo=True)
+                    sudo('chown -R ' + usernamea + ':' + usernamea + ' /' + usernamea + '/.ssh/')
+                    # put('/home/'+usernamea+'/.ssh/authorized_keys', '/home/'+usernamea+'/.ssh/')
+                    local('sudo chmod 700 /' + usernamea)
+                    local('sudo chmod 700 /' + usernamea + '/.ssh')
+                    local('sudo chmod 600 /' + usernamea + '/.ssh/id_rsa.pub')
+
+            else:
+                key_file = '/home/' + usernamea + '/.ssh/id_rsa.pub'
+                local('sudo chmod 701 /home/' + usernamea)
+                local('sudo chmod 741 /home/' + usernamea + '/.ssh')
+                local('sudo chmod 604 /home/' + usernamea + '/.ssh/id_rsa.pub')
+                key_text = key_read_file(key_file, usernamea)
+                local('sudo chmod 700 /home/' + usernamea)
+                local('sudo chmod 700 /home/' + usernamea + '/.ssh')
+                local('sudo chmod 600 /home/' + usernamea + '/.ssh/id_rsa.pub')
+                if exists('/home/' + usernamea + '/.ssh/authorized_keys', use_sudo=True):
+                    print colored('#########################################', 'blue')
+                    print colored('##### authorized_keys file exists #######', 'blue')
+                    print colored('#########################################', 'blue')
+                    append('/home/' + usernamea + '/.ssh/authorized_keys', key_text, use_sudo=True)
+                    sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
+                else:
+                    sudo('mkdir -p /home/' + usernamea + '/.ssh/')
+                    sudo('touch /home/' + usernamea + '/.ssh/authorized_keys')
+                    append('/home/' + usernamea + '/.ssh/authorized_keys', key_text, use_sudo=True)
+                    sudo('chown -R ' + usernamea + ':' + usernamea + ' /home/' + usernamea + '/.ssh/')
+                    # put('/home/'+usernamea+'/.ssh/authorized_keys', '/home/'+usernamea+'/.ssh/')
+    except SystemExit:
+        print colored('######################################################', 'red')
+        print colored('"' + usernamea + '" couldnt be created for some reason', 'red')
+        print colored('######################################################', 'red')
 
 
 def key_remove(usernamea):
@@ -1292,7 +1394,7 @@ Install in the host7s NFS Server under Debian/Ubuntu based systems
         sudo('apt-get update')
         sudo('apt-get -y install nfs-kernel-server')
 
-        if exists( nfs_dir, use_sudo=True):
+        if exists(nfs_dir, use_sudo=True):
             print colored('###########################################', 'blue')
             print colored('####### Directory already created #########', 'blue')
             print colored('###########################################', 'blue')
@@ -1301,11 +1403,11 @@ Install in the host7s NFS Server under Debian/Ubuntu based systems
             print colored('###### Creating NFS share Directory #######', 'red')
             print colored('###########################################', 'red')
             sudo('mkdir ' + nfs_dir)
-            sudo('chmod -R 777 '+nfs_dir+'/')
+            sudo('chmod -R 777 ' + nfs_dir + '/')
             sudo('chown nobody:nogroup ' + nfs_dir + '/')
 
         with settings(warn_only=True):
-            #sudo('chkconfig nfs on')
+            # sudo('chkconfig nfs on')
             sudo('service rpcbind start')
             sudo('service nfs start')
 
@@ -1313,7 +1415,8 @@ Install in the host7s NFS Server under Debian/Ubuntu based systems
         netmask = sudo('ifconfig eth1 | awk \'/inet /{print substr($4,6)}\'')
         subnet_temp = iptools.ipv4.subnet2block(str(ip_addr) + '/' + str(netmask))
         subnet = subnet_temp[0]
-        sudo('echo "' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_subtree_check)" > /etc/exports')
+        sudo(
+            'echo "' + nfs_dir + '     ' + subnet + '/' + netmask + '(rw,sync,no_root_squash,no_subtree_check)" > /etc/exports')
         sudo('echo "' + nfs_dir + '     *(rw,sync,no_root_squash)" > /etc/exports')
 
         sudo('sudo exportfs -a')
@@ -2355,15 +2458,15 @@ Apache2 HTTP Server installation in Ubuntu 14.04.
         sudo('mkdir -p /var/www/binbash.com.ar/logs')
 
         sudo('wget -P /var/www/binbash.com.ar'
-            ' --recursive'
-            ' --no-clobber'
-            ' --page-requisites'
-            ' --html-extension'
-            ' --convert-links'
-            ' --restrict-file-names=windows'
-            ' --domains website.org'
-            ' --no-parent'
-            ' http://www.binbash.com.ar')
+             ' --recursive'
+             ' --no-clobber'
+             ' --page-requisites'
+             ' --html-extension'
+             ' --convert-links'
+             ' --restrict-file-names=windows'
+             ' --domains website.org'
+             ' --no-parent'
+             ' http://www.binbash.com.ar')
 
         sudo('cp /var/www/binbash.com.ar/www.binbash.com.ar/index.html /var/www/binbash.com.ar/public_html/index.html')
         sudo('rm -r /var/www/binbash.com.ar/www.binbash.com.ar/')
@@ -2414,7 +2517,7 @@ Munin Master HTTP Monitoring installation in Ubuntu 14.04.
         sudo('chown 0:0 /etc/munin/apache.conf')
         sudo('chown 0:0 /etc/munin/plugin-conf.d/munin-node')
 
-        #Activating extra plugins (Apache & Squid)
+        # Activating extra plugins (Apache & Squid)
         with settings(warn_only=True):
             sudo('/usr/sbin/munin-node-configure --suggest')
             sudo('/usr/sbin/munin-node-configure --shell | sudo sh')
@@ -2429,7 +2532,7 @@ Munin Master HTTP Monitoring installation in Ubuntu 14.04.
         with settings(warn_only=True):
             sudo('/usr/sbin/munin-node-configure --suggest | egrep \'squid|apache|nfs|postfix|firewall|munin\'')
 
-        #Restarting services
+        # Restarting services
 
         sudo('service apache2 restart')
         sudo('service munin-node restart')
@@ -2460,7 +2563,7 @@ Munin Node HTTP Monitoring installation in Ubuntu 14.04.
             sudo('ln -s /usr/share/munin/plugins/squid_traffic /etc/munin/plugins/')
             sudo('/usr/sbin/munin-node-configure --suggest | egrep \'squid|apache|nfs|postfix|firewall|munin\'')
 
-        #  Restarting services
+        # Restarting services
         sudo('service munin-node restart')
 
 
@@ -3437,7 +3540,6 @@ Install Docker Engine, docker-compose, docker-machine
         print colored('################################################################', 'red', attrs=['bold'])
         print colored('################################################################', 'red', attrs=['bold'])
 
-
         print colored(' ____             _               ____                           ', 'blue', attrs=['bold'])
         print colored('|  _ \  ___   ___| | _____ _ __  / ___|  ___ _ ____   _____ _ __ ', 'blue', attrs=['bold'])
         print colored('| | | |/ _ \ / __| |/ / _ \  __| \___ \ / _ \  __\ \ / / _ \  __|', 'blue', attrs=['bold'])
@@ -3455,7 +3557,8 @@ Install Docker Engine, docker-compose, docker-machine
         print colored('                 dMMMMMMdXMMMMMM,xMMMMMMc                    kMMMWd.', 'cyan')
         print colored('                 dMMMMMMdXMMMMMM,xMMMMMMc                   cMMMMMMO.', 'cyan')
         print colored('                ,,,,,, :xxxxxx;oxxxxxx.:xxxxxx .,,,,,,.           xMMMMMMMO. ....', 'cyan')
-        print colored('                .XMMMMMW,dMMMMMMdXMMMMMM,xMMMMMMckMMMMMMc           lMMMMMMMMXNWMWWX0x:.', 'cyan')
+        print colored('                .XMMMMMW,dMMMMMMdXMMMMMM,xMMMMMMckMMMMMMc           lMMMMMMMMXNWMWWX0x:.',
+                      'cyan')
         print colored('        .XMMMMMW,dMMMMMMdXMMMMMM,dMMMMMMckMMMMMMc           .0MMMMMMMMMMMMMMMMK.', 'cyan')
         print colored('        .XMMMMMW,dMMMMMMdXMMMMMM,xMMMMMMckMMMMMMc            ;NMMMMMMMMMMMMMWk.', 'cyan')
         print colored(',;;;;;;:dddddddclddddddloddddddclddddddcoddddddl;;;;;;:cldOKWMMMMMMMMMWXOdc.', 'cyan')
@@ -3514,14 +3617,14 @@ Install Docker Engine, docker-compose, docker-machine
                 sudo('curl -fsSL https://get.docker.com/ | sh')
             else:
                 print colored('===================================================================', 'blue')
-                print colored('DOCKER '+ docker_version + ' INSTALLED          ', 'blue', attrs=['bold'])
+                print colored('DOCKER ' + docker_version + ' INSTALLED          ', 'blue', attrs=['bold'])
                 print colored('===================================================================', 'blue')
 
         # Enable the service.
         sudo('systemctl enable docker.service')
         # Start the Docker daemon.
         sudo('systemctl start docker')
-        #Verify docker is installed correctly by running a test image in a container.
+        # Verify docker is installed correctly by running a test image in a container.
         sudo('docker run --rm hello-world')
         # Configure the Docker daemon to start automatically when the host starts:
         sudo('systemctl enable docker')
@@ -3537,7 +3640,7 @@ Install Docker Engine, docker-compose, docker-machine
             # Create the docker group
             sudo('groupadd docker')
             # Add your user to docker group.
-            sudo('usermod -aG docker '+ username)
+            sudo('usermod -aG docker ' + username)
 
         print colored('===================================================================', 'blue')
         print colored('DOCKER COMPOSE PROVISIONING                         ', 'blue', attrs=['bold'])
@@ -3560,7 +3663,7 @@ Install Docker Engine, docker-compose, docker-machine
                      '>/usr/local/bin/docker-machine && chmod +x /usr/local/bin/docker-machine')
             else:
                 print colored('===================================================================', 'blue')
-                print colored('DOCKER '+ docker_machine_version + ' INSTALLED     ', 'blue', attrs=['bold'])
+                print colored('DOCKER ' + docker_machine_version + ' INSTALLED     ', 'blue', attrs=['bold'])
                 print colored('===================================================================', 'blue')
 
 

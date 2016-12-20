@@ -8,6 +8,7 @@
       <module fileurl="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/.idea/deploy_scripts.iml" filepath="$USER_HOME$/Globant/grey_repo/deploy_scripts/.idea/deploy_scripts.iml" />
       <module fileurl="file://$USER_HOME$/Globant/grey_repo/docker-stacks-demo/.idea/docker-stacks-demo.iml" filepath="$USER_HOME$/Globant/grey_repo/docker-stacks-demo/.idea/docker-stacks-demo.iml" />
       <module fileurl="file://$USER_HOME$/Globant/grey_repo/feeds-docker-stack/.idea/feeds-docker-stack.iml" filepath="$USER_HOME$/Globant/grey_repo/feeds-docker-stack/.idea/feeds-docker-stack.iml" />
+      <module fileurl="file://$USER_HOME$/Globant/grey_repo/.idea/grey_repo.iml" filepath="$USER_HOME$/Globant/grey_repo/.idea/grey_repo.iml" />
       <module fileurl="file://$USER_HOME$/vagrant_projects/.idea/vagrant_projects.iml" filepath="$USER_HOME$/vagrant_projects/.idea/vagrant_projects.iml" />
     </modules>
   </component>
