@@ -1,6 +1,8 @@
 # Import Fabric's API module#
 from fabric.api import sudo, settings, env, run, local, put, cd, get, hide
+from fabric.decorators import task
 from termcolor import colored
+
 
 @task
 def add_centos_sudo(usernamec):
@@ -38,6 +40,7 @@ Add a user in RedHat/Centos based OS in wheel group (sudo)
             print colored('######################################################', 'red')
             print colored('"' + usernamec + '" couldnt be created for some reason', 'red')
             print colored('######################################################', 'red')
+            
 
 @task
 def add_centos_sudo_no_prompt(usernamec):
@@ -71,6 +74,7 @@ Add a user in RedHat/Centos based OS in wheel group (sudo) skiping servers that 
         print colored('######################################################', 'red')
         print colored('"' + usernamec + '" couldnt be created for some reason', 'red')
         print colored('######################################################', 'red')
+
 
 @task
 def add_centos(usernamec):
@@ -108,6 +112,7 @@ Add a user in RedHat/Centos based OS
             print colored('"' + usernamec + '" couldnt be created for some reason', 'green')
             print colored('######################################################', 'green')
 
+
 @task
 def add_ubuntu(usernamec):
     """
@@ -136,6 +141,7 @@ Add a user in Debian/Ubuntu based OS
             print colored('######################################################', 'green')
             print colored('"' + usernamec + '" couldnt be created for some reason', 'green')
             print colored('######################################################', 'green')
+
 
 @task
 def remove_from_group_centos(usernamelist, group):
@@ -168,6 +174,7 @@ eg: fab -f fabfile.py user_remove_from_group_centos:'tom;dick;harry',wheel
             print colored('######################################################', 'green')
             print colored('"' + usernamelist + '" couldnt be removed for some reason', 'green')
             print colored('######################################################', 'green')
+
 
 @task
 def change_pass(usernameu, upass):

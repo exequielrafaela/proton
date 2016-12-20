@@ -374,8 +374,6 @@ Install/Upgrade an RedHat/Centos yum based linux package
             print colored('############################################################################', 'blue')
 
 
-
-
 # def user_add_centos_sudo(usernamec):
 #     """
 # Add a user in RedHat/Centos based OS in wheel group (sudo)
