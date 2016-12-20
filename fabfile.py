@@ -50,7 +50,8 @@ from time import gmtime, strftime
 # from passlib.hash import pbkdf2_sha256
 
 import config
-import modules.users
+from modules import users
+#import modules.users
 
 print config.CONFIG_DIR
 
@@ -82,7 +83,7 @@ env.skip_bad_hosts = True
 # env.abort_on_prompts = True
 env.timeout = 5
 
-
+@task
 def show_help():
     """
 Show proton help
