@@ -105,11 +105,17 @@ Show proton help
 
 
 class show_roles(Task):
+    """
+Show the fabric declared roles
+    cmd: fab shwo_roles
+    """
     name = "show_roles"
     for key, value in sorted(env.roledefs.items()):
         print key, value
 
 sr_instance = show_roles()
+
+
 
 #def show_roles():
 #    """
