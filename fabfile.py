@@ -27,6 +27,7 @@ ORDER THE IMPORTS ALPHABETICALLY and DIVIDE IN 3 SECTIONS
 # Import Fabric's API module#
 # from fabric.api import hosts, sudo, settings, hide, env, execute, prompt, run, local, task, put, cd, get
 from fabric.api import sudo, settings, env, run, local, put, cd, get, hide
+from fabric.decorators import task
 from fabric.colors import red, blue, yellow, green
 from fabric.contrib.files import append, exists, sed
 from fabric.contrib.project import rsync_project, upload_project
@@ -49,7 +50,7 @@ from time import gmtime, strftime
 # from passlib.hash import pbkdf2_sha256
 
 import config
-from modules import users
+import modules.users
 
 print config.CONFIG_DIR
 

@@ -40,7 +40,7 @@ Add a user in RedHat/Centos based OS in wheel group (sudo)
             print colored('######################################################', 'red')
             print colored('"' + usernamec + '" couldnt be created for some reason', 'red')
             print colored('######################################################', 'red')
-            
+
 
 @task
 def add_centos_sudo_no_prompt(usernamec):
