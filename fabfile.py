@@ -28,6 +28,7 @@ ORDER THE IMPORTS ALPHABETICALLY and DIVIDE IN 3 SECTIONS
 # from fabric.api import hosts, sudo, settings, hide, env, execute, prompt, run, local, task, put, cd, get
 from fabric.api import sudo, settings, env, run, local, put, cd, get, hide
 from fabric.decorators import task
+from fabric.tasks import Task
 from fabric.colors import red, blue, yellow, green
 from fabric.contrib.files import append, exists, sed
 from fabric.contrib.project import rsync_project, upload_project
@@ -101,13 +102,22 @@ Show proton help
         print "s, q, quit, exit             Exit"
 
 
-def show_roles():
-    """
-Show the fabric declared roles
-    cmd: fab show_roles
-    """
+
+
+class show_roles(Task):
+    name = "show_roles"
     for key, value in sorted(env.roledefs.items()):
         print key, value
+
+sr_instance = show_roles()
+
+#def show_roles():
+#    """
+#Show the fabric declared roles
+#    cmd: fab show_roles
+#    """
+#    for key, value in sorted(env.roledefs.items()):
+#        print key, value
 
 
 def load_configuration(conf_file, section, option):
