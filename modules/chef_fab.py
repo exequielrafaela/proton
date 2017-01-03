@@ -1,6 +1,6 @@
 # Import Fabric's API module#
-from fabric.api import settings
-from fabric.contrib.files import exists, run, sudo, cd
+from fabric.api import sudo, settings, run, cd
+from fabric.contrib.files import exists
 from fabric.decorators import task
 from termcolor import colored
 
