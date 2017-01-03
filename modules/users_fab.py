@@ -1,5 +1,5 @@
 # Import Fabric's API module#
-from fabric.api import sudo, settings, env, run, local, put, cd, get, hide
+from fabric.api import sudo, settings, env
 from fabric.decorators import task
 from termcolor import colored
 
@@ -200,3 +200,23 @@ Change RedHat/Centos based OS user password
             print colored('#################################', 'red')
             print colored('"' + usernameu + '" doesnt exists', 'red')
             print colored('##################################', 'red')
+
+
+@task
+def sudo_command(cmd):
+    """
+Run a certain command with sudo priviledges
+    :param cmd: bash command to be executed as sudo
+    #eg : fab -R dev sudo_command:"apt-get install geany"
+    """
+    with settings(warn_only=False):
+        sudo(cmd)
+
+
+@task
+def sudoers_group():
+    """
+Modify /etc/sudoers adding sudo NOPASSWD wheel group (Still Incomplete)
+    """
+    with settings(warn_only=False):
+        sudo('echo "%wheel        ALL=(ALL)       NOPASSWD: ALL" | (EDITOR="tee -a" visudo)')
