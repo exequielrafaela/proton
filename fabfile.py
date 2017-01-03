@@ -47,19 +47,18 @@ import logging
 # from passlib.hash import pbkdf2_sha256
 
 import config
-import modules
-# from modules import file_fab
-# from modules import key_fab
-# from modules import pkg_mgr_fab
-# from modules import show_fab
-# from modules import chef_fab
-# from modules import nfs_fab
-# from modules import mysql_fab
-# from modules import inst_centos_7_fab
-# from modules import inst_ubu_14_fab
-# from modules import rm_centos_7_fab
-# from modules import rsync_fab
-# from modules import download_files_fab
+from modules import file_fab
+from modules import key_fab
+from modules import pkg_mgr_fab
+from modules import show_fab
+from modules import chef_fab
+from modules import nfs_fab
+from modules import mysql_fab
+from modules import inst_centos_7_fab
+from modules import inst_ubu_14_fab
+from modules import rm_centos_7_fab
+from modules import rsync_fab
+from modules import download_files_fab
 
 print config.CONFIG_DIR
 
