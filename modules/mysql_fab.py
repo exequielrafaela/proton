@@ -3,7 +3,9 @@ import os
 from time import strftime, gmtime
 
 from fabric.api import settings
-from fabric.contrib.files import exists, sudo, cd, get, env, hide
+from fabric.contrib.files import exists
+from fabric.api import sudo, settings, cd, get, hide, env
+
 from fabric.decorators import task
 from termcolor import colored
 
