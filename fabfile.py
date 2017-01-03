@@ -14,7 +14,6 @@
 |    - $ fab show_help for more information                             |
 ========================================================================
 """
-import sys
 
 """
 ORDER THE IMPORTS ALPHABETICALLY and DIVIDE IN 3 SECTIONS
@@ -27,40 +26,40 @@ ORDER THE IMPORTS ALPHABETICALLY and DIVIDE IN 3 SECTIONS
 # Import Fabric's API module#
 # from fabric.api import hosts, sudo, settings, hide, env, execute, prompt, run, local, task, put, cd, get
 from fabric.api import sudo, settings, env, run, local, put, cd, get, hide
-from fabric.decorators import task
-from fabric.tasks import Task
 from fabric.colors import red, blue, yellow, green
 from fabric.contrib.files import append, exists, sed
-from fabric.contrib.project import rsync_project, upload_project
 from termcolor import colored
-from distutils.util import strtobool
-import logging
-import os
-import base64
-import re
+# from fabric.contrib.project import rsync_project, upload_project
+# from distutils.util import strtobool
 
-import iptools
-import time
-import ConfigParser
-from optparse import OptionParser
-from time import gmtime, strftime
+
+import logging
+# import sys
+# import os
+# import base64
+# import re
+
+# import iptools
+# import time
+# import ConfigParser
+# from optparse import OptionParser
+# from time import gmtime, strftime
 # from passlib.hash import pbkdf2_sha256
 
 import config
-from modules import users_fab
-from modules import file_fab
-from modules import key_fab
-from modules import pkg_mgr_fab
-from modules import show_fab
-from modules import chef_fab
-from modules import nfs_fab
-from modules import mysql_fab
-from modules import inst_centos_7_fab
-from modules import inst_ubu_14_fab
-from modules import rm_centos_7_fab
-from modules import rsync_fab
-from modules import download_files_fab
-
+import modules
+# from modules import file_fab
+# from modules import key_fab
+# from modules import pkg_mgr_fab
+# from modules import show_fab
+# from modules import chef_fab
+# from modules import nfs_fab
+# from modules import mysql_fab
+# from modules import inst_centos_7_fab
+# from modules import inst_ubu_14_fab
+# from modules import rm_centos_7_fab
+# from modules import rsync_fab
+# from modules import download_files_fab
 
 print config.CONFIG_DIR
 
@@ -91,7 +90,6 @@ env.shell = "/bin/sh -c"
 env.skip_bad_hosts = True
 # env.abort_on_prompts = True
 env.timeout = 5
-
 
 
 def command(cmd):
@@ -345,7 +343,6 @@ Check a certain folder Disk Usage
         print "available space for non-super user: %d Bytes = %.2f KBytes = %.2f MBytes = %.2f GBytes " % (
             total_avail_space_non_root, total_avail_space_non_root / 1024, total_avail_space_non_root / 1024 / 1024,
             total_avail_space_non_root / 1024 / 1024 / 1024)
-
 
 
 """

@@ -2,7 +2,6 @@
 import os
 from time import strftime, gmtime
 
-from fabric.api import settings
 from fabric.contrib.files import exists
 from fabric.api import sudo, settings, cd, get, hide, env
 
