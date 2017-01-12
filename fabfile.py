@@ -45,18 +45,24 @@ from termcolor import colored
 # from time import gmtime, strftime
 # from passlib.hash import pbkdf2_sha256
 
-from modules import file_fab
-from modules import key_fab
-from modules import pkg_mgr_fab
-from modules import show_fab
 from modules import chef_fab
-from modules import nfs_fab
-from modules import mysql_fab
+from modules import conf_files_fab
+from modules import download_files_fab
+from modules import file_fab
 from modules import inst_centos_7_fab
 from modules import inst_ubu_14_fab
+from modules import key_fab
+from modules import logger_fab
+from modules import mail_fab
+from modules import mysql_fab
+from modules import nfs_fab
+from modules import passwd_fab
+from modules import pkg_mgr_fab
 from modules import rm_centos_7_fab
 from modules import rsync_fab
-from modules import download_files_fab
+from modules import show_fab
+from modules import upload_files_fab
+from modules import users_fab
 
 print config.CONFIG_DIR
 
