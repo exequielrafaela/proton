@@ -15,29 +15,28 @@
 ========================================================================
 """
 
-"""
-ORDER THE IMPORTS ALPHABETICALLY and DIVIDE IN 3 SECTIONS
-1st.standard library modules – e.g. sys, os, getopt, re
-2nd.third-party library modules (anything installed in Python’s site-packages directory)
- – e.g. mx.DateTime, ZODB, PIL.Image, etc
-  3rd.locally-developed modules
-"""
-
-# Import Fabric's API module#
-# from fabric.api import hosts, sudo, settings, hide, env, execute, prompt, run, local, task, put, cd, get
-from fabric.api import sudo, settings, env, run, local, put, cd, get, hide
-from fabric.colors import red, blue, yellow, green
-from fabric.contrib.files import append, exists, sed
-from termcolor import colored
-# from fabric.contrib.project import rsync_project, upload_project
-# from distutils.util import strtobool
-
+# ORDER THE IMPORTS ALPHABETICALLY and DIVIDE IN 3 SECTIONS
+# 1st.standard library modules – e.g. sys, os, getopt, re
+# 2nd.third-party library modules (anything installed in Python’s site-packages directory)
+# – e.g. mx.DateTime, ZODB, PIL.Image, etc
+# 3rd.locally-developed modules
 
 import logging
+import config
 # import sys
 # import os
 # import base64
 # import re
+
+# Import Fabric's API module#
+# from fabric.api import hosts, sudo, settings, hide, env, execute, prompt, run, local, task, put, cd, get
+from fabric.api import sudo, settings, env, run, cd
+from fabric.colors import red, blue, yellow, green
+# from fabric.contrib.files import append, exists, sed
+from fabric.contrib.files import exists, sed
+from termcolor import colored
+# from fabric.contrib.project import rsync_project, upload_project
+# from distutils.util import strtobool
 
 # import iptools
 # import time
@@ -46,7 +45,6 @@ import logging
 # from time import gmtime, strftime
 # from passlib.hash import pbkdf2_sha256
 
-import config
 from modules import file_fab
 from modules import key_fab
 from modules import pkg_mgr_fab
