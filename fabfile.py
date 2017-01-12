@@ -52,7 +52,6 @@ from modules import file_fab
 from modules import inst_centos_7_fab
 from modules import inst_ubu_14_fab
 from modules import key_fab
-from modules import logger_fab
 from modules import mail_fab
 from modules import mysql_fab
 from modules import nfs_fab
