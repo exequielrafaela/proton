@@ -9,4 +9,5 @@ LOGS_DIR = "./logs/"
 MYSQL_CONFIG_FILE_PATH = CONFIG_SQL_DIR + "mysql.conf"
 SERVERS_FILE_PATH = CONFIG_DIR + "servers.conf"
 
-#NUMBER_OF_OPTIONS_MATCHES = 3 # Maximum number of different extension that an OPTIONS message can "target" after being considered a scanning attack
+# NUMBER_OF_OPTIONS_MATCHES = 3 # Maximum number of different extension that an OPTIONS message can "target"
+# after being considered a scanning attack
