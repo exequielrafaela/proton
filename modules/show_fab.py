@@ -22,21 +22,21 @@ Show proton help
         print "s, q, quit, exit             Exit"
 
 
-class ShowRoles(Task):
-    """
-Show the fabric declared roles
-    cmd: fab shwo_roles
-    """
-
-    def run(self):
-        pass
-
-    name = 'show_roles'
-    for key, value in sorted(env.roledefs.items()):
-        print key, value
-
-
-sr_instance = ShowRoles()
+# class ShowRoles(Task):
+#     """
+# Show the fabric declared roles
+#     cmd: fab shwo_roles
+#     """
+#
+#     def run(self):
+#         pass
+#
+#     name = 'show_roles'
+#     for key, value in sorted(env.roledefs.items()):
+#         print key, value
+#
+#
+# sr_instance = ShowRoles()
 
 
 # def show_roles():

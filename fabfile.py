@@ -33,7 +33,7 @@ import config
 from fabric.api import sudo, settings, env, run, cd
 from fabric.colors import red, blue, yellow, green
 # from fabric.contrib.files import append, exists, sed
-from fabric.contrib.files import exists, sed
+from fabric.contrib.files import exists, sed, task
 from termcolor import colored
 # from fabric.contrib.project import rsync_project, upload_project
 # from distutils.util import strtobool
@@ -92,6 +92,17 @@ env.shell = "/bin/sh -c"
 env.skip_bad_hosts = True
 # env.abort_on_prompts = True
 env.timeout = 5
+
+
+@task
+def show_roles():
+    """
+ Show the fabric declared roles
+     cmd: fab show_roles
+    """
+    with settings(warn_only=False):
+        for key, value in sorted(env.roledefs.items()):
+            print key, value
 
 
 def command(cmd):
