@@ -47,12 +47,9 @@ from termcolor import colored
 
 
 from modules import chef_fab, conf_files_fab, download_files_fab, file_fab, inst_centos_7_fab, inst_ubu_14_fab, \
-    key_fab, nfs_fab, passwd_fab, pkg_mgr_fab, rm_centos_7_fab, rsync_fab, show_fab, upload_files_fab,\
+    key_fab, mysql_fab, nfs_fab, passwd_fab, pkg_mgr_fab, rm_centos_7_fab, rsync_fab, show_fab, upload_files_fab,\
     users_fab
 
-# import modules.mysql_fab
-# import modules.key_fab
-# from modules.show_fab import ShowRoles
 
 print config.CONFIG_DIR
 
