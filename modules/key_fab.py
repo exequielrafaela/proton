@@ -194,7 +194,7 @@ In the localhost read and return as a string the public ssh key file given as pa
 
 
 @task
-def append(usernamea):
+def appending(usernamea):
     """
 Append the public key string in the /home/usernamea/.ssh/authorized_keys of the host
     :param usernamea: "username" to append the key to.
