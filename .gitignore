@@ -8,4 +8,8 @@ logs/.idea/
 ./idea/workspace.xml
 .idea/workspace.xml
 .idea/misc.xml
+fabfile.pyc
+logs/check_ssh.log
+key_fab.pyc
+show_fab.pyc
 .gitignore

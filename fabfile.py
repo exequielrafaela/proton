@@ -45,23 +45,14 @@ from termcolor import colored
 # from time import gmtime, strftime
 # from passlib.hash import pbkdf2_sha256
 
-from modules import chef_fab
-from modules import conf_files_fab
-from modules import download_files_fab
-from modules import file_fab
-from modules import inst_centos_7_fab
-from modules import inst_ubu_14_fab
-from modules import key_fab
-from modules import mail_fab
-from modules import mysql_fab
-from modules import nfs_fab
-from modules import passwd_fab
-from modules import pkg_mgr_fab
-from modules import rm_centos_7_fab
-from modules import rsync_fab
-from modules import show_fab
-from modules import upload_files_fab
-from modules import users_fab
+
+from modules import chef_fab, conf_files_fab, download_files_fab, file_fab, inst_centos_7_fab, inst_ubu_14_fab, \
+    key_fab, nfs_fab, passwd_fab, pkg_mgr_fab, rm_centos_7_fab, rsync_fab, show_fab, upload_files_fab,\
+    users_fab
+
+# import modules.mysql_fab
+# import modules.key_fab
+# from modules.show_fab import ShowRoles
 
 print config.CONFIG_DIR
 
@@ -95,16 +86,6 @@ env.timeout = 5
 
 
 @task
-def show_roles():
-    """
- Show the fabric declared roles
-     cmd: fab show_roles
-    """
-    with settings(warn_only=False):
-        for key, value in sorted(env.roledefs.items()):
-            print key, value
-
-
 def command(cmd):
     """
 Run a command in the host/s
@@ -118,7 +99,7 @@ Run a command in the host/s
         print yellow('cmd has been run')
         print green('cmd has been run')
 
-
+@task
 def haproxy_ws(action, ws_ip):
     """
 Add/Remove a WS from a Haproxy Load Balancer
@@ -203,7 +184,7 @@ Add/Remove a WS from a Haproxy Load Balancer
                 print colored('Problem found haproxy.cfg not found - check istallation', 'red')
                 print colored('=======================================================', 'red')
 
-
+@task
 def maltrail(role):
     """
 Instaling maltrail IDS as Server or Sensor
@@ -321,7 +302,7 @@ Instaling maltrail IDS as Server or Sensor
             print colored('Problem installing MALTRAIL', 'red')
             print colored('===========================', 'red')
 
-
+@task
 def disk_usage(tree_dir='/'):
     """
 Check a certain folder Disk Usage

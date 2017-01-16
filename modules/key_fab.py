@@ -6,7 +6,91 @@ import pwd
 from fabric.api import settings, env, sudo, local
 from fabric.contrib.files import exists
 from fabric.decorators import task
+# from fabric.tasks import Task
 from termcolor import colored
+
+
+# class GenUser(Task):
+#     name = 'gen'
+#
+#     def gen_user(self, usernameg=""):
+#         """
+#      Generate an SSH key for a certain user
+#      Remember that this task it's intended to be run with role "local"
+#         cmd: fab gen
+#         :type usernameg:
+#         :param usernameg: "username" to change password
+#         """
+#         pass
+#         with settings(warn_only=False):
+#             # usernameg = prompt("Which USERNAME you like to GEN KEYS?")
+#             # user_exists = sudo('cut -d: -f1 /etc/passwd | grep '+usernameg)
+#             # user_exists = sudo('cat /etc/passwd | grep ' + usernameg)
+#             # user_exists = ""
+#             try:
+#                 user_struct = pwd.getpwnam(usernameg)
+#                 user_exists = user_struct.pw_gecos.split(",")[0]
+#                 print colored(user_exists, 'green')
+#                 if user_exists == "root":
+#                     print colored('#################################################################', 'yellow')
+#                     print colored('CAREFULL: ROOT ssh keys will be generated if they does not exists', 'yellow')
+#                     print colored('#################################################################', 'yellow')
+#                     if os.path.exists('/' + usernameg + '/.ssh/id_rsa'):
+#                         print colored(str(os.path.exists('/' + usernameg + '/.ssh/id_rsa')), 'blue')
+#                         print colored('###########################################', 'blue')
+#                         print colored('username: ' + usernameg + ' KEYS already EXISTS', 'blue')
+#                         print colored('###########################################', 'blue')
+#                     else:
+#                         print colored('###########################################', 'blue')
+#                         print colored('username: ' + usernameg + ' Creating KEYS', 'blue')
+#                         print colored('###########################################', 'blue')
+#                         sudo("ssh-keygen -t rsa -f /" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
+#                         # http://unix.stackexchange.com/questions/36540/why-am-i-still-getting-a-
+#                         password-prompt-with-ssh
+#                         # -with-public-key-authentication
+#                         # sudo('chmod 700 /home/' + usernameg)
+#                         sudo('chmod 755 /' + usernameg)
+#                         sudo('chmod 755 /' + usernameg + '/.ssh')
+#                         sudo('chmod 600 /' + usernameg + '/.ssh/id_rsa')
+#
+#                 elif os.path.exists('/home/' + usernameg + '/.ssh/id_rsa'):
+#                     print colored(str(os.path.exists('/home/' + usernameg + '/.ssh/id_rsa')), 'blue')
+#                     print colored('###########################################', 'blue')
+#                     print colored('username: ' + usernameg + ' KEYS already EXISTS', 'blue')
+#                     print colored('###########################################', 'blue')
+#                 else:
+#                     print colored('###########################################', 'blue')
+#                     print colored('username: ' + usernameg + ' Creating KEYS', 'blue')
+#                     print colored('###########################################', 'blue')
+#                     sudo("ssh-keygen -t rsa -f /home/" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
+#                     # http://unix.stackexchange.com/
+#                       questions/36540/why-am-i-still-getting-a-password-prompt-with-ssh
+#                     # -with-public-key-authentication
+#                     # sudo('chmod 700 /home/' + usernameg)
+#                     sudo('chmod 755 /home/' + usernameg)
+#                     sudo('chmod 755 /home/' + usernameg + '/.ssh')
+#                     sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
+#                     sudo('gpasswd -a ' + usernameg + ' wheel')
+#             except KeyError:
+#                 print colored('####################################', 'blue')
+#                 print colored('User ' + usernameg + 'does not exists', 'blue')
+#                 print colored('####################################', 'blue')
+#
+#                 # if user_exists == "" and usernameg != "root":
+#                 #     print colored('User ' + usernameg + ' does not exist', 'red')
+#                 #     print colored('#######################################################', 'blue')
+#                 #     print colored('Consider that we generate user: username pass: username', 'blue')
+#                 #     print colored('#######################################################', 'blue')
+#                 #
+#                 #     sudo('useradd ' + usernameg + ' -m -d /home/' + usernameg)
+#                 #     sudo('echo "' + usernameg + ':' + usernameg + '" | chpasswd')
+#                 #     sudo("ssh-keygen -t rsa -f /home/" + usernameg + "/.ssh/id_rsa -N ''", user=usernameg)
+#                 #     sudo('chmod 755 /home/' + usernameg)
+#                 #     sudo('chmod 755 /home/' + usernameg + '/.ssh')
+#                 #     sudo('chmod 600 /home/' + usernameg + '/.ssh/id_rsa')
+#                 #     sudo('gpasswd -a ' + usernameg + ' wheel')
+#
+# ug_instance = GenUser()
 
 
 @task
@@ -46,7 +130,6 @@ Remember that this task it's intended to be run with role "local"
                     sudo('chmod 755 /' + usernameg)
                     sudo('chmod 755 /' + usernameg + '/.ssh')
                     sudo('chmod 600 /' + usernameg + '/.ssh/id_rsa')
-
             elif os.path.exists('/home/' + usernameg + '/.ssh/id_rsa'):
                 print colored(str(os.path.exists('/home/' + usernameg + '/.ssh/id_rsa')), 'blue')
                 print colored('###########################################', 'blue')
