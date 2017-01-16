@@ -4,7 +4,7 @@ import os
 
 import pwd
 from fabric.api import settings, env, sudo, local
-from fabric.contrib.files import exists
+from fabric.contrib.files import exists, append
 from fabric.decorators import task
 # from fabric.tasks import Task
 from termcolor import colored
