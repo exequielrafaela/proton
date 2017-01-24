@@ -5,7 +5,7 @@ from fabric.tasks import Task
 
 
 @task
-def show_help():
+def help_proton():
     """
 Show proton help
     cmd: fab show_help
@@ -14,16 +14,17 @@ Show proton help
         print ""
         print "Commands list:"
         print ""
-        print "fab show_help                Change behaviour mode to passive"
-        print "fab -l                       To list all the fabric functions defined in proton"
-        print "fab -d \"task_name\"           To list all the fabric functions defined in proton"
-        print "fab show_roles               Change behaviour mode to aggressive"
+        print "fab show_help                        Change behaviour mode to passive"
+        print "fab -l                               To list all the fabric functions defined in proton"
+        print "fab - -list - format = nested - l    To list all the fabric functions defined in proton"
+
+        print "fab -d \"task_name\"                 To list all the fabric functions defined in proton"
+        print "fab show_roles                       Change behaviour mode to aggressive"
         print ""
-        print "s, q, quit, exit             Exit"
 
 
-class ShowRoles(Task):
-    name = 'show_roles'
+class ServerRoles(Task):
+    name = 'server_roles'
 
     def run(self):
         """
@@ -31,11 +32,12 @@ class ShowRoles(Task):
          cmd: fab show_roles
         """
         pass
+
     for key, value in sorted(env.roledefs.items()):
         print key, value
 
 
-sr_instance = ShowRoles()
+sr_instance = ServerRoles()
 
 
 # def show_roles():

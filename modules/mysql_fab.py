@@ -8,9 +8,7 @@ from fabric.api import sudo, settings, cd, get, hide, env
 from fabric.decorators import task
 from termcolor import colored
 
-from modules import conf_files_fab
-from modules import passwd_fab
-from modules import file_fab
+from modules import conf_files_fab, passwd_fab, file_fab
 import config
 
 

@@ -203,17 +203,6 @@ Change RedHat/Centos based OS user password
 
 
 @task
-def sudo_command(cmd):
-    """
-Run a certain command with sudo priviledges
-    :param cmd: bash command to be executed as sudo
-    #eg : fab -R dev sudo_command:"apt-get install geany"
-    """
-    with settings(warn_only=False):
-        sudo(cmd)
-
-
-@task
 def sudoers_group():
     """
 Modify /etc/sudoers adding sudo NOPASSWD wheel group (Still Incomplete)
