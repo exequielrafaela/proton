@@ -197,6 +197,21 @@ Install Jenkins Server w/ prerequisites
         sudo('apt-get install -y git jenkins redis-tools mysql-client pigz rsync')
         file_fab.send("./conf/rsync/rsync-no24.sh", "/usr/bin/rsync-no24")
 
+        # /var/lib/jenkins/job
+        # /var/lib/jenkins/users
+        # ssh keys /var/lib/jenkins/.ssh/id_rsa
+        # ssh keys /var/lib/jenkins/.ssh/id_rsa_bitbucket
+        # ssh keys /var/lib/jenkins/.ssh/kwnon_hosts
+        # pip packages for deployments
+
+        # Jenkins Plugins:
+        # Role-based Authorization Strategy => /var/lib/jenkins/config.xml => here are the roles
+        # Slack Notification Plugin
+        # Extensible choice parameter
+        # Multiple SCMs
+        # SCM Sync Configuration Plugin
+        # Last Changes Plugin
+
 
 @task
 def install_upgrade_python_27_13():
@@ -395,17 +410,37 @@ Install Docker Engine, docker-compose, docker-machine
 
         run('docker -v && docker-compose -v && docker-machine -v')
 
-# /var/lib/jenkins/job
-# /var/lib/jenkins/users
-# ssh keys /var/lib/jenkins/.ssh/id_rsa
-# ssh keys /var/lib/jenkins/.ssh/id_rsa_bitbucket
-# ssh keys /var/lib/jenkins/.ssh/kwnon_hosts
-# pip packages for deployments
 
-# Jenkins Plugins:
-# Role Based authorization Strategy => /var/lib/jenkins/config.xml => here are the roles
-# Slack Notifier
-# Extensible choice parameter
-# Multiple SCMs
-# SCM Sync Configuration Plugin
+@task
+def install_wordpress():
+    """
+Install wordpress CMS on Ubuntu 14.04
 
+    """
+    with settings(warn_only=False):
+        print colored('===================================================================', 'blue')
+        print colored('DEPENDENCIES PROVISIONING                          ', 'blue', attrs=['bold'])
+        print colored('===================================================================', 'blue')
+        sudo('apt-get install unzip')
+
+        sudo('mkdir /var/www/html')
+        with cd('/var/www/html'):
+            if exists('./latest.zip', use_sudo=True):
+                if exists('./wordpress', use_sudo=True):
+                    print colored('==========================================', 'yellow')
+                    print colored('WORDPRESS alredy INSTALLED', 'yellow', attrs=['bold'])
+                    print colored('==========================================', 'yellow')
+                else:
+                    sudo('unzip latest.zip')
+                    if exists('./wordpress', use_sudo=True):
+                        print colored('======================================', 'blue')
+                        print colored('WORDPRESS INSTALLED OK', 'blue', attrs=['bold'])
+                        print colored('======================================', 'blue')
+
+            else:
+                sudo('wget https://wordpress.org/latest.zip')
+                sudo('unzip latest.zip')
+                if exists('./wordpress', use_sudo=True):
+                    print colored('======================================', 'blue')
+                    print colored('WORDPRESS INSTALLED OK', 'blue', attrs=['bold'])
+                    print colored('======================================', 'blue')
