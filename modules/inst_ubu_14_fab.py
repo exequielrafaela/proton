@@ -1,4 +1,5 @@
 # Import Fabric's API module#
+from fabric.contrib.files import exists
 from fabric.decorators import task
 from fabric.api import sudo, settings, run, cd
 from termcolor import colored
@@ -212,11 +213,17 @@ Install and upgrade python 2.7 to Python 2.7.13
              'tk-dev libgdbm-dev libc6-dev libbz2-dev')
 
         with cd('/usr/src'):
-            sudo('wget https://www.python.org/ftp/python/2.7.13/Python-2.7.13.tgz')
-            sudo('tar xzf Python-2.7.13.tgz')
-            with cd('/Python-2.7.13'):
-                sudo('./configure')
-                sudo('make altinstall')
+            if exists('Python-2.7.13.tgz', use_sudo=True):
+                if exists('Python-2.7.13', use_sudo=True):
+                    with cd('/Python-2.7.13'):
+                        sudo('./configure')
+                        sudo('make altinstall')
+            else:
+                sudo('wget https://www.python.org/ftp/python/2.7.13/Python-2.7.13.tgz')
+                sudo('tar xzf Python-2.7.13.tgz')
+                with cd('/Python-2.7.13'):
+                    sudo('./configure')
+                    sudo('make altinstall')
 
         python_ver = run('python2.7 -V')
         if python_ver == "Python 2.7.13":
@@ -395,4 +402,5 @@ Install Docker Engine, docker-compose, docker-machine
 # Slack Notifier
 # Extensible choice parameter
 # Multiple SCMs
+# SCM Sync Configuration Plugin
 
