@@ -213,8 +213,8 @@ Install and upgrade python 2.7 to Python 2.7.13
              'tk-dev libgdbm-dev libc6-dev libbz2-dev')
 
         with cd('/usr/src'):
-            if exists('Python-2.7.13.tgz', use_sudo=True):
-                if exists('Python-2.7.13', use_sudo=True):
+            if exists('./Python-2.7.13.tgz', use_sudo=True):
+                if exists('./Python-2.7.13', use_sudo=True):
                     with cd('/usr/src/Python-2.7.13'):
                         sudo('./configure')
                         sudo('make altinstall')
