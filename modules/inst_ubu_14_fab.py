@@ -215,13 +215,18 @@ Install and upgrade python 2.7 to Python 2.7.13
         with cd('/usr/src'):
             if exists('Python-2.7.13.tgz', use_sudo=True):
                 if exists('Python-2.7.13', use_sudo=True):
-                    with cd('/Python-2.7.13'):
+                    with cd('/usr/src/Python-2.7.13'):
+                        sudo('./configure')
+                        sudo('make altinstall')
+                else:
+                    sudo('tar xzf Python-2.7.13.tgz')
+                    with cd('/usr/src/Python-2.7.13'):
                         sudo('./configure')
                         sudo('make altinstall')
             else:
                 sudo('wget https://www.python.org/ftp/python/2.7.13/Python-2.7.13.tgz')
                 sudo('tar xzf Python-2.7.13.tgz')
-                with cd('/Python-2.7.13'):
+                with cd('/usr/src/Python-2.7.13'):
                     sudo('./configure')
                     sudo('make altinstall')
 
