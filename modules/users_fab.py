@@ -144,6 +144,36 @@ Add a user in Debian/Ubuntu based OS
 
 
 @task
+def add_ubuntu_sudo(usernamec):
+    """
+Add a user in Debian/Ubuntu based OS
+    :param usernamec: "username" to add
+    """
+    with settings(warn_only=True):
+        try:
+            # if(user_exists != ""):
+            user_true = sudo('cut -d: -f1 /etc/passwd | grep ' + usernamec)
+            if user_true != "":
+                print colored('##############################', 'green')
+                print colored('"' + usernamec + '" already exists', 'green')
+                print colored('##############################', 'green')
+                # sudo('gpasswd -a ' + usernamec + ' wheel')
+            else:
+                print colored('#################################', 'green')
+                print colored('"' + usernamec + '" doesnt exists', 'green')
+                print colored('WILL BE CREATED', 'green')
+                print colored('##################################', 'green')
+                sudo('useradd ' + usernamec + ' -m -d /home/' + usernamec)
+                # sudo('echo "' + usernamec + ':' + usernamec + '" | chpasswd')
+                sudo('gpasswd -a ' + usernamec + ' sudo')
+        except SystemExit:
+            # else:
+            print colored('######################################################', 'green')
+            print colored('"' + usernamec + '" couldnt be created for some reason', 'green')
+            print colored('######################################################', 'green')
+
+
+@task
 def remove_from_group_centos(usernamelist, group):
     """
 Remove a user from a certain group in RedHat/Centos based OS

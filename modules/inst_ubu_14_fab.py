@@ -1,9 +1,7 @@
 # Import Fabric's API module#
-from fabric.api import settings
 from fabric.decorators import task
-from fabric.operations import sudo
+from fabric.api import sudo, settings, run, cd
 from termcolor import colored
-
 from modules import file_fab
 
 
@@ -180,3 +178,221 @@ Munin Node HTTP Monitoring installation in Ubuntu 14.04.
 
         # Restarting services
         sudo('service munin-node restart')
+
+
+@task
+def install_jenkins():
+    """
+Install Jenkins Server w/ prerequisites
+
+    """
+    with settings(warn_only=False):
+        print colored('===================================================================', 'blue')
+        print colored('DEPENDENCIES PROVISIONING                          ', 'blue', attrs=['bold'])
+        print colored('===================================================================', 'blue')
+        run('wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -')
+        sudo('sh -c \'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list\'')
+        sudo('apt-get update')
+        sudo('apt-get install -y git jenkins redis-tools mysql-client pigz rsync')
+        file_fab.send("./conf/rsync/rsync-no24.sh", "/usr/bin/rsync-no24")
+
+
+@task
+def install_upgrade_python_27_13():
+    """
+Install and upgrade python 2.7 to Python 2.7.13
+
+    """
+    with settings(warn_only=False):
+        print colored('===================================================================', 'blue')
+        print colored('DEPENDENCIES PROVISIONING                          ', 'blue', attrs=['bold'])
+        print colored('===================================================================', 'blue')
+        sudo('apt-get install build-essential checkinstall')
+        sudo('apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev '
+             'tk-dev libgdbm-dev libc6-dev libbz2-dev')
+
+        with cd('/usr/src'):
+            sudo('wget https://www.python.org/ftp/python/2.7.13/Python-2.7.13.tgz')
+            sudo('tar xzf Python-2.7.13.tgz')
+            with cd('/Python-2.7.13'):
+                sudo('./configure')
+                sudo('make altinstall')
+
+        python_ver = run('python2.7 -V')
+        if python_ver == "Python 2.7.13":
+            print colored('==========================', 'blue')
+            print colored('Python SUCCESFULLY UPDATED', 'blue', attrs=['bold'])
+            print colored('==========================', 'blue')
+        else:
+            print colored('================================', 'blue')
+            print colored('Python NOT UPDATED, please check', 'blue', attrs=['bold'])
+            print colored('================================', 'blue')
+
+        with cd('/usr/bin'):
+            sudo('ls -ltra | grep python')
+            sudo('rm python')
+            sudo('ln -s /usr/src/Python-2.7.13/python python')
+            sudo('ls -ltra | grep python')
+
+        pip_status = str(run('pip | grep "pip <command>"'))
+        pip_status = pip_status.strip()
+        if pip_status != "pip <command> [options]":
+            with cd('/usr/src'):
+                sudo('wget https://bootstrap.pypa.io/get-pip.py')
+                sudo('python get-pip.py')
+                sudo('pip install --upgrade pip')
+
+
+@task
+def install_docker(username):
+    """
+Install Docker Engine, docker-compose, docker-machine
+    :param username: user to be aded to the docker group
+    """
+    with settings(warn_only=False):
+
+        print colored('################################################################', 'red', attrs=['bold'])
+        print colored('################################################################', 'red', attrs=['bold'])
+
+        print colored(' ____             _               ____                           ', 'blue', attrs=['bold'])
+        print colored('|  _ \  ___   ___| | _____ _ __  / ___|  ___ _ ____   _____ _ __ ', 'blue', attrs=['bold'])
+        print colored('| | | |/ _ \ / __| |/ / _ \  __| \___ \ / _ \  __\ \ / / _ \  __|', 'blue', attrs=['bold'])
+        print colored('| |_| | (_) | (__|   <  __/ |     ___) |  __/ |   \ V /  __/ |   ', 'blue', attrs=['bold'])
+        print colored('|____/ \___/ \___|_|\_\___|_|    |____/ \___|_|    \_/ \___|_|   ', 'blue', attrs=['bold'])
+
+        print colored('                                                                  ', 'blue')
+        print colored('                                                                  ', 'blue')
+
+        print colored('                                 xMMMMMMc', 'cyan')
+        print colored('                                 xMMMMMMc', 'cyan')
+        print colored('                                 xMMMMMMc', 'cyan')
+        print colored('                  ......  ...... ;dddddd ', 'cyan')
+        print colored('                 oWWWWWWo0NNNNNN,dNNNNNN:                     dOl.', 'cyan')
+        print colored('                 dMMMMMMdXMMMMMM,xMMMMMMc                    kMMMWd.', 'cyan')
+        print colored('                 dMMMMMMdXMMMMMM,xMMMMMMc                   cMMMMMMO.', 'cyan')
+        print colored('                ,,,,,, :xxxxxx;oxxxxxx.:xxxxxx .,,,,,,.           xMMMMMMMO. ....', 'cyan')
+        print colored('                .XMMMMMW,dMMMMMMdXMMMMMM,xMMMMMMckMMMMMMc           lMMMMMMMMXNWMWWX0x:.',
+                      'cyan')
+        print colored('        .XMMMMMW,dMMMMMMdXMMMMMM,dMMMMMMckMMMMMMc           .0MMMMMMMMMMMMMMMMK.', 'cyan')
+        print colored('        .XMMMMMW,dMMMMMMdXMMMMMM,xMMMMMMckMMMMMMc            ;NMMMMMMMMMMMMMWk.', 'cyan')
+        print colored(',;;;;;;:dddddddclddddddloddddddclddddddcoddddddl;;;;;;:cldOKWMMMMMMMMMWXOdc.', 'cyan')
+        print colored('WMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMWc''..', 'cyan')
+        print colored('MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNc', 'cyan')
+        print colored('WMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN;', 'cyan')
+        print colored('0MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMO.', 'cyan')
+        print colored(':WMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMd', 'cyan')
+        print colored(' dMMMMMMMMMMMMMMMMMMW0KxKMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM0:', 'cyan')
+        print colored('  dMMMMMMMMMMMMMMMMMNOKO0MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNx,', 'cyan')
+        print colored('   oWMMMMMMMMMWWX0ONMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMWx.', 'cyan')
+        print colored('    .d0o .......    0MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNOc.', 'cyan')
+        print colored('      .dOl.          lNMMMMMMMMMMMMMMMMMMMMMMMMMNOc.', 'cyan')
+        print colored('        .:odo:.       .lKWMMMMMMMMMMMMMMMMMWKxc,.', 'cyan')
+        print colored('            .;dxxxoc:;, .ckXMMMMMMMMWX0xo: .', 'cyan')
+        print colored('                     cxOKNWWWWWWNXKOxo; .', 'cyan')
+
+        print colored('                                                                  ', 'blue')
+        print colored('                                                                  ', 'blue')
+
+        print colored('              cd.                                ,dc', 'blue')
+        print colored('              XMo                                kMW.', 'blue')
+        print colored('     .,:cc: . XMo     .;ccc;.           :ccc;.   kMW.   ;;       :llc;.         . ;:,', 'blue')
+        print colored('   c0WW0OOKWW0WMo  .dXMN0OOXMNx.    ,OWWKOO0NW:  kMW..dNMO   ,OWMKOk0NMKl.    :0WWK0x', 'blue')
+        print colored('  OMXc     .cXMMo  NMO,      xWN;  oMNo.         kMWONWk,   oWNl.     xMMK  .0MK:.', 'blue')
+        print colored(' cMW         .WMo OMk         oMN.,MM:           kMMWx.    ;MM;    .lKM0l.  dMX.', 'blue')
+        print colored(' cMN.        .NMl 0Mx         lMW.,MM,           kMMWl     :MM,  ,OWM0;     kM0', 'blue')
+        print colored(' .KMO'      '0MK. :WWo.      cNMd  xMK;          kMMXMXl.   xMKl0WXd        kM0', 'blue')
+        print colored('  .xWMKdooxKMWd.   ,0MWOdlokNMX:    lNMNkdodOK;  kMW.;0MNo   cXMMNxoxOK:    kM0', 'blue')
+        print colored('    .;ldxxdl,        .:oxxxo:.        ,ldxxdo;   ,dl    do      cdxxxo;     ;x:', 'blue')
+
+        print colored('                                                                  ', 'blue')
+        print colored('                                                                  ', 'blue')
+
+        print colored('===================================================================', 'blue')
+        print colored('DEPENDENCIES PROVISIONING                          ', 'blue', attrs=['bold'])
+        print colored('===================================================================', 'blue')
+        sudo('apt-get update')
+        sudo('apt-get install -y --no-install-recommends linux-image-extra-$(uname -r) linux-image-extra-virtual')
+
+        print colored('===================================================================', 'blue')
+        print colored('INSTALLING PYTHON PIP                              ', 'blue', attrs=['bold'])
+        print colored('===================================================================', 'blue')
+        sudo('apt-get install -y python-pip')
+        sudo('pip install --upgrade pip')
+
+        print colored('===================================================================', 'blue')
+        print colored('DOCKER ENGINE PROVISIONING                         ', 'blue', attrs=['bold'])
+        print colored('===================================================================', 'blue')
+
+        with settings(warn_only=True):
+            docker_version = run('docker -v')
+            docker_version.strip()
+            if "Docker version" not in docker_version:
+                # Set up the repository.
+                sudo('apt-get install -y --no-install-recommends apt-transport-https ca-certificates curl'
+                     ' software-properties-common')
+                run('curl -fsSL https://apt.dockerproject.org/gpg | sudo apt-key add -')
+                sudo('add-apt-repository "deb https://apt.dockerproject.org/repo/ ubuntu-$(lsb_release -cs) main"')
+
+                # Install Docker
+                sudo('apt-get update')
+                sudo('apt-get -y install docker-engine')
+            else:
+                print colored('===================================================================', 'blue')
+                print colored('DOCKER ' + docker_version + ' INSTALLED          ', 'blue', attrs=['bold'])
+                print colored('===================================================================', 'blue')
+
+        # Verify docker is installed correctly by running a test image in a container.
+        sudo('docker run --rm hello-world')
+
+        # The docker daemon binds to a Unix socket instead of a TCP port.
+        # By default that Unix socket is owned by the user root and other users can access it with sudo.
+        # For this reason, docker daemon always runs as the root user.
+        # To avoid having to use sudo when you use the docker command, create a Unix group called
+        # docker and add users to it. When the docker daemon starts, it makes the ownership of
+        # the Unix socket read/writable by the docker group. Uncoment the sudo() lines below if you like
+        # to achieve this result
+        with settings(warn_only=True):
+            # Add your user to docker group.
+            sudo('usermod -aG docker ' + username)
+
+        print colored('===================================================================', 'blue')
+        print colored('DOCKER COMPOSE PROVISIONING                         ', 'blue', attrs=['bold'])
+        print colored('===================================================================', 'blue')
+
+        sudo('pip install docker-compose')
+
+        print colored('===================================================================', 'blue')
+        print colored('DOCKER MACHINE PROVISIONING                         ', 'blue', attrs=['bold'])
+        print colored('===================================================================', 'blue')
+
+        with settings(warn_only=True):
+            docker_machine_version = run('docker-machine -v')
+            print colored(docker_machine_version, 'red', attrs=['bold'])
+            docker_machine_version.strip()
+            if "docker-machine version" not in docker_machine_version:
+                # Run the Docker installation script.
+                sudo('curl -L https://github.com/docker/machine/releases/download/'
+                     'v0.9.0/docker-machine-`uname -s`-`uname -m` >/tmp/docker-machine && '
+                     'chmod +x /tmp/docker-machine && '
+                     'sudo cp /tmp/docker-machine /usr/local/bin/docker-machine')
+
+            else:
+                print colored('===================================================================', 'blue')
+                print colored('DOCKER ' + docker_machine_version + ' INSTALLED     ', 'blue', attrs=['bold'])
+                print colored('===================================================================', 'blue')
+
+        run('docker -v && docker-compose -v && docker-machine -v')
+
+# /var/lib/jenkins/job
+# /var/lib/jenkins/users
+# ssh keys /var/lib/jenkins/.ssh/id_rsa
+# ssh keys /var/lib/jenkins/.ssh/id_rsa_bitbucket
+# ssh keys /var/lib/jenkins/.ssh/kwnon_hosts
+# pip packages for deployments
+
+# Jenkins Plugins:
+# Role Based authorization Strategy => /var/lib/jenkins/config.xml => here are the roles
+# Slack Notifier
+# Extensible choice parameter
+# Multiple SCMs
+
