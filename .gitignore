@@ -1,4 +1,4 @@
-modules/upload_files_fab.pyc
+modules/*.pyc
 modules/users_fab.pyc
 modules/os_fab.pyc
 modules/maltrail_fab.pyc
@@ -9,6 +9,10 @@ fabfile.pyc
 modules/key_fab.pyc
 modules/show_fab.pyc
 modules/mysql_fab.pyc
+modules/inst_ubu_14_fab.pyc
+modules/key_fab.pyc
+modules/mysql_fab.pyc
+modules/show_fab.pyc
 logs/
 .idea/
 modules/.idea/
@@ -20,7 +24,6 @@ logs/.idea/
 ./idea/workspace.xml
 .idea/workspace.xml
 .idea/misc.xml
-fabfile.pyc
 logs/check_ssh.log
 key_fab.pyc
 show_fab.pyc
