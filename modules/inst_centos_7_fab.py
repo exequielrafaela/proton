@@ -8,7 +8,7 @@ from termcolor import colored
 
 
 @task
-def ruby():
+def install_ruby():
     """
 Install ruby via rvm in Centos based system
     """
@@ -30,13 +30,13 @@ Install ruby via rvm in Centos based system
 
 
 @task
-def lamp():
+def install_lamp():
     """
 LAMP Stack installation in Centos7 OS.
     """
     with settings(warn_only=False):
         sudo('yum update')
-        sudo('yum install epel-release')
+        sudo('yum install -y epel-release')
         print colored('=================================', 'blue')
         print colored('INSTALLING : "APACHE2 WebqServer"', 'blue')
         print colored('=================================', 'blue')
@@ -147,7 +147,7 @@ LAMP Stack installation in Centos7 OS.
 
 
 @task
-def mysql_server():
+def install_mysql_server():
     """
 MySQL Server installation in Centos7 OS.
     """
@@ -200,7 +200,7 @@ MySQL Server installation in Centos7 OS.
 
 
 @task
-def various():
+def install_various():
     """
 Install custom list of packets
     """
@@ -273,7 +273,7 @@ Install custom list of packets
 
 
 @task
-def docker(username):
+def install_docker(username):
     """
 Install Docker Engine, docker-compose, docker-machine
     :param username: user to be aded to the docker group
@@ -411,7 +411,7 @@ Install Docker Engine, docker-compose, docker-machine
 
 
 @task
-def php53():
+def install_php53():
     """
 Install php-5.3.29 in a CentOS7 Server
     """
