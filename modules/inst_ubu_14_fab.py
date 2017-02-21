@@ -444,3 +444,10 @@ Install wordpress CMS on Ubuntu 14.04
                     print colored('======================================', 'blue')
                     print colored('WORDPRESS INSTALLED OK', 'blue', attrs=['bold'])
                     print colored('======================================', 'blue')
+
+        sudo('chown -R www-data:www-data /var/www/html/*')
+        file_fab.send("./conf/apache/wordpress.conf", "/etc/apache2/sites-available/wordpress.conf")
+        sudo('sudo a2dissite default')
+        sudo('sudo a2ensite wordpress')
+        sudo('service apache2 reload')
+        sudo('service apache2 restart')
