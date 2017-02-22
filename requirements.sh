@@ -33,6 +33,8 @@ DEB_PACKAGE_NAME="python2.7 python-dev python-pip libssl-dev"
     apt-get autoremove -y
     apt-get install -y $DEB_PACKAGE_NAME
     pip install --upgrade pip
+    pip uninstall six
+    pip install --upgrade six
     pip install -r requirements.txt
  elif cat /etc/*release | grep ^NAME | grep Debian ; then
     echo "====================================="

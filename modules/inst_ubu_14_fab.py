@@ -423,7 +423,7 @@ Install wordpress CMS on Ubuntu 14.04
         print colored('===================================================================', 'blue')
         sudo('apt-get install unzip')
 
-        sudo('mkdir /var/www/html')
+        sudo('mkdir -p /var/www/html')
         with cd('/var/www/html'):
             if exists('./latest.zip', use_sudo=True):
                 if exists('./wordpress', use_sudo=True):
