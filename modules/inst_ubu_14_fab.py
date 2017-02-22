@@ -1,9 +1,9 @@
 # Import Fabric's API module#
-from fabric.contrib.files import exists
+from fabric.contrib.files import exists, sed
 from fabric.decorators import task
 from fabric.api import sudo, settings, run, cd
 from termcolor import colored
-from modules import file_fab
+from modules import file_fab, mysql_fab
 
 
 @task
@@ -444,3 +444,29 @@ Install wordpress CMS on Ubuntu 14.04
                     print colored('======================================', 'blue')
                     print colored('WORDPRESS INSTALLED OK', 'blue', attrs=['bold'])
                     print colored('======================================', 'blue')
+
+        sudo('chown -R www-data:www-data /var/www/html/*')
+        file_fab.send("./conf/apache/wordpress.conf", "/etc/apache2/sites-available/wordpress.conf")
+        sudo('sudo a2dissite default')
+        sudo('sudo a2ensite wordpress')
+        sudo('service apache2 reload')
+        sudo('service apache2 restart')
+
+        sudo('apt-get intall apache2 mysql-server')
+        sudo('apt-get install php5 libapache2-mod-php5 php5-mcrypt php5-mysql')
+
+        sudo('chmod 757 /etc/apache2/mods-available/')
+        sudo('chmod 666 /etc/apache2/mods-available/dir.conf')
+        str_to_remove = "DirectoryIndex index.html index.cgi index.pl index.php index.xhtml index.htm"
+        str_to_add = "DirectoryIndex index.php index.html index.cgi index.pl index.php index.xhtml index.htm"
+        sed('/etc/haproxy/haproxy.cfg', str_to_remove, str_to_add, limit='', use_sudo=True, backup='.bak', flags='',
+            shell=False)
+        sudo('chmod 755 /etc/apache2/mods-available/')
+        sudo('chmod 644 /etc/apache2/mods-available/dir.conf')
+        sudo('service apache2 restart')
+
+        mysql_fab.create_db("wp_binbash_db","root")
+        mysql_fab.create_local_user("root", "wp_binbash_user", db_user_pass="wp_binbash_pass")
+        mysql_fab.grant_user_db("wp_binbash_db", "wp_binbash_user", db_user_pass="wp_binbash_pass")
+
+

@@ -35,7 +35,7 @@ def install_lamp():
 LAMP Stack installation in Centos7 OS.
     """
     with settings(warn_only=False):
-        sudo('yum update')
+        sudo('yum update -y')
         sudo('yum install -y epel-release')
         print colored('=================================', 'blue')
         print colored('INSTALLING : "APACHE2 WebqServer"', 'blue')

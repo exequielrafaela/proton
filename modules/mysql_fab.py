@@ -81,16 +81,17 @@ fab -R devtest mysql_sh_db_user:root,127.0.0.1
 
 
 @task
-def create_db(db_name, mysql_ip="127.0.0.1"):
+def create_db(db_name, admin_db_user, mysql_ip="127.0.0.1"):
     """
 Create a MySQL Database with the given db_name
+    :param admin_db_user: mysql root user
     :param db_name: Database name to be created
     :param mysql_ip: MySQL Server IP Address
     """
     with settings(warn_only=False):
         try:
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "CREATE DATABASE ' + db_name + ';"')
-            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "show databases;"')
+            sudo('mysql -h ' + mysql_ip + ' -u ' + admin_db_user + ' -p -e "CREATE DATABASE ' + db_name + ';"')
+            sudo('mysql -h ' + mysql_ip + ' -u ' + admin_db_user + ' -p -e "show databases;"')
         except SystemExit:
             print colored('===================', 'red')
             print colored('MySQL query problem', 'red')
@@ -139,6 +140,7 @@ to database 'wordpress'
             sudo('mysql -h ' + mysql_ip + ' -u root -p -e "GRANT ALL PRIVILEGES ON ' + db_name + '.* TO '
                  + db_user + '@localhost IDENTIFIED BY \'' + db_user_pass + '\';"')
             sudo('mysql -h ' + mysql_ip + ' -u root -p -e "SELECT User, Host, Password FROM mysql.user;"')
+            sudo('mysql -h ' + mysql_ip + ' -u root -p -e "FLUSH PRIVILEGES;"')
         except SystemExit:
             print colored('===================', 'red')
             print colored('MySQL query problem', 'red')
