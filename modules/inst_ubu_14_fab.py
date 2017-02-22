@@ -450,6 +450,7 @@ Install wordpress CMS on Ubuntu 14.04
 
         sudo('chown -R www-data:www-data /var/www/html/*')
         file_fab.send("./conf/apache/wordpress.conf", "/etc/apache2/sites-available/wordpress.conf")
+        file_fab.send("./conf/php/wordpress.php.ini", "/etc/php5/apache2/php.ini")
         sudo('sudo a2dissite 000-default.conf')
         sudo('sudo a2ensite wordpress')
         sudo('service apache2 reload')
