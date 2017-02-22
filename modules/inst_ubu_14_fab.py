@@ -459,7 +459,7 @@ Install wordpress CMS on Ubuntu 14.04
         sudo('chmod 666 /etc/apache2/mods-available/dir.conf')
         str_to_remove = "DirectoryIndex index.html index.cgi index.pl index.php index.xhtml index.htm"
         str_to_add = "DirectoryIndex index.php index.html index.cgi index.pl index.php index.xhtml index.htm"
-        sed('/etc/haproxy/haproxy.cfg', str_to_remove, str_to_add, limit='', use_sudo=True, backup='.bak', flags='',
+        sed('/etc/apache2/mods-enabled/dir.conf', str_to_remove, str_to_add, limit='', use_sudo=True, backup='.bak', flags='',
             shell=False)
         sudo('chmod 755 /etc/apache2/mods-available/')
         sudo('chmod 644 /etc/apache2/mods-available/dir.conf')
