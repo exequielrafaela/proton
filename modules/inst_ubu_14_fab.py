@@ -445,15 +445,15 @@ Install wordpress CMS on Ubuntu 14.04
                     print colored('WORDPRESS INSTALLED OK', 'blue', attrs=['bold'])
                     print colored('======================================', 'blue')
 
+        sudo('apt-get intall apache2 mysql-server')
+        sudo('apt-get install php5 libapache2-mod-php5 php5-mcrypt php5-mysql')
+
         sudo('chown -R www-data:www-data /var/www/html/*')
         file_fab.send("./conf/apache/wordpress.conf", "/etc/apache2/sites-available/wordpress.conf")
         sudo('sudo a2dissite default')
         sudo('sudo a2ensite wordpress')
         sudo('service apache2 reload')
         sudo('service apache2 restart')
-
-        sudo('apt-get intall apache2 mysql-server')
-        sudo('apt-get install php5 libapache2-mod-php5 php5-mcrypt php5-mysql')
 
         sudo('chmod 757 /etc/apache2/mods-available/')
         sudo('chmod 666 /etc/apache2/mods-available/dir.conf')
