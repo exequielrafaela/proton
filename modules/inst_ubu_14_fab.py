@@ -211,6 +211,11 @@ Install Jenkins Server w/ prerequisites
         # Multiple SCMs
         # SCM Sync Configuration Plugin
         # Last Changes Plugin
+        # Bitbucket Branch Source Plugin
+        # Checkstyle (for processing PHP_CodeSniffer logfiles in Checkstyle format)
+        # Clover PHP (for processing PHPUnit's Clover XML logfile)
+        # DRY Plug-in (for processing phpcpd logfiles in PMD-CPD format) => Depends on Static Analysis Utilities plugin
+        # Bitbucket pullrequest builder plugin - to support it as code then => "Job DSL plugin"
 
 
 @task
@@ -432,6 +437,7 @@ Install wordpress CMS on Ubuntu 14.04
                     print colored('==========================================', 'yellow')
                 else:
                     sudo('unzip latest.zip')
+                    sudo('rm ./latest.zip')
                     if exists('./wordpress', use_sudo=True):
                         print colored('======================================', 'blue')
                         print colored('WORDPRESS INSTALLED OK', 'blue', attrs=['bold'])
@@ -440,6 +446,7 @@ Install wordpress CMS on Ubuntu 14.04
             else:
                 sudo('wget https://wordpress.org/latest.zip')
                 sudo('unzip latest.zip')
+                sudo('rm ./latest.zip')
                 if exists('./wordpress', use_sudo=True):
                     print colored('======================================', 'blue')
                     print colored('WORDPRESS INSTALLED OK', 'blue', attrs=['bold'])
@@ -450,7 +457,7 @@ Install wordpress CMS on Ubuntu 14.04
 
         sudo('chown -R www-data:www-data /var/www/html/*')
         file_fab.send("./conf/apache/wordpress.conf", "/etc/apache2/sites-available/wordpress.conf")
-        file_fab.send("./conf/php/wordpress.php.ini", "/etc/php5/apache2/php.ini")
+        file_fab.send("./conf/php/wordpress_php.ini", "/etc/php5/apache2/php.ini")
         sudo('sudo a2dissite 000-default.conf')
         sudo('sudo a2ensite wordpress')
         sudo('service apache2 reload')
