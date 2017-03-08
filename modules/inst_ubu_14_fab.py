@@ -437,7 +437,7 @@ Install wordpress CMS on Ubuntu 14.04
                     print colored('==========================================', 'yellow')
                 else:
                     sudo('unzip latest.zip')
-                    sudo('rm ./latest.zip')
+                    sudo('rm -rf ./latest.zip')
                     if exists('./wordpress', use_sudo=True):
                         print colored('======================================', 'blue')
                         print colored('WORDPRESS INSTALLED OK', 'blue', attrs=['bold'])
@@ -446,7 +446,7 @@ Install wordpress CMS on Ubuntu 14.04
             else:
                 sudo('wget https://wordpress.org/latest.zip')
                 sudo('unzip latest.zip')
-                sudo('rm ./latest.zip')
+                sudo('rm -rf ./latest.zip')
                 if exists('./wordpress', use_sudo=True):
                     print colored('======================================', 'blue')
                     print colored('WORDPRESS INSTALLED OK', 'blue', attrs=['bold'])
