@@ -45,6 +45,10 @@ import config
 # from passlib.hash import pbkdf2_sha256
 """
 
+from modules import chef_fab, conf_files_fab, download_files_fab, file_fab, inst_centos_7_fab, haproxy_fab, \
+    inst_ubu_14_fab, key_fab, maltrail_fab, mysql_fab, nfs_fab, os_fab, passwd_fab, pkg_mgr_fab, rm_centos_7_fab, \
+    rsync_fab, show_fab, upload_files_fab, users_fab, aws_fab
+
 print config.CONFIG_DIR
 
 # As a good practice we can log the state of each phase in our script.
