@@ -31,3 +31,4 @@ show_fab.pyc
 config.pyci
 conf/AWS/*
 config.pyc
+scripts/pagerduty/*
