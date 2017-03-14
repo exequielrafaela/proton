@@ -9,6 +9,7 @@ requests
 simplejson
 ujson
 pyparsing
+appdirs
 pagerduty
 pygerduty
 pagerduty-api
