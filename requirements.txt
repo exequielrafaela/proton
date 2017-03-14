@@ -4,14 +4,14 @@ Fabric
 iptools
 passlib
 termcolor
+pyparsing
+appdirs
 cffi
+pygit2
 awscli
 requests
 simplejson
 ujson
-pyparsing
-appdirs
-pygit2
 pagerduty
 pygerduty
 pagerduty-api
