@@ -1,5 +1,6 @@
-#pip freeze > requirements.txt
-#pip install -r /path/to/requirements.txt
+# pip freeze > requirements.txt
+# pip install -r /path/to/requirements.txt
+# pygit2
 paramiko
 Fabric
 iptools
@@ -8,7 +9,6 @@ termcolor
 pyparsing
 appdirs
 cffi
-pygit2
 awscli
 requests
 simplejson
