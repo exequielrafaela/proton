@@ -479,16 +479,12 @@ Install wordpress CMS on Ubuntu 14.04
 
 
 @task
-def local_env(username):
+def install_oracle_java8():
     """
-Install wordpress CMS on Ubuntu 14.04
+Install Oracle Java8
 
     """
     with settings(warn_only=False):
-        print colored('===================================================================', 'blue')
-        print colored('DEPENDENCIES PROVISIONING                          ', 'blue', attrs=['bold'])
-        print colored('===================================================================', 'blue')
-
         print colored('===================================================================', 'blue')
         print colored('INSTALLING ORACLE JAVA 1.8.0', 'blue', attrs=['bold'])
         print colored('===================================================================', 'blue')
@@ -520,6 +516,13 @@ Install wordpress CMS on Ubuntu 14.04
             print colored('===============================================================', 'blue')
 
 
+@task
+def install_maven(username):
+    """
+Install maven 3.3.9
+
+    """
+    with settings(warn_only=False):
         print colored('================================', 'blue')
         print colored('INSTALLING MAVEN', 'blue', attrs=['bold'])
         print colored('================================', 'blue')
@@ -595,6 +598,14 @@ Install wordpress CMS on Ubuntu 14.04
             print colored('MAVEN VERSION up to date: ' + maven_version, 'blue', attrs=['bold'])
             print colored('==========================================================', 'blue')
 
+
+@task
+def install_node():
+    """
+Install Oracle Java8
+
+    """
+    with settings(warn_only=False):
         # NodeJs
         node_version = run('node -v')
         node_version.strip()
@@ -604,6 +615,7 @@ Install wordpress CMS on Ubuntu 14.04
             sudo('npm cache clean -f')
             sudo('npm install -g n')
             sudo('n stable')
+            # Not necesary sudo ln -sf /usr/local/n/versions/node/<VERSION>/bin/node /usr/bin/node
 
         else:
             print colored('===============================================================', 'blue')
@@ -611,11 +623,18 @@ Install wordpress CMS on Ubuntu 14.04
             print colored('===============================================================', 'blue')
 
 
-        # Python
-        sudo('apt-get install python-tk')
-        sudo('pip install scipy')
-        sudo('pip install matplotlib')
-        sudo('pip install pytrends')
+@task
+def install_py_libs():
+    """
+Install Python 2.7 libs
+
+    """
+    sudo('apt-get install python-tk')
+    sudo('pip install scipy')
+    sudo('pip install matplotlib')
+    sudo('pip install pytrends')
+
+
 
 
         # vagrant@jwt:/data$ mvn clean package -P development
@@ -629,23 +648,22 @@ Install wordpress CMS on Ubuntu 14.04
         # vagrant@jwt:/data/jwt-cic-services$ cd target/
         # vagrant@jwt:/data/jwt-cic-services/target$ java -jar jwt-cic-services-0.0.1-SNAPSHOT.jar &
 
-        vagrant@jwt:/data/jwt-cic-frontend$ pwd
-        /data/jwt-cic-frontend
-        vagrant@jwt:/data/jwt-cic-frontend$ grunt serve
-        vagrant@jwt:/data/jwt-cic-frontend$ npm run serve
+        # vagrant@jwt:/data/jwt-cic-frontend$ pwd
+        # /data/jwt-cic-frontend
+        # vagrant@jwt:/data/jwt-cic-frontend$ grunt serve
+        # vagrant@jwt:/data/jwt-cic-frontend$ npm run serve
 
-        > jwt-cic-frontend@0.0.1 serve /data/jwt-cic-frontend
-        > grunt serve
+        # > jwt-cic-frontend@0.0.1 serve /data/jwt-cic-frontend
+        # > grunt serve
 
-        npm ERR! weird error 1
-        npm WARN This failure might be due to the use of legacy binary "node"
-        npm WARN For further explanations, please read
-        /usr/share/doc/nodejs/README.Debian
+        # npm ERR! weird error 1
+        # npm WARN This failure might be due to the use of legacy binary "node"
+        # npm WARN For further explanations, please read
+        # /usr/share/doc/nodejs/README.Debian
 
-        npm ERR! not ok code 0
+        # npm ERR! not ok code 0
 
 
 
-        # Not necesary sudo ln -sf /usr/local/n/versions/node/<VERSION>/bin/node /usr/bin/node
 
-        # aclarar el tema del S3.
+
