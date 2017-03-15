@@ -536,6 +536,7 @@ Install maven 3.3.9
         # Default locale: en_US, platform encoding: ANSI_X3.4-1968
         # OS name: "linux", version: "3.13.0-112-generic", arch: "amd64", family: "unix"
         # sudo('apt-get install maven')
+        sudo('sudo apt-get install maven')
         maven_version = run('mvn -version')
         maven_version.strip()
         print "CURRENT MAVEN VER: " + maven_version
