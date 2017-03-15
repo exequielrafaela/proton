@@ -638,20 +638,30 @@ Install Oracle Java8
     with settings(warn_only=False):
         # NodeJs
         sudo('apt-get install -y node nodejs npm')
-        node_version = run('node -v')
-        node_version.strip()
-        print "CURRENT NODE VER: " + node_version
-        if "7.6.0" not in node_version:
+
+        try:
+            run('node -v')
+            node_version = run('node -v')
+            node_version.strip()
+            print "CURRENT NODE VER: " + node_version
+            if "7.6.0" not in node_version:
+                sudo('npm cache clean -f')
+                sudo('npm install -g n')
+                sudo('n stable')
+                # Not necesary sudo ln -sf /usr/local/n/versions/node/<VERSION>/bin/node /usr/bin/node
+
+            else:
+                print colored('===============================================================', 'blue')
+                print colored('NODE VERSION: ' + node_version + ' INSTALLED   ', 'blue', attrs=['bold'])
+                print colored('===============================================================', 'blue')
+
+        except SystemExit:
+            print colored('==============================================', 'blue')
+            print colored('NODE VERSION: NOT INSTALLED   ', 'blue', attrs=['bold'])
+            print colored('==============================================', 'blue')
             sudo('npm cache clean -f')
             sudo('npm install -g n')
             sudo('n stable')
-            # Not necesary sudo ln -sf /usr/local/n/versions/node/<VERSION>/bin/node /usr/bin/node
-
-        else:
-            print colored('===============================================================', 'blue')
-            print colored('NODE VERSION: ' + node_version + ' INSTALLED   ', 'blue', attrs=['bold'])
-            print colored('===============================================================', 'blue')
-
 
 @task
 def install_py_libs():
