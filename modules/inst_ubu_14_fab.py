@@ -1,5 +1,5 @@
 # Import Fabric's API module#
-from fabric.contrib.files import exists, sed, append
+from fabric.contrib.files import exists, sed, append, contains
 from fabric.decorators import task
 from fabric.api import sudo, settings, run, cd
 from termcolor import colored
@@ -560,10 +560,14 @@ Install maven 3.3.9
                             # run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
                             # run('echo "PATH=$M2:$PATH >> ~/.bashrc"')
 
-                            append('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
-                            append('~/.bashrc', 'M2=$M2_HOME/bin', use_sudo=True)
-                            append('~/.bashrc', 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
-                            append('~/.bashrc', 'PATH=$M2:$PATH', use_sudo=True)
+                            if contains('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9',
+                                     exact=False, use_sudo=False, escape=True, shell=False, case_sensitive=True):
+                                print "maven 3.3.9 lines already added"
+                            else:
+                                append('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
+                                append('~/.bashrc', 'M2=$M2_HOME/bin', use_sudo=True)
+                                append('~/.bashrc', 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
+                                append('~/.bashrc', 'PATH=$M2:$PATH', use_sudo=True)
 
                 else:
                     run('wget http://apache.mirrors.lucidnetworks.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz')
@@ -581,10 +585,14 @@ Install maven 3.3.9
                             # run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
                             # run('echo "PATH=$M2:$PATH >> ~/.bashrc"')
 
-                            append('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
-                            append('~/.bashrc', 'M2=$M2_HOME/bin', use_sudo=True)
-                            append('~/.bashrc', 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
-                            append('~/.bashrc', 'PATH=$M2:$PATH', use_sudo=True)
+                            if contains('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9',
+                                     exact=False, use_sudo=False, escape=True, shell=False, case_sensitive=True):
+                                print "maven 3.3.9 lines already added"
+                            else:
+                                append('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
+                                append('~/.bashrc', 'M2=$M2_HOME/bin', use_sudo=True)
+                                append('~/.bashrc', 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
+                                append('~/.bashrc', 'PATH=$M2:$PATH', use_sudo=True)
 
                     else:
                         sudo('mkdir -p /usr/local/apache-maven')
@@ -601,10 +609,14 @@ Install maven 3.3.9
                             # run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
                             # run('echo "PATH=$M2:$PATH >> ~/.bashrc"')
 
-                            append('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
-                            append('~/.bashrc', 'M2=$M2_HOME/bin', use_sudo=True)
-                            append('~/.bashrc', 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
-                            append('~/.bashrc', 'PATH=$M2:$PATH', use_sudo=True)
+                            if contains('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9',
+                                     exact=False, use_sudo=False, escape=True, shell=False, case_sensitive=True):
+                                print "maven 3.3.9 lines already added"
+                            else:
+                                append('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
+                                append('~/.bashrc', 'M2=$M2_HOME/bin', use_sudo=True)
+                                append('~/.bashrc', 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
+                                append('~/.bashrc', 'PATH=$M2:$PATH', use_sudo=True)
 
             maven_final_ver = run('mvn -version')
             print colored('============================================', 'blue')
@@ -625,11 +637,11 @@ Install Oracle Java8
     """
     with settings(warn_only=False):
         # NodeJs
+        sudo('apt-get install -y node nodejs npm')
         node_version = run('node -v')
         node_version.strip()
         print "CURRENT NODE VER: " + node_version
         if "7.6.0" not in node_version:
-            sudo('apt-get install -y node nodejs npm')
             sudo('npm cache clean -f')
             sudo('npm install -g n')
             sudo('n stable')
