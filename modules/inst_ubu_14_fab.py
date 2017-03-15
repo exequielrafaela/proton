@@ -228,8 +228,8 @@ Install and upgrade python 2.7 to Python 2.7.13
         print colored('===================================================================', 'blue')
         print colored('DEPENDENCIES PROVISIONING                          ', 'blue', attrs=['bold'])
         print colored('===================================================================', 'blue')
-        sudo('apt-get install build-essential checkinstall')
-        sudo('apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev '
+        sudo('apt-get install -y build-essential checkinstall')
+        sudo('apt-get install -y libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev '
              'tk-dev libgdbm-dev libc6-dev libbz2-dev')
 
         with cd('/usr/src'):
@@ -478,3 +478,174 @@ Install wordpress CMS on Ubuntu 14.04
         mysql_fab.grant_user_db("wp_binbash_db", "wp_binbash_user", db_user_pass="wp_binbash_pass")
 
 
+@task
+def local_env(username):
+    """
+Install wordpress CMS on Ubuntu 14.04
+
+    """
+    with settings(warn_only=False):
+        print colored('===================================================================', 'blue')
+        print colored('DEPENDENCIES PROVISIONING                          ', 'blue', attrs=['bold'])
+        print colored('===================================================================', 'blue')
+
+        print colored('===================================================================', 'blue')
+        print colored('INSTALLING ORACLE JAVA 1.8.0', 'blue', attrs=['bold'])
+        print colored('===================================================================', 'blue')
+        # add conditonal to validate java version
+        # vagrant@jwt:/data$ java -version
+        # java version "1.8.0_121"
+        # Java(TM) SE Runtime Environment (build 1.8.0_121-b13)
+        # Java HotSpot(TM) 64-Bit Server VM (build 25.121-b13, mixed mode)
+        # vagrant@jwt:~$ sudo update-alternatives --config java
+        # There are 2 choices for the alternative java (providing /usr/bin/java).
+        # Selection    Path                                            Priority   Status
+        # ------------------------------------------------------------
+        #  0            /usr/lib/jvm/java-8-oracle/jre/bin/java          1081      auto mode
+        #  1            /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java   1071      manual mode
+        #* 2            /usr/lib/jvm/java-8-oracle/jre/bin/java          1081      manual mode
+        #sudo('update-alternatives --config java')
+        java_version = run('java -version')
+        java_version.strip()
+        print "CURRENT JAVA VER: " + java_version
+        if "1.8.0" not in java_version:
+            # Set up the repository.
+            sudo('add-apt-repository ppa:webupd8team/java')
+            sudo('apt-get update')
+            sudo('apt-get install oracle-java8-installer')
+
+        else:
+            print colored('===============================================================', 'blue')
+            print colored('JAVA VERSION: ' + java_version + ' INSTALLED   ', 'blue', attrs=['bold'])
+            print colored('===============================================================', 'blue')
+
+
+        print colored('================================', 'blue')
+        print colored('INSTALLING MAVEN', 'blue', attrs=['bold'])
+        print colored('================================', 'blue')
+        # Java dependencies
+        # Upgrade to MAVEN 3.3.9 (http://javedmandary.blogspot.com.ar/2016/09/install-maven-339-on-ubuntu.html)
+        # vagrant@jwt:/data$ mvn -version
+        # Apache Maven 3.0.5
+        # Maven home: /usr/share/maven
+        # Java version: 1.8.0_121, vendor: Oracle Corporation
+        # Java home: /usr/lib/jvm/java-8-oracle/jre
+        # Default locale: en_US, platform encoding: ANSI_X3.4-1968
+        # OS name: "linux", version: "3.13.0-112-generic", arch: "amd64", family: "unix"
+        # sudo('apt-get install maven')
+        maven_version = run('mvn -version')
+        maven_version.strip()
+        print "CURRENT MAVEN VER: " + maven_version
+
+        if "3.3.9" not in maven_version:
+            with cd('/home/' + username):
+                if exists('/home/' + username + '/apache-maven-3.3.9-bin.tar.gz', use_sudo=True):
+                    if exists('/usr/local/apache-maven', use_sudo=True):
+                        sudo('mv apache-maven-3.3.9-bin.tar.gz /usr/local/apache-maven')
+                        with cd('/usr/local/apache-maven'):
+                            sudo('tar -xzvf apache-maven-3.3.9-bin.tar.gz')
+                            run('export M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9')
+                            run('export M2=$M2_HOME/bin')
+                            run('export MAVEN_OPTS="-Xms256m -Xmx512m"')
+                            run('export PATH=$M2:$PATH')
+
+                            run('echo "M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9" >> ~/.bashrc')
+                            run('echo "M2=$M2_HOME/bin" >> ~/.bashrc')
+                            run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
+                            run('echo "PATH=$M2:$PATH" >> ~/.bashrc')
+
+                else:
+                    run('wget http://apache.mirrors.lucidnetworks.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz')
+                    if exists('/usr/local/apache-maven', use_sudo=True):
+                        sudo('mv apache-maven-3.3.9-bin.tar.gz /usr/local/apache-maven')
+                        with cd('/usr/local/apache-maven'):
+                            sudo('tar -xzvf apache-maven-3.3.9-bin.tar.gz')
+                            run('export M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9')
+                            run('export M2=$M2_HOME/bin')
+                            run('export MAVEN_OPTS="-Xms256m -Xmx512m"')
+                            run('export PATH=$M2:$PATH')
+
+                            run('echo "M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9" >> ~/.bashrc')
+                            run('echo "M2=$M2_HOME/bin" >> ~/.bashrc')
+                            run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
+                            run('echo "PATH=$M2:$PATH" >> ~/.bashrc')
+
+                    else:
+                        sudo('mkdir -p /usr/local/apache-maven')
+                        sudo('mv apache-maven-3.3.9-bin.tar.gz /usr/local/apache-maven')
+                        with cd('/usr/local/apache-maven'):
+                            sudo('tar -xzvf apache-maven-3.3.9-bin.tar.gz')
+                            run('export M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9')
+                            run('export M2=$M2_HOME/bin')
+                            run('export MAVEN_OPTS="-Xms256m -Xmx512m"')
+                            run('export PATH=$M2:$PATH')
+
+                            run('echo "M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9" >> ~/.bashrc')
+                            run('echo "M2=$M2_HOME/bin" >> ~/.bashrc')
+                            run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
+                            run('echo "PATH=$M2:$PATH" >> ~/.bashrc')
+
+            maven_final_ver = run('mvn -version')
+            print colored('============================================', 'blue')
+            print colored('MAVEN VERSION: ' + maven_final_ver , 'blue', attrs=['bold'])
+            print colored('============================================', 'blue')
+
+        else:
+            print colored('==========================================================', 'blue')
+            print colored('MAVEN VERSION up to date: ' + maven_version, 'blue', attrs=['bold'])
+            print colored('==========================================================', 'blue')
+
+        # NodeJs
+        node_version = run('node -v')
+        node_version.strip()
+        print "CURRENT NODE VER: " + node_version
+        if "7.6.0" not in node_version:
+            sudo('apt-get install node nodejs npm')
+            sudo('npm cache clean -f')
+            sudo('npm install -g n')
+            sudo('n stable')
+
+        else:
+            print colored('===============================================================', 'blue')
+            print colored('NODE VERSION: ' + node_version + ' INSTALLED   ', 'blue', attrs=['bold'])
+            print colored('===============================================================', 'blue')
+
+
+        # Python
+        sudo('apt-get install python-tk')
+        sudo('pip install scipy')
+        sudo('pip install matplotlib')
+        sudo('pip install pytrends')
+
+
+        # vagrant@jwt:/data$ mvn clean package -P development
+        # vagrant@jwt:/data$ mvn -DskipTests clean package -P development
+        # npm install -g grunt-cli
+
+        # 332 -rw-rw-r-- 1 vagrant vagrant 338245 Mar 14 19:51 frontend.zip
+        # vagrant@jwt:/data/jwt-cic-frontend/target$ pwd
+        # /data/jwt-cic-frontend/target
+
+        # vagrant@jwt:/data/jwt-cic-services$ cd target/
+        # vagrant@jwt:/data/jwt-cic-services/target$ java -jar jwt-cic-services-0.0.1-SNAPSHOT.jar &
+
+        vagrant@jwt:/data/jwt-cic-frontend$ pwd
+        /data/jwt-cic-frontend
+        vagrant@jwt:/data/jwt-cic-frontend$ grunt serve
+        vagrant@jwt:/data/jwt-cic-frontend$ npm run serve
+
+        > jwt-cic-frontend@0.0.1 serve /data/jwt-cic-frontend
+        > grunt serve
+
+        npm ERR! weird error 1
+        npm WARN This failure might be due to the use of legacy binary "node"
+        npm WARN For further explanations, please read
+        /usr/share/doc/nodejs/README.Debian
+
+        npm ERR! not ok code 0
+
+
+
+        # Not necesary sudo ln -sf /usr/local/n/versions/node/<VERSION>/bin/node /usr/bin/node
+
+        # aclarar el tema del S3.
