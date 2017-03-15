@@ -545,6 +545,8 @@ Install maven 3.3.9
 
         if "3.3.9" not in maven_version:
             with cd('/home/' + username):
+                bashrc_path = '/home/' + username + '/.bashrc'
+
                 if exists('/home/' + username + '/apache-maven-3.3.9-bin.tar.gz', use_sudo=True):
                     if exists('/usr/local/apache-maven', use_sudo=True):
                         sudo('mv apache-maven-3.3.9-bin.tar.gz /usr/local/apache-maven')
@@ -560,14 +562,16 @@ Install maven 3.3.9
                             # run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
                             # run('echo "PATH=$M2:$PATH >> ~/.bashrc"')
 
-                            if contains('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9',
-                                     exact=False, use_sudo=False, escape=True, shell=False, case_sensitive=True):
+                            # if contains('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9',
+                                        # exact=False, use_sudo=True, escape=True, shell=False, case_sensitive=True):
+
+                            if contains(bashrc_path, 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True):
                                 print "maven 3.3.9 lines already added"
                             else:
-                                append('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
-                                append('~/.bashrc', 'M2=$M2_HOME/bin', use_sudo=True)
-                                append('~/.bashrc', 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
-                                append('~/.bashrc', 'PATH=$M2:$PATH', use_sudo=True)
+                                append(bashrc_path, 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
+                                append(bashrc_path, 'M2=$M2_HOME/bin', use_sudo=True)
+                                append(bashrc_path, 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
+                                append(bashrc_path, 'PATH=$M2:$PATH', use_sudo=True)
 
                 else:
                     run('wget http://apache.mirrors.lucidnetworks.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz')
@@ -585,14 +589,14 @@ Install maven 3.3.9
                             # run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
                             # run('echo "PATH=$M2:$PATH >> ~/.bashrc"')
 
-                            if contains('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9',
+                            if contains(bashrc_path, 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9',
                                      exact=False, use_sudo=False, escape=True, shell=False, case_sensitive=True):
                                 print "maven 3.3.9 lines already added"
                             else:
-                                append('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
-                                append('~/.bashrc', 'M2=$M2_HOME/bin', use_sudo=True)
-                                append('~/.bashrc', 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
-                                append('~/.bashrc', 'PATH=$M2:$PATH', use_sudo=True)
+                                append(bashrc_path, 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
+                                append(bashrc_path, 'M2=$M2_HOME/bin', use_sudo=True)
+                                append(bashrc_path, 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
+                                append(bashrc_path, 'PATH=$M2:$PATH', use_sudo=True)
 
                     else:
                         sudo('mkdir -p /usr/local/apache-maven')
@@ -609,14 +613,14 @@ Install maven 3.3.9
                             # run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
                             # run('echo "PATH=$M2:$PATH >> ~/.bashrc"')
 
-                            if contains('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9',
+                            if contains(bashrc_path, 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9',
                                      exact=False, use_sudo=False, escape=True, shell=False, case_sensitive=True):
                                 print "maven 3.3.9 lines already added"
                             else:
-                                append('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
-                                append('~/.bashrc', 'M2=$M2_HOME/bin', use_sudo=True)
-                                append('~/.bashrc', 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
-                                append('~/.bashrc', 'PATH=$M2:$PATH', use_sudo=True)
+                                append(bashrc_path, 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
+                                append(bashrc_path, 'M2=$M2_HOME/bin', use_sudo=True)
+                                append(bashrc_path, 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
+                                append(bashrc_path, 'PATH=$M2:$PATH', use_sudo=True)
 
             maven_final_ver = run('mvn -version')
             print colored('============================================', 'blue')
@@ -662,6 +666,7 @@ Install Oracle Java8
             sudo('npm cache clean -f')
             sudo('npm install -g n')
             sudo('n stable')
+
 
 @task
 def install_py_libs():
