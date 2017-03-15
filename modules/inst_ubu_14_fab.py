@@ -508,7 +508,7 @@ Install Oracle Java8
             # Set up the repository.
             sudo('add-apt-repository ppa:webupd8team/java')
             sudo('apt-get update')
-            sudo('apt-get install oracle-java8-installer')
+            sudo('apt-get install -y oracle-java8-installer')
 
         else:
             print colored('===============================================================', 'blue')
@@ -611,7 +611,7 @@ Install Oracle Java8
         node_version.strip()
         print "CURRENT NODE VER: " + node_version
         if "7.6.0" not in node_version:
-            sudo('apt-get install node nodejs npm')
+            sudo('apt-get install -y node nodejs npm')
             sudo('npm cache clean -f')
             sudo('npm install -g n')
             sudo('n stable')
@@ -629,7 +629,7 @@ def install_py_libs():
 Install Python 2.7 libs
 
     """
-    sudo('apt-get install python-tk')
+    sudo('apt-get install -y python-tk')
     sudo('pip install scipy')
     sudo('pip install matplotlib')
     sudo('pip install pytrends')
