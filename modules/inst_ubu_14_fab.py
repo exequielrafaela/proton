@@ -1,4 +1,5 @@
 # Import Fabric's API module#
+from fabric.context_managers import shell_env
 from fabric.contrib.files import exists, sed, append, contains
 from fabric.decorators import task
 from fabric.api import sudo, settings, run, cd
@@ -678,7 +679,6 @@ Install Python 2.7 libs
     sudo('pip install scipy')
     sudo('pip install matplotlib')
     sudo('pip install pytrends')
-
 
 
 
