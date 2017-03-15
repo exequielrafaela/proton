@@ -1,5 +1,5 @@
 # Import Fabric's API module#
-from fabric.contrib.files import exists, sed
+from fabric.contrib.files import exists, sed, append
 from fabric.decorators import task
 from fabric.api import sudo, settings, run, cd
 from termcolor import colored
@@ -508,7 +508,9 @@ Install Oracle Java8
             # Set up the repository.
             sudo('add-apt-repository ppa:webupd8team/java')
             sudo('apt-get update')
+            run('echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections')
             sudo('apt-get install -y oracle-java8-installer')
+            sudo('apt-get install oracle-java8-set-default')
 
         else:
             print colored('===============================================================', 'blue')
@@ -536,7 +538,7 @@ Install maven 3.3.9
         # Default locale: en_US, platform encoding: ANSI_X3.4-1968
         # OS name: "linux", version: "3.13.0-112-generic", arch: "amd64", family: "unix"
         # sudo('apt-get install maven')
-        sudo('sudo apt-get install maven')
+        sudo('sudo apt-get install -y maven')
         maven_version = run('mvn -version')
         maven_version.strip()
         print "CURRENT MAVEN VER: " + maven_version
@@ -553,10 +555,15 @@ Install maven 3.3.9
                             run('export MAVEN_OPTS="-Xms256m -Xmx512m"')
                             run('export PATH=$M2:$PATH')
 
-                            run('echo "M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9" >> ~/.bashrc')
-                            run('echo "M2=$M2_HOME/bin" >> ~/.bashrc')
-                            run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
-                            run('echo "PATH=$M2:$PATH" >> ~/.bashrc')
+                            # run('echo "M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9" >> ~/.bashrc')
+                            # run('echo "M2=$M2_HOME/bin" >> ~/.bashrc')
+                            # run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
+                            # run('echo "PATH=$M2:$PATH >> ~/.bashrc"')
+
+                            append('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
+                            append('~/.bashrc', 'M2=$M2_HOME/bin', use_sudo=True)
+                            append('~/.bashrc', 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
+                            append('~/.bashrc', 'PATH=$M2:$PATH', use_sudo=True)
 
                 else:
                     run('wget http://apache.mirrors.lucidnetworks.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz')
@@ -569,10 +576,15 @@ Install maven 3.3.9
                             run('export MAVEN_OPTS="-Xms256m -Xmx512m"')
                             run('export PATH=$M2:$PATH')
 
-                            run('echo "M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9" >> ~/.bashrc')
-                            run('echo "M2=$M2_HOME/bin" >> ~/.bashrc')
-                            run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
-                            run('echo "PATH=$M2:$PATH" >> ~/.bashrc')
+                            # run('echo "M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9" >> ~/.bashrc')
+                            # run('echo "M2=$M2_HOME/bin" >> ~/.bashrc')
+                            # run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
+                            # run('echo "PATH=$M2:$PATH >> ~/.bashrc"')
+
+                            append('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
+                            append('~/.bashrc', 'M2=$M2_HOME/bin', use_sudo=True)
+                            append('~/.bashrc', 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
+                            append('~/.bashrc', 'PATH=$M2:$PATH', use_sudo=True)
 
                     else:
                         sudo('mkdir -p /usr/local/apache-maven')
@@ -584,10 +596,15 @@ Install maven 3.3.9
                             run('export MAVEN_OPTS="-Xms256m -Xmx512m"')
                             run('export PATH=$M2:$PATH')
 
-                            run('echo "M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9" >> ~/.bashrc')
-                            run('echo "M2=$M2_HOME/bin" >> ~/.bashrc')
-                            run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
-                            run('echo "PATH=$M2:$PATH" >> ~/.bashrc')
+                            # run('echo "M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9" >> ~/.bashrc')
+                            # run('echo "M2=$M2_HOME/bin" >> ~/.bashrc')
+                            # run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
+                            # run('echo "PATH=$M2:$PATH >> ~/.bashrc"')
+
+                            append('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
+                            append('~/.bashrc', 'M2=$M2_HOME/bin', use_sudo=True)
+                            append('~/.bashrc', 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
+                            append('~/.bashrc', 'PATH=$M2:$PATH', use_sudo=True)
 
             maven_final_ver = run('mvn -version')
             print colored('============================================', 'blue')
