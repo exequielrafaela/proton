@@ -573,7 +573,7 @@ Install maven 3.3.9
                             sudo('tar -xzvf apache-maven-3.3.9-bin.tar.gz')
                             run('export "M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9"')
                             run('export "M2=$M2_HOME/bin"')
-                            run('export "MAVEN_OPTS=\"-Xms256m -Xmx512m\""')
+                            run('export MAVEN_OPTS="-Xms256m -Xmx512m"')
                             run('export "PATH=$M2:$PATH"')
 
                             # run('echo "M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9" >> ~/.bashrc')
