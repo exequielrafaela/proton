@@ -682,33 +682,5 @@ Install Python 2.7 libs
 
 
 
-        # vagrant@jwt:/data$ mvn clean package -P development
-        # vagrant@jwt:/data$ mvn -DskipTests clean package -P development
-        # npm install -g grunt-cli
-
-        # 332 -rw-rw-r-- 1 vagrant vagrant 338245 Mar 14 19:51 frontend.zip
-        # vagrant@jwt:/data/jwt-cic-frontend/target$ pwd
-        # /data/jwt-cic-frontend/target
-
-        # vagrant@jwt:/data/jwt-cic-services$ cd target/
-        # vagrant@jwt:/data/jwt-cic-services/target$ java -jar jwt-cic-services-0.0.1-SNAPSHOT.jar &
-
-        # vagrant@jwt:/data/jwt-cic-frontend$ pwd
-        # /data/jwt-cic-frontend
-        # vagrant@jwt:/data/jwt-cic-frontend$ grunt serve
-        # vagrant@jwt:/data/jwt-cic-frontend$ npm run serve
-
-        # > jwt-cic-frontend@0.0.1 serve /data/jwt-cic-frontend
-        # > grunt serve
-
-        # npm ERR! weird error 1
-        # npm WARN This failure might be due to the use of legacy binary "node"
-        # npm WARN For further explanations, please read
-        # /usr/share/doc/nodejs/README.Debian
-
-        # npm ERR! not ok code 0
-
-
-
 
 

@@ -2,7 +2,7 @@
 set -e
 
 YUM_PACKAGE_NAME="python python-devl python-pip openssl-devel"
-DEB_PACKAGE_NAME="python2.7 python-dev python-pip libssl-dev build-essential libffi-dev"
+DEB_PACKAGE_NAME="python2.7 python-dev python-pip libssl-dev build-essential libffi-dev dtachs"
 # DEB_PACKAGE_NAME="python2.7 python-dev python-pip libssl-dev build-essential libffi-dev libgit2-0 libgit2-dev"
 
 
