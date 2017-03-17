@@ -679,6 +679,8 @@ Install Python 2.7 libs
     sudo('pip install scipy')
     sudo('pip install matplotlib')
     sudo('pip install pytrends')
+    sudo('pip install boto3')
+    sudo('pip install boto')
 
 
 
