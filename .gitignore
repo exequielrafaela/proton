@@ -32,3 +32,4 @@ config.pyci
 conf/AWS/*
 config.pyc
 scripts/pagerduty/*
+.idea/modules.xml

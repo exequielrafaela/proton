@@ -553,18 +553,6 @@ Install maven 3.3.9
                         sudo('mv apache-maven-3.3.9-bin.tar.gz /usr/local/apache-maven')
                         with cd('/usr/local/apache-maven'):
                             sudo('tar -xzvf apache-maven-3.3.9-bin.tar.gz')
-                            # run('export M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9')
-                            # run('export M2=$M2_HOME/bin')
-                            # run('export MAVEN_OPTS="-Xms256m -Xmx512m"')
-                            # run('export PATH=$M2:$PATH')
-
-                            # run('echo "M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9" >> ~/.bashrc')
-                            # run('echo "M2=$M2_HOME/bin" >> ~/.bashrc')
-                            # run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
-                            # run('echo "PATH=$M2:$PATH >> ~/.bashrc"')
-
-                            # if contains('~/.bashrc', 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9',
-                                        # exact=False, use_sudo=True, escape=True, shell=False, case_sensitive=True):
 
                             if contains(bashrc_path, 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True):
                                 print "maven 3.3.9 lines already added"
@@ -580,15 +568,6 @@ Install maven 3.3.9
                         sudo('mv apache-maven-3.3.9-bin.tar.gz /usr/local/apache-maven')
                         with cd('/usr/local/apache-maven'):
                             sudo('tar -xzvf apache-maven-3.3.9-bin.tar.gz')
-                            # run('export "M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9"')
-                            # run('export "M2=$M2_HOME/bin"')
-                            # run('export MAVEN_OPTS="-Xms256m -Xmx512m"')
-                            # run('export "PATH=$M2:$PATH"')
-
-                            # run('echo "M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9" >> ~/.bashrc')
-                            # run('echo "M2=$M2_HOME/bin" >> ~/.bashrc')
-                            # run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
-                            # run('echo "PATH=$M2:$PATH >> ~/.bashrc"')
 
                             if contains(bashrc_path, 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9',
                                      exact=False, use_sudo=False, escape=True, shell=False, case_sensitive=True):
@@ -604,15 +583,6 @@ Install maven 3.3.9
                         sudo('mv apache-maven-3.3.9-bin.tar.gz /usr/local/apache-maven')
                         with cd('/usr/local/apache-maven'):
                             sudo('tar -xzvf apache-maven-3.3.9-bin.tar.gz')
-                            # run('export M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9')
-                            # run('export M2=$M2_HOME/bin')
-                            # run('export MAVEN_OPTS="-Xms256m -Xmx512m"')
-                            # run('export PATH=$M2:$PATH')
-
-                            # run('echo "M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9" >> ~/.bashrc')
-                            # run('echo "M2=$M2_HOME/bin" >> ~/.bashrc')
-                            # run('echo "MAVEN_OPTS=\"-Xms256m -Xmx512m\"" >> ~/.bashrc')
-                            # run('echo "PATH=$M2:$PATH >> ~/.bashrc"')
 
                             if contains(bashrc_path, 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9',
                                      exact=False, use_sudo=False, escape=True, shell=False, case_sensitive=True):
@@ -653,6 +623,7 @@ Install Oracle Java8
                 sudo('npm cache clean -f')
                 sudo('npm install -g n')
                 sudo('n stable')
+                sudo('npm install -g grunt-cli')
                 # Not necesary sudo ln -sf /usr/local/n/versions/node/<VERSION>/bin/node /usr/bin/node
 
             else:
@@ -667,6 +638,7 @@ Install Oracle Java8
             sudo('npm cache clean -f')
             sudo('npm install -g n')
             sudo('n stable')
+            sudo('npm install -g grunt-cli')
 
 
 @task
