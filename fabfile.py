@@ -22,14 +22,10 @@
 # 3rd.locally-developed modules
 
 import logging
-import config
-# import sys
-# import os
-# import base64
-# import re
 
-# Import Fabric's API module#
 from fabric.api import env
+
+import config
 
 """
 # from fabric.api import hosts, sudo, settings, hide, env, execute, prompt, run, local, task, put, cd, get
@@ -51,8 +47,7 @@ from fabric.api import env
 
 from modules import chef_fab, conf_files_fab, download_files_fab, file_fab, inst_centos_7_fab, haproxy_fab, \
     inst_ubu_14_fab, key_fab, maltrail_fab, mysql_fab, nfs_fab, os_fab, passwd_fab, pkg_mgr_fab, rm_centos_7_fab, \
-    rsync_fab, show_fab, upload_files_fab, users_fab
-
+    rsync_fab, show_fab, upload_files_fab, users_fab, aws_fab
 
 print config.CONFIG_DIR
 

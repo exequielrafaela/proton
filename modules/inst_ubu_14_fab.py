@@ -1,5 +1,6 @@
 # Import Fabric's API module#
-from fabric.contrib.files import exists, sed
+from fabric.context_managers import shell_env
+from fabric.contrib.files import exists, sed, append, contains
 from fabric.decorators import task
 from fabric.api import sudo, settings, run, cd
 from termcolor import colored
@@ -211,6 +212,11 @@ Install Jenkins Server w/ prerequisites
         # Multiple SCMs
         # SCM Sync Configuration Plugin
         # Last Changes Plugin
+        # Bitbucket Branch Source Plugin
+        # Checkstyle (for processing PHP_CodeSniffer logfiles in Checkstyle format)
+        # Clover PHP (for processing PHPUnit's Clover XML logfile)
+        # DRY Plug-in (for processing phpcpd logfiles in PMD-CPD format) => Depends on Static Analysis Utilities plugin
+        # Bitbucket pullrequest builder plugin - to support it as code then => "Job DSL plugin"
 
 
 @task
@@ -223,8 +229,8 @@ Install and upgrade python 2.7 to Python 2.7.13
         print colored('===================================================================', 'blue')
         print colored('DEPENDENCIES PROVISIONING                          ', 'blue', attrs=['bold'])
         print colored('===================================================================', 'blue')
-        sudo('apt-get install build-essential checkinstall')
-        sudo('apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev '
+        sudo('apt-get install -y build-essential checkinstall')
+        sudo('apt-get install -y libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev '
              'tk-dev libgdbm-dev libc6-dev libbz2-dev')
 
         with cd('/usr/src'):
@@ -423,7 +429,7 @@ Install wordpress CMS on Ubuntu 14.04
         print colored('===================================================================', 'blue')
         sudo('apt-get install unzip')
 
-        sudo('mkdir /var/www/html')
+        sudo('mkdir -p /var/www/html')
         with cd('/var/www/html'):
             if exists('./latest.zip', use_sudo=True):
                 if exists('./wordpress', use_sudo=True):
@@ -432,6 +438,7 @@ Install wordpress CMS on Ubuntu 14.04
                     print colored('==========================================', 'yellow')
                 else:
                     sudo('unzip latest.zip')
+                    sudo('rm -rf ./latest.zip')
                     if exists('./wordpress', use_sudo=True):
                         print colored('======================================', 'blue')
                         print colored('WORDPRESS INSTALLED OK', 'blue', attrs=['bold'])
@@ -440,26 +447,28 @@ Install wordpress CMS on Ubuntu 14.04
             else:
                 sudo('wget https://wordpress.org/latest.zip')
                 sudo('unzip latest.zip')
+                sudo('rm -rf ./latest.zip')
                 if exists('./wordpress', use_sudo=True):
                     print colored('======================================', 'blue')
                     print colored('WORDPRESS INSTALLED OK', 'blue', attrs=['bold'])
                     print colored('======================================', 'blue')
 
+        sudo('apt-get install -y apache2 mysql-server')
+        sudo('apt-get install -y php5 libapache2-mod-php5 php5-mcrypt php5-mysql')
+
         sudo('chown -R www-data:www-data /var/www/html/*')
         file_fab.send("./conf/apache/wordpress.conf", "/etc/apache2/sites-available/wordpress.conf")
-        sudo('sudo a2dissite default')
+        file_fab.send("./conf/php/wordpress_php.ini", "/etc/php5/apache2/php.ini")
+        sudo('sudo a2dissite 000-default.conf')
         sudo('sudo a2ensite wordpress')
         sudo('service apache2 reload')
         sudo('service apache2 restart')
-
-        sudo('apt-get intall apache2 mysql-server')
-        sudo('apt-get install php5 libapache2-mod-php5 php5-mcrypt php5-mysql')
 
         sudo('chmod 757 /etc/apache2/mods-available/')
         sudo('chmod 666 /etc/apache2/mods-available/dir.conf')
         str_to_remove = "DirectoryIndex index.html index.cgi index.pl index.php index.xhtml index.htm"
         str_to_add = "DirectoryIndex index.php index.html index.cgi index.pl index.php index.xhtml index.htm"
-        sed('/etc/haproxy/haproxy.cfg', str_to_remove, str_to_add, limit='', use_sudo=True, backup='.bak', flags='',
+        sed('/etc/apache2/mods-enabled/dir.conf', str_to_remove, str_to_add, limit='', use_sudo=True, backup='.bak', flags='',
             shell=False)
         sudo('chmod 755 /etc/apache2/mods-available/')
         sudo('chmod 644 /etc/apache2/mods-available/dir.conf')
@@ -468,5 +477,185 @@ Install wordpress CMS on Ubuntu 14.04
         mysql_fab.create_db("wp_binbash_db","root")
         mysql_fab.create_local_user("root", "wp_binbash_user", db_user_pass="wp_binbash_pass")
         mysql_fab.grant_user_db("wp_binbash_db", "wp_binbash_user", db_user_pass="wp_binbash_pass")
+
+
+@task
+def install_oracle_java8():
+    """
+Install Oracle Java8
+
+    """
+    with settings(warn_only=False):
+        print colored('===================================================================', 'blue')
+        print colored('INSTALLING ORACLE JAVA 1.8.0', 'blue', attrs=['bold'])
+        print colored('===================================================================', 'blue')
+        # add conditonal to validate java version
+        # vagrant@jwt:/data$ java -version
+        # java version "1.8.0_121"
+        # Java(TM) SE Runtime Environment (build 1.8.0_121-b13)
+        # Java HotSpot(TM) 64-Bit Server VM (build 25.121-b13, mixed mode)
+        # vagrant@jwt:~$ sudo update-alternatives --config java
+        # There are 2 choices for the alternative java (providing /usr/bin/java).
+        # Selection    Path                                            Priority   Status
+        # ------------------------------------------------------------
+        #  0            /usr/lib/jvm/java-8-oracle/jre/bin/java          1081      auto mode
+        #  1            /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java   1071      manual mode
+        #* 2            /usr/lib/jvm/java-8-oracle/jre/bin/java          1081      manual mode
+        #sudo('update-alternatives --config java')
+        java_version = run('java -version')
+        java_version.strip()
+        print "CURRENT JAVA VER: " + java_version
+        if "1.8.0" not in java_version:
+            # Set up the repository.
+            sudo('add-apt-repository ppa:webupd8team/java -y')
+            sudo('apt-get update')
+            run('echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections')
+            sudo('apt-get install -y oracle-java8-installer')
+            sudo('apt-get install oracle-java8-set-default')
+
+        else:
+            print colored('===============================================================', 'blue')
+            print colored('JAVA VERSION: ' + java_version + ' INSTALLED   ', 'blue', attrs=['bold'])
+            print colored('===============================================================', 'blue')
+
+
+@task
+def install_maven(username):
+    """
+Install maven 3.3.9
+
+    """
+    with settings(warn_only=False):
+        print colored('================================', 'blue')
+        print colored('INSTALLING MAVEN', 'blue', attrs=['bold'])
+        print colored('================================', 'blue')
+        # Java dependencies
+        # Upgrade to MAVEN 3.3.9 (http://javedmandary.blogspot.com.ar/2016/09/install-maven-339-on-ubuntu.html)
+        # vagrant@jwt:/data$ mvn -version
+        # Apache Maven 3.0.5
+        # Maven home: /usr/share/maven
+        # Java version: 1.8.0_121, vendor: Oracle Corporation
+        # Java home: /usr/lib/jvm/java-8-oracle/jre
+        # Default locale: en_US, platform encoding: ANSI_X3.4-1968
+        # OS name: "linux", version: "3.13.0-112-generic", arch: "amd64", family: "unix"
+        # sudo('apt-get install maven')
+        sudo('sudo apt-get install -y maven')
+        maven_version = run('mvn -version')
+        maven_version.strip()
+        print "CURRENT MAVEN VER: " + maven_version
+
+        if "3.3.9" not in maven_version:
+            with cd('/home/' + username):
+                bashrc_path = '/home/' + username + '/.bashrc'
+
+                if exists('/home/' + username + '/apache-maven-3.3.9-bin.tar.gz', use_sudo=True):
+                    if exists('/usr/local/apache-maven', use_sudo=True):
+                        sudo('mv apache-maven-3.3.9-bin.tar.gz /usr/local/apache-maven')
+                        with cd('/usr/local/apache-maven'):
+                            sudo('tar -xzvf apache-maven-3.3.9-bin.tar.gz')
+
+                            if contains(bashrc_path, 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True):
+                                print "maven 3.3.9 lines already added"
+                            else:
+                                append(bashrc_path, 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
+                                append(bashrc_path, 'M2=$M2_HOME/bin', use_sudo=True)
+                                append(bashrc_path, 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
+                                append(bashrc_path, 'PATH=$M2:$PATH', use_sudo=True)
+
+                else:
+                    run('wget http://apache.mirrors.lucidnetworks.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz')
+                    if exists('/usr/local/apache-maven', use_sudo=True):
+                        sudo('mv apache-maven-3.3.9-bin.tar.gz /usr/local/apache-maven')
+                        with cd('/usr/local/apache-maven'):
+                            sudo('tar -xzvf apache-maven-3.3.9-bin.tar.gz')
+
+                            if contains(bashrc_path, 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9',
+                                     exact=False, use_sudo=False, escape=True, shell=False, case_sensitive=True):
+                                print "maven 3.3.9 lines already added"
+                            else:
+                                append(bashrc_path, 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
+                                append(bashrc_path, 'M2=$M2_HOME/bin', use_sudo=True)
+                                append(bashrc_path, 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
+                                append(bashrc_path, 'PATH=$M2:$PATH', use_sudo=True)
+
+                    else:
+                        sudo('mkdir -p /usr/local/apache-maven')
+                        sudo('mv apache-maven-3.3.9-bin.tar.gz /usr/local/apache-maven')
+                        with cd('/usr/local/apache-maven'):
+                            sudo('tar -xzvf apache-maven-3.3.9-bin.tar.gz')
+
+                            if contains(bashrc_path, 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9',
+                                     exact=False, use_sudo=False, escape=True, shell=False, case_sensitive=True):
+                                print "maven 3.3.9 lines already added"
+                            else:
+                                append(bashrc_path, 'M2_HOME=/usr/local/apache-maven/apache-maven-3.3.9', use_sudo=True)
+                                append(bashrc_path, 'M2=$M2_HOME/bin', use_sudo=True)
+                                append(bashrc_path, 'MAVEN_OPTS="-Xms256m -Xmx512m"', use_sudo=True)
+                                append(bashrc_path, 'PATH=$M2:$PATH', use_sudo=True)
+
+            maven_final_ver = run('mvn -version')
+            print colored('============================================', 'blue')
+            print colored('MAVEN VERSION: ' + maven_final_ver , 'blue', attrs=['bold'])
+            print colored('============================================', 'blue')
+
+        else:
+            print colored('==========================================================', 'blue')
+            print colored('MAVEN VERSION up to date: ' + maven_version, 'blue', attrs=['bold'])
+            print colored('==========================================================', 'blue')
+
+
+@task
+def install_node():
+    """
+Install Node
+
+    """
+    with settings(warn_only=False):
+        # NodeJs
+        sudo('apt-get install -y node nodejs npm')
+
+        try:
+            run('node -v')
+            node_version = run('node -v')
+            node_version.strip()
+            print "CURRENT NODE VER: " + node_version
+            if "7.6.0" not in node_version:
+                sudo('npm cache clean -f')
+                sudo('npm install -g n')
+                sudo('n stable')
+                sudo('npm install -g grunt-cli')
+                sudo('npm install -g bower')
+                # Not necesary sudo ln -sf /usr/local/n/versions/node/<VERSION>/bin/node /usr/bin/node
+
+            else:
+                print colored('===============================================================', 'blue')
+                print colored('NODE VERSION: ' + node_version + ' INSTALLED   ', 'blue', attrs=['bold'])
+                print colored('===============================================================', 'blue')
+
+        except SystemExit:
+            print colored('==============================================', 'blue')
+            print colored('NODE VERSION: NOT INSTALLED   ', 'blue', attrs=['bold'])
+            print colored('==============================================', 'blue')
+            sudo('npm cache clean -f')
+            sudo('npm install -g n')
+            sudo('n stable')
+            sudo('npm install -g grunt-cli')
+
+
+@task
+def install_py_libs():
+    """
+Install Python 2.7 libs
+
+    """
+    sudo('apt-get install -y python-tk')
+    sudo('pip install scipy')
+    sudo('pip install matplotlib')
+    sudo('pip install pytrends')
+    sudo('pip install boto3')
+    sudo('pip install boto')
+
+
+
 
 

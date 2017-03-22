@@ -1,13 +1,18 @@
-#pip freeze > requirements.txt
-#pip install -r /path/to/requirements.txt
+# pip freeze > requirements.txt
+# pip install -r /path/to/requirements.txt
+# pygit2
+paramiko
 Fabric
 iptools
 passlib
 termcolor
-
-
-
-
-
-
-
+pyparsing
+appdirs
+cffi
+awscli
+requests
+simplejson
+ujson
+pagerduty
+pygerduty
+pagerduty-api

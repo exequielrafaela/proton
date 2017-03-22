@@ -2,7 +2,9 @@
 set -e
 
 YUM_PACKAGE_NAME="python python-devl python-pip openssl-devel"
-DEB_PACKAGE_NAME="python2.7 python-dev python-pip libssl-dev"
+DEB_PACKAGE_NAME="python2.7 python-dev python-pip libssl-dev build-essential libffi-dev dtach"
+# DEB_PACKAGE_NAME="python2.7 python-dev python-pip libssl-dev build-essential libffi-dev libgit2-0 libgit2-dev"
+
 
  if cat /etc/*release | grep ^NAME | grep CentOS; then
     echo "====================================="
@@ -33,6 +35,8 @@ DEB_PACKAGE_NAME="python2.7 python-dev python-pip libssl-dev"
     apt-get autoremove -y
     apt-get install -y $DEB_PACKAGE_NAME
     pip install --upgrade pip
+    pip uninstall -y six
+    pip install --upgrade six
     pip install -r requirements.txt
  elif cat /etc/*release | grep ^NAME | grep Debian ; then
     echo "====================================="

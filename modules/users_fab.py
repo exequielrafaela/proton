@@ -32,7 +32,7 @@ Add a user in RedHat/Centos based OS in wheel group (sudo)
                 print colored('"' + usernamec + '" doesnt exists', 'blue')
                 print colored('WILL BE CREATED', 'blue')
                 print colored('##################################', 'blue')
-                sudo('useradd ' + usernamec + ' -m -d /home/' + usernamec)
+                sudo('/usr/sbin/useradd ' + usernamec + ' -m -d /home/' + usernamec)
                 # sudo('echo "' + usernamec + ':' + usernamec + '" | chpasswd')
                 sudo('gpasswd -a ' + usernamec + ' wheel')
         except SystemExit:

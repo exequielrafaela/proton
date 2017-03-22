@@ -28,4 +28,8 @@ logs/check_ssh.log
 key_fab.pyc
 show_fab.pyc
 .gitignore
+config.pyci
+conf/AWS/*
 config.pyc
+scripts/pagerduty/*
+.idea/modules.xml
