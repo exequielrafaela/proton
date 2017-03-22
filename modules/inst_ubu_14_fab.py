@@ -607,7 +607,7 @@ Install maven 3.3.9
 @task
 def install_node():
     """
-Install Oracle Java8
+Install Node
 
     """
     with settings(warn_only=False):
@@ -624,6 +624,7 @@ Install Oracle Java8
                 sudo('npm install -g n')
                 sudo('n stable')
                 sudo('npm install -g grunt-cli')
+                sudo('npm install -g bower')
                 # Not necesary sudo ln -sf /usr/local/n/versions/node/<VERSION>/bin/node /usr/bin/node
 
             else:

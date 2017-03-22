@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 # This script requires pygerduty: https://github.com/dropbox/pygerduty
-# https://gist.github.com/chrisgagne/100159a100fd78e45858
 
 # Given a start date and end date, this sample will export the description and
 # notes from all incidents to a CSV file. The CSV file is formatted for use
@@ -16,9 +15,12 @@
 # Example: python incidents.py 2015-01-01 2015-03-31
 
 import pygerduty
-pager = pygerduty.PagerDuty("[subdomain]", "[api key]")
+pager = pygerduty.PagerDuty("btr-consulting", "tAA4wF6yrX1Xrd1nx1Js")
+
 
 import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 import os.path
 
 startdate, enddate = sys.argv[1:]
@@ -30,6 +32,9 @@ startdate, enddate = sys.argv[1:]
 def escape( str ):
 	str = str.replace("\"", "\"\"")
 	return str
+
+def change_text( text ):
+    return text.encode('utf-8')
 
 my_filename = sys.path[0] + "/incident_notes_%s_-_%s.csv" % (startdate, enddate)
 with open(my_filename, 'w',1) as the_file:
@@ -45,6 +50,7 @@ with open(my_filename, 'w',1) as the_file:
 			my_count += 1
 			if my_count > 1:
 				my_line += "\n"
-			my_line += "%s, %s: %s" % (escape(note.user.name), escape(note.created_at), escape(note.content))
+                        print note.content
+			my_line += "%s, %s: %s" % (escape(note.user.name), escape(note.created_at), str(note.content.encode("utf-8")))
 		my_line += "\"\n"
 		the_file.write(my_line)
