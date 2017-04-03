@@ -5,6 +5,8 @@
       <module fileurl="file://$PROJECT_DIR$/../.idea/Programming.iml" filepath="$PROJECT_DIR$/../.idea/Programming.iml" />
       <module fileurl="file://$USER_HOME$/Globant/grey_repo/deploy_scripts/.idea/deploy_scripts.iml" filepath="$USER_HOME$/Globant/grey_repo/deploy_scripts/.idea/deploy_scripts.iml" />
       <module fileurl="file://$USER_HOME$/Globant/grey_repo/.idea/grey_repo.iml" filepath="$USER_HOME$/Globant/grey_repo/.idea/grey_repo.iml" />
+      <module fileurl="file://$USER_HOME$/Globant/JWT/jwt_repos/.idea/jwt_repos.iml" filepath="$USER_HOME$/Globant/JWT/jwt_repos/.idea/jwt_repos.iml" />
+      <module fileurl="file://$USER_HOME$/Binbash/repos/.idea/repos.iml" filepath="$USER_HOME$/Binbash/repos/.idea/repos.iml" />
       <module fileurl="file://$USER_HOME$/Binbash/Projects/BTR/tunubi.com/.idea/tunubi.com.iml" filepath="$USER_HOME$/Binbash/Projects/BTR/tunubi.com/.idea/tunubi.com.iml" />
       <module fileurl="file://$USER_HOME$/vagrant_projects/.idea/vagrant_projects.iml" filepath="$USER_HOME$/vagrant_projects/.idea/vagrant_projects.iml" />
     </modules>

@@ -640,6 +640,7 @@ Install Node
             sudo('npm install -g n')
             sudo('n stable')
             sudo('npm install -g grunt-cli')
+            sudo('npm install -g bower')
 
 
 @task

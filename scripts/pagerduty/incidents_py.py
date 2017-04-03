@@ -6,16 +6,16 @@ import json
 from datetime import date, timedelta
 
 # Your PagerDuty API key.  A read-only key will work for this.
-AUTH_TOKEN = 'tAA4wF6yrX1Xrd1nx1Js'
+AUTH_TOKEN = 'key'
 # The API base url, make sure to include the subdomain
-BASE_URL = 'https://btr-consulting.pagerduty.com/api/v1'
+BASE_URL = 'https://subdomain.pagerduty.com/api/v1'
 # The service ID that you would like to query.  You can leave this blank to query all services.
 service_id = ""
 # The start date that you would like to search.  It's currently setup to start yesterday.
 # yesterday = date.today() - timedelta(1)
-since = '2017-03-09'
+since = '2017-03-20'
 # The end date that you would like to search.
-until = '2017-03-16'
+until = '2017-03-26'
 
 HEADERS = {
     'Authorization': 'Token token={0}'.format(AUTH_TOKEN),
