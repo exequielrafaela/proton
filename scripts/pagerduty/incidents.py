@@ -15,7 +15,7 @@
 # Example: python incidents.py 2015-01-01 2015-03-31
 
 import pygerduty
-pager = pygerduty.PagerDuty("btr-consulting", "tAA4wF6yrX1Xrd1nx1Js")
+pager = pygerduty.PagerDuty("", "")
 
 
 import sys
