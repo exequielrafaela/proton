@@ -6,9 +6,9 @@ import json
 from datetime import date, timedelta
 
 # Your PagerDuty API key.  A read-only key will work for this.
-AUTH_TOKEN = 'tAA4wF6yrX1Xrd1nx1Js'
+AUTH_TOKEN = ''
 # The API base url, make sure to include the subdomain
-BASE_URL = 'https://btr-consulting.pagerduty.com/api/v1'
+BASE_URL = 'https://domain.pagerduty.com/api/v1'
 # The service ID that you would like to query.  You can leave this blank to query all services.
 service_id = ""
 # The start date that you would like to search.  It's currently setup to start yesterday.
