@@ -32,4 +32,6 @@ config.pyci
 conf/AWS/*
 config.pyc
 scripts/pagerduty/*
+scripts/pagerduty/incidents.py
+scripts/pagerduty/incidents_py.py
 .idea/modules.xml
