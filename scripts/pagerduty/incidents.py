@@ -16,7 +16,7 @@
 
 import pygerduty
 pager = pygerduty.PagerDuty("pd-subdomain", "key")
-
+pager = pygerduty.PagerDuty("", "")
 
 import sys
 reload(sys)

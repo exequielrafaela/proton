@@ -9,6 +9,9 @@ from datetime import date, timedelta
 AUTH_TOKEN = 'key'
 # The API base url, make sure to include the subdomain
 BASE_URL = 'https://subdomain.pagerduty.com/api/v1'
+AUTH_TOKEN = ''
+# The API base url, make sure to include the subdomain
+BASE_URL = 'https://domain.pagerduty.com/api/v1'
 # The service ID that you would like to query.  You can leave this blank to query all services.
 service_id = ""
 # The start date that you would like to search.  It's currently setup to start yesterday.
